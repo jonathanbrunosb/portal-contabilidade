@@ -1,0 +1,82 @@
+[
+  {
+    "id": "n1",
+    "categoria": "ANEEL",
+    "titulo": "Agenda regulatória: pontos de atenção para o fechamento",
+    "resumo": "Confira os temas para análise da equipe e a preparação das evidências regulatórias.",
+    "conteudoCompleto": "CONTEÚDO DEMONSTRATIVO — não constitui norma, orientação regulatória ou deliberação vigente.\nEsta publicação ilustra o fluxo de comunicação da Gerência. Substitua por conteúdo revisado e aprovado, incluindo a fonte primária e a data de vigência confirmada.\nPróximos passos: avaliar os processos impactados, designar responsáveis e registrar as evidências da análise. Compartilhe o resultado no checkpoint do time.",
+    "dataPublicacao": "2026-09-14",
+    "dataVigencia": null,
+    "fonte": "Pauta demonstrativa · acompanhamento ANEEL",
+    "link": null,
+    "documento": null,
+    "empresasImpactadas": [
+      "Empresa A (exemplo)",
+      "Empresa B (exemplo)"
+    ],
+    "areaResponsavel": "Normas e Reporte",
+    "responsavel": "Marina Oliveira",
+    "nivelImpacto": "Alto",
+    "status": "Publicado"
+  },
+  {
+    "id": "n2",
+    "categoria": "CPC / IFRS",
+    "titulo": "IFRS 18: preparação e avaliação de impactos",
+    "resumo": "Uma pauta para discutir apresentação, reporte e adequação dos processos contábeis.",
+    "conteudoCompleto": "CONTEÚDO DEMONSTRATIVO — não constitui norma, orientação regulatória ou deliberação vigente.\nEsta publicação ilustra o fluxo de comunicação da Gerência. Substitua por conteúdo revisado e aprovado, incluindo a fonte primária e a data de vigência confirmada.\nPróximos passos: avaliar os processos impactados, designar responsáveis e registrar as evidências da análise. Compartilhe o resultado no checkpoint do time.",
+    "dataPublicacao": "2026-09-13",
+    "dataVigencia": null,
+    "fonte": "Pauta demonstrativa · normas e reporte",
+    "link": null,
+    "documento": null,
+    "empresasImpactadas": [
+      "Empresa A (exemplo)",
+      "Empresa B (exemplo)"
+    ],
+    "areaResponsavel": "Normas e Reporte",
+    "responsavel": "Marina Oliveira",
+    "nivelImpacto": "Alto",
+    "status": "Publicado"
+  },
+  {
+    "id": "n3",
+    "categoria": "DELIBERAÇÃO DO GRUPO",
+    "titulo": "Alinhamento das diretrizes de fechamento",
+    "resumo": "Responsabilidades, prazos e aprovações reunidos para o ciclo de setembro.",
+    "conteudoCompleto": "CONTEÚDO DEMONSTRATIVO — não constitui norma, orientação regulatória ou deliberação vigente.\nEsta publicação ilustra o fluxo de comunicação da Gerência. Substitua por conteúdo revisado e aprovado, incluindo a fonte primária e a data de vigência confirmada.\nPróximos passos: avaliar os processos impactados, designar responsáveis e registrar as evidências da análise. Compartilhe o resultado no checkpoint do time.",
+    "dataPublicacao": "2026-09-12",
+    "dataVigencia": null,
+    "fonte": "Exemplo de deliberação corporativa",
+    "link": null,
+    "documento": null,
+    "empresasImpactadas": [
+      "Empresa A (exemplo)",
+      "Empresa B (exemplo)"
+    ],
+    "areaResponsavel": "Gerência de Contabilidade",
+    "responsavel": "Marina Oliveira",
+    "nivelImpacto": "Moderado",
+    "status": "Publicado"
+  },
+  {
+    "id": "n4",
+    "categoria": "COMUNICADO INTERNO",
+    "titulo": "Conciliações: novo roteiro de evidências",
+    "resumo": "Conheça o modelo de organização dos suportes e a rotina de revisão entre os times.",
+    "conteudoCompleto": "CONTEÚDO DEMONSTRATIVO — não constitui norma, orientação regulatória ou deliberação vigente.\nEsta publicação ilustra o fluxo de comunicação da Gerência. Substitua por conteúdo revisado e aprovado, incluindo a fonte primária e a data de vigência confirmada.\nPróximos passos: avaliar os processos impactados, designar responsáveis e registrar as evidências da análise. Compartilhe o resultado no checkpoint do time.",
+    "dataPublicacao": "2026-09-11",
+    "dataVigencia": null,
+    "fonte": "Exemplo de comunicado interno",
+    "link": null,
+    "documento": null,
+    "empresasImpactadas": [
+      "Empresa A (exemplo)",
+      "Empresa B (exemplo)"
+    ],
+    "areaResponsavel": "Gerência de Contabilidade",
+    "responsavel": "Jonathan Bruno",
+    "nivelImpacto": "Baixo",
+    "status": "Publicado"
+  }
+]

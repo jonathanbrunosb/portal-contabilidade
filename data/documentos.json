@@ -1,0 +1,145 @@
+[
+  {
+    "id": "d1",
+    "categoria": "Políticas",
+    "titulo": "Políticas — guia de referência",
+    "descricao": "Modelo local para organização e consulta do acervo da Gerência.",
+    "formato": "HTML",
+    "arquivo": "assets/documents/documento-01.html",
+    "responsavel": "Normas e Reporte",
+    "data": "2026-09-14",
+    "versao": "0.1 · exemplo"
+  },
+  {
+    "id": "d2",
+    "categoria": "Normas CPC",
+    "titulo": "Normas CPC — guia de referência",
+    "descricao": "Modelo local para organização e consulta do acervo da Gerência.",
+    "formato": "HTML",
+    "arquivo": "assets/documents/documento-02.html",
+    "responsavel": "Normas e Reporte",
+    "data": "2026-09-14",
+    "versao": "0.1 · exemplo"
+  },
+  {
+    "id": "d3",
+    "categoria": "IFRS",
+    "titulo": "IFRS — guia de referência",
+    "descricao": "Modelo local para organização e consulta do acervo da Gerência.",
+    "formato": "HTML",
+    "arquivo": "assets/documents/documento-03.html",
+    "responsavel": "Normas e Reporte",
+    "data": "2026-09-14",
+    "versao": "0.1 · exemplo"
+  },
+  {
+    "id": "d4",
+    "categoria": "ANEEL",
+    "titulo": "ANEEL — guia de referência",
+    "descricao": "Modelo local para organização e consulta do acervo da Gerência.",
+    "formato": "HTML",
+    "arquivo": "assets/documents/documento-04.html",
+    "responsavel": "Normas e Reporte",
+    "data": "2026-09-14",
+    "versao": "0.1 · exemplo"
+  },
+  {
+    "id": "d5",
+    "categoria": "Procedimentos internos",
+    "titulo": "Procedimentos internos — guia de referência",
+    "descricao": "Modelo local para organização e consulta do acervo da Gerência.",
+    "formato": "HTML",
+    "arquivo": "assets/documents/documento-05.html",
+    "responsavel": "Normas e Reporte",
+    "data": "2026-09-14",
+    "versao": "0.1 · exemplo"
+  },
+  {
+    "id": "d6",
+    "categoria": "Manuais",
+    "titulo": "Manuais — guia de referência",
+    "descricao": "Modelo local para organização e consulta do acervo da Gerência.",
+    "formato": "HTML",
+    "arquivo": "assets/documents/documento-06.html",
+    "responsavel": "Normas e Reporte",
+    "data": "2026-09-14",
+    "versao": "0.1 · exemplo"
+  },
+  {
+    "id": "d7",
+    "categoria": "Fechamento",
+    "titulo": "Fechamento — guia de referência",
+    "descricao": "Modelo local para organização e consulta do acervo da Gerência.",
+    "formato": "HTML",
+    "arquivo": "assets/documents/documento-07.html",
+    "responsavel": "Normas e Reporte",
+    "data": "2026-09-14",
+    "versao": "0.1 · exemplo"
+  },
+  {
+    "id": "d8",
+    "categoria": "Auditoria",
+    "titulo": "Auditoria — guia de referência",
+    "descricao": "Modelo local para organização e consulta do acervo da Gerência.",
+    "formato": "HTML",
+    "arquivo": "assets/documents/documento-08.html",
+    "responsavel": "Normas e Reporte",
+    "data": "2026-09-14",
+    "versao": "0.1 · exemplo"
+  },
+  {
+    "id": "d9",
+    "categoria": "Demonstrações Financeiras",
+    "titulo": "Demonstrações Financeiras — guia de referência",
+    "descricao": "Modelo local para organização e consulta do acervo da Gerência.",
+    "formato": "HTML",
+    "arquivo": "assets/documents/documento-09.html",
+    "responsavel": "Normas e Reporte",
+    "data": "2026-09-14",
+    "versao": "0.1 · exemplo"
+  },
+  {
+    "id": "d10",
+    "categoria": "ECD",
+    "titulo": "ECD — guia de referência",
+    "descricao": "Modelo local para organização e consulta do acervo da Gerência.",
+    "formato": "HTML",
+    "arquivo": "assets/documents/documento-10.html",
+    "responsavel": "Normas e Reporte",
+    "data": "2026-09-14",
+    "versao": "0.1 · exemplo"
+  },
+  {
+    "id": "d11",
+    "categoria": "ECF",
+    "titulo": "ECF — guia de referência",
+    "descricao": "Modelo local para organização e consulta do acervo da Gerência.",
+    "formato": "HTML",
+    "arquivo": "assets/documents/documento-11.html",
+    "responsavel": "Normas e Reporte",
+    "data": "2026-09-14",
+    "versao": "0.1 · exemplo"
+  },
+  {
+    "id": "d12",
+    "categoria": "Conciliações",
+    "titulo": "Conciliações — guia de referência",
+    "descricao": "Modelo local para organização e consulta do acervo da Gerência.",
+    "formato": "HTML",
+    "arquivo": "assets/documents/documento-12.html",
+    "responsavel": "Normas e Reporte",
+    "data": "2026-09-14",
+    "versao": "0.1 · exemplo"
+  },
+  {
+    "id": "d13",
+    "categoria": "Relatórios",
+    "titulo": "Relatórios — guia de referência",
+    "descricao": "Modelo local para organização e consulta do acervo da Gerência.",
+    "formato": "HTML",
+    "arquivo": "assets/documents/documento-13.html",
+    "responsavel": "Normas e Reporte",
+    "data": "2026-09-14",
+    "versao": "0.1 · exemplo"
+  }
+]

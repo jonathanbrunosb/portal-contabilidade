@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Portal da Gerência de Contabilidade: comunicação, pessoas, processos e governança.">
+  <title>Portal Contabilidade | Gerência Corporativa</title>
+  <link rel="icon" href="assets/logos/portal.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Ir para o conteúdo</a>
+  <button id="scrim" class="scrim" aria-label="Fechar menu" hidden></button>
+  <aside class="sidebar" id="sidebar" aria-label="Menu principal">
+    <a class="brand" href="#inicio"><img src="assets/logos/portal.svg" width="38" height="38" alt=""><span>Portal Contabilidade<small>GERÊNCIA CORPORATIVA</small></span></a>
+    <button class="mobile-close icon-btn" id="close-menu" aria-label="Fechar menu">×</button>
+    <section class="profile" id="profile"><img class="avatar large" src="assets/users/default.svg" alt="Avatar padrão"><h2>Colaborador não identificado</h2><p>Identificação pela matrícula</p></section>
+    <nav id="navigation"></nav>
+    <div class="sidebar-footer"><span class="live-dot"></span> Ambiente local <span class="version">v1.0</span><small>Conectando pessoas e conhecimento.</small></div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar">
+      <button id="menu-toggle" class="icon-btn hamburger" aria-label="Abrir menu" aria-controls="sidebar" aria-expanded="false"></button>
+      <form class="global-search" id="search-form" role="search"><span data-icon="search"></span><input id="global-search" type="search" aria-label="Busca global" placeholder="Buscar processo, sistema, colaborador, deliberação, norma ou documento..." autocomplete="off"><kbd>/</kbd></form>
+      <div class="top-actions"><button class="icon-btn notification-btn" id="notifications" aria-label="Ver notificações"><span data-icon="bell"></span><i></i></button><button class="icon-btn" id="settings" aria-label="Configurações"><span data-icon="settings"></span></button><div class="top-user" id="top-user"></div></div>
+    </header>
+    <main id="main" tabindex="-1">
+      <div class="page-context" id="inicio"><span>Workspace <b>/</b> Visão geral</span><span class="context-date">14 de setembro de 2026 <span class="demo-label">Demonstração</span></span></div>
+      <section class="hero" aria-labelledby="portal-title"><div class="hero-copy"><div class="eyebrow"><span class="live-dot"></span> INFORMAÇÃO QUE CONECTA. GESTÃO QUE EVOLUI.</div><h1 id="portal-title">Portal da Gerência<br>de Contabilidade</h1><p>Ambiente integrado para comunicação, gestão, estrutura organizacional, acessos internos e acompanhamento dos principais processos da área.</p><a href="#painel" class="hero-link">Acompanhar a gerência <span aria-hidden="true">↗</span></a></div><div class="hero-metrics" id="hero-metrics"></div></section>
+      <div id="load-error" role="alert" hidden></div>
+      <section id="search-section" class="panel search-section" hidden aria-labelledby="search-title"><div class="section-heading"><h2 id="search-title">Resultados da busca</h2><button id="clear-search" class="text-btn">Limpar busca ×</button></div><p id="search-count" aria-live="polite"></p><div id="search-results" class="card-grid"></div></section>
+      <div class="home-columns">
+        <section class="panel content-panel" id="central" aria-labelledby="central-title"><div class="section-heading"><div><span class="section-kicker">FIQUE POR DENTRO</span><h2 id="central-title">Central de conteúdo</h2></div><span class="edition">SETEMBRO / 2026</span></div>
+          <div class="tabs" role="tablist" aria-label="Central de conteúdo"><button id="tab-newsletter" role="tab" aria-selected="true" aria-controls="content-view" data-tab="newsletter">Newsletter Contábil</button><button id="tab-noticias" role="tab" aria-selected="false" tabindex="-1" aria-controls="content-view" data-tab="noticias">Notícias & Impactos</button><button id="tab-sistemas" role="tab" aria-selected="false" tabindex="-1" aria-controls="content-view" data-tab="sistemas">Sistemas da Área</button><button id="tab-documentos" role="tab" aria-selected="false" tabindex="-1" aria-controls="content-view" data-tab="documentos">Documentos & Normas</button></div>
+          <div id="content-view" role="tabpanel" aria-labelledby="tab-newsletter" tabindex="0"><p class="loading">Carregando a central de conteúdo…</p></div>
+        </section>
+        <section class="panel teams-panel" id="equipes" aria-labelledby="teams-title"><div class="section-heading"><div><span class="section-kicker">PESSOAS & RESPONSABILIDADES</span><h2 id="teams-title">Estrutura das equipes</h2></div><span data-icon="users"></span></div><div class="segmented" role="tablist" aria-label="Estrutura das equipes"><button id="team-tab-equipes" role="tab" aria-selected="true" aria-controls="teams-view" data-team-tab="equipes">Equipes</button><button id="team-tab-organograma" role="tab" aria-selected="false" tabindex="-1" aria-controls="teams-view" data-team-tab="organograma">Organograma</button></div><div id="teams-view" role="tabpanel" aria-labelledby="team-tab-equipes" tabindex="0"></div></section>
+      </div>
+      <section id="painel" aria-labelledby="panel-title"><div class="section-heading dashboard-heading"><div><span class="section-kicker">ACOMPANHAMENTO EXECUTIVO</span><h2 id="panel-title">Painel da gerência</h2></div><span class="period"><span class="live-dot"></span> Competência: setembro 2026</span></div><div class="kpi-grid" id="kpis"></div>
+        <div class="management-columns"><section class="panel" id="processos"><div class="section-heading"><h3>Processos críticos</h3><span class="muted">Visão consolidada</span></div><div class="table-scroll"><table><thead><tr><th scope="col">Processo</th><th scope="col">Responsável</th><th scope="col">Prazo</th><th scope="col">Status</th></tr></thead><tbody id="process-table"></tbody></table></div></section><section class="panel" id="agenda"><div class="section-heading"><h3>Agenda da gerência</h3><span data-icon="calendar"></span></div><div id="agenda-list"></div></section></div>
+        <section class="panel deliveries-panel" id="entregas"><div class="section-heading"><div><span class="section-kicker">14 — 20 SETEMBRO</span><h3>Entregas da semana</h3></div><span class="muted">Prioridades dos times</span></div><div id="deliveries" class="deliveries"></div></section>
+      </section>
+      <footer class="footer"><span><strong>Portal Contabilidade</strong> · Gerência Corporativa</span><span>Dados ilustrativos · Atualização da base: 14/09/2026</span></footer>
+    </main>
+  </div>
+  <dialog id="detail-dialog" aria-labelledby="dialog-title"><div class="dialog-top"><span id="dialog-category" class="section-kicker"></span><button class="icon-btn" id="close-dialog" aria-label="Fechar detalhes">×</button></div><h2 id="dialog-title"></h2><div id="dialog-body"></div></dialog>
+  <div id="toast" role="status" hidden></div>
+</body>
+</html>

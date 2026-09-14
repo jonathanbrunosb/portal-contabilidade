@@ -1,0 +1,44 @@
+[
+  {
+    "id": "u1",
+    "matricula": "2026001",
+    "nome": "Jonathan Bruno",
+    "cargo": "Coordenador Corporativo de Contabilidade",
+    "area": "Contabilidade IV",
+    "perfil": "Gestor",
+    "equipe": "Contabilidade IV",
+    "foto": "assets/users/2026001.svg",
+    "permissoes": [
+      "conteudo",
+      "time"
+    ]
+  },
+  {
+    "id": "u2",
+    "matricula": "123456",
+    "nome": "Marina Oliveira",
+    "cargo": "Gerente Corporativa de Contabilidade",
+    "area": "Gerência",
+    "perfil": "Gerência",
+    "equipe": "Gerência",
+    "foto": "assets/users/default.svg",
+    "permissoes": [
+      "conteudo",
+      "gerencial",
+      "time"
+    ]
+  },
+  {
+    "id": "u3",
+    "matricula": "2026002",
+    "nome": "Ana Martins",
+    "cargo": "Analista Contábil",
+    "area": "Contabilidade I",
+    "perfil": "Colaborador",
+    "equipe": "Contabilidade I",
+    "foto": "assets/users/default.svg",
+    "permissoes": [
+      "conteudo"
+    ]
+  }
+]

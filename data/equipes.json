@@ -1,0 +1,113 @@
+[
+  {
+    "id": "t1",
+    "sigla": "CI",
+    "nome": "Contabilidade I",
+    "descricao": "Contabilidade geral e fechamento",
+    "lider": "Ana Martins",
+    "quantidade": 12,
+    "responsabilidades": [
+      "Fechamento mensal",
+      "Conciliações contábeis"
+    ],
+    "empresas": [
+      "Empresa A (exemplo)"
+    ],
+    "responsaveis": [
+      "Ana Martins — liderança"
+    ],
+    "solucoes": [
+      "s4"
+    ]
+  },
+  {
+    "id": "t2",
+    "sigla": "CII",
+    "nome": "Contabilidade II",
+    "descricao": "Ativos e gestão patrimonial",
+    "lider": "Rafael Santos",
+    "quantidade": 10,
+    "responsabilidades": [
+      "Ativo imobilizado",
+      "Movimentação patrimonial"
+    ],
+    "empresas": [
+      "Empresa B (exemplo)"
+    ],
+    "responsaveis": [
+      "Rafael Santos — liderança"
+    ],
+    "solucoes": [
+      "s4"
+    ]
+  },
+  {
+    "id": "t3",
+    "sigla": "CIII",
+    "nome": "Contabilidade III",
+    "descricao": "Normas, reporte e obrigações",
+    "lider": "Camila Costa",
+    "quantidade": 9,
+    "responsabilidades": [
+      "Demonstrações financeiras",
+      "ECD e ECF"
+    ],
+    "empresas": [
+      "Empresa C (exemplo)"
+    ],
+    "responsaveis": [
+      "Camila Costa — liderança"
+    ],
+    "solucoes": [
+      "s4"
+    ]
+  },
+  {
+    "id": "t4",
+    "sigla": "CIV",
+    "nome": "Contabilidade IV",
+    "descricao": "Projetos, sistemas e melhoria contínua",
+    "lider": "Jonathan Bruno",
+    "quantidade": 8,
+    "responsabilidades": [
+      "Soluções digitais",
+      "Arrendamentos",
+      "Melhoria de processos"
+    ],
+    "empresas": [
+      "Empresa D (exemplo)"
+    ],
+    "responsaveis": [
+      "Jonathan Bruno — liderança"
+    ],
+    "solucoes": [
+      "s1",
+      "s2",
+      "s3",
+      "s4"
+    ]
+  },
+  {
+    "id": "gerencia",
+    "sigla": "GC",
+    "nome": "Gerência",
+    "descricao": "Governança e direcionamento estratégico",
+    "lider": "Marina Oliveira",
+    "quantidade": 3,
+    "responsabilidades": [
+      "Governança contábil",
+      "Relacionamento com auditoria",
+      "Aprovação dos reportes"
+    ],
+    "empresas": [
+      "Todas as empresas (exemplo)"
+    ],
+    "responsaveis": [
+      "Marina Oliveira — gerente corporativa"
+    ],
+    "solucoes": [
+      "s2",
+      "s4"
+    ]
+  }
+]

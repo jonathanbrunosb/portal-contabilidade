@@ -1,0 +1,82 @@
+[
+  {
+    "id": "news1",
+    "categoria": "Tecnologia",
+    "titulo": "IA no apoio às rotinas contábeis",
+    "resumo": "Pauta de discussão: como avaliar automação, revisão humana e qualidade das evidências.",
+    "conteudoCompleto": "CONTEÚDO DEMONSTRATIVO — não constitui norma, orientação regulatória ou deliberação vigente.\nEsta publicação ilustra o fluxo de comunicação da Gerência. Substitua por conteúdo revisado e aprovado, incluindo a fonte primária e a data de vigência confirmada.\nPróximos passos: avaliar os processos impactados, designar responsáveis e registrar as evidências da análise. Compartilhe o resultado no checkpoint do time.",
+    "dataPublicacao": "2026-09-14",
+    "dataVigencia": null,
+    "fonte": "Pauta editorial demonstrativa — sem notícia externa vinculada",
+    "link": null,
+    "documento": null,
+    "empresasImpactadas": [
+      "Empresa A (exemplo)",
+      "Empresa B (exemplo)"
+    ],
+    "areaResponsavel": "Normas e Reporte",
+    "responsavel": "Marina Oliveira",
+    "nivelImpacto": "Moderado",
+    "status": "Publicado"
+  },
+  {
+    "id": "news2",
+    "categoria": "Auditoria",
+    "titulo": "Trilha de evidências e rastreabilidade",
+    "resumo": "Pauta de discussão: fortalecer os registros das revisões durante o fechamento.",
+    "conteudoCompleto": "CONTEÚDO DEMONSTRATIVO — não constitui norma, orientação regulatória ou deliberação vigente.\nEsta publicação ilustra o fluxo de comunicação da Gerência. Substitua por conteúdo revisado e aprovado, incluindo a fonte primária e a data de vigência confirmada.\nPróximos passos: avaliar os processos impactados, designar responsáveis e registrar as evidências da análise. Compartilhe o resultado no checkpoint do time.",
+    "dataPublicacao": "2026-09-14",
+    "dataVigencia": null,
+    "fonte": "Pauta editorial demonstrativa — sem notícia externa vinculada",
+    "link": null,
+    "documento": null,
+    "empresasImpactadas": [
+      "Empresa A (exemplo)",
+      "Empresa B (exemplo)"
+    ],
+    "areaResponsavel": "Normas e Reporte",
+    "responsavel": "Marina Oliveira",
+    "nivelImpacto": "Moderado",
+    "status": "Publicado"
+  },
+  {
+    "id": "news3",
+    "categoria": "Energia",
+    "titulo": "Monitoramento do ambiente regulatório",
+    "resumo": "Pauta de discussão: organizar a análise de publicações e seus potenciais impactos.",
+    "conteudoCompleto": "CONTEÚDO DEMONSTRATIVO — não constitui norma, orientação regulatória ou deliberação vigente.\nEsta publicação ilustra o fluxo de comunicação da Gerência. Substitua por conteúdo revisado e aprovado, incluindo a fonte primária e a data de vigência confirmada.\nPróximos passos: avaliar os processos impactados, designar responsáveis e registrar as evidências da análise. Compartilhe o resultado no checkpoint do time.",
+    "dataPublicacao": "2026-09-14",
+    "dataVigencia": null,
+    "fonte": "Pauta editorial demonstrativa — sem notícia externa vinculada",
+    "link": null,
+    "documento": null,
+    "empresasImpactadas": [
+      "Empresa A (exemplo)",
+      "Empresa B (exemplo)"
+    ],
+    "areaResponsavel": "Normas e Reporte",
+    "responsavel": "Marina Oliveira",
+    "nivelImpacto": "Moderado",
+    "status": "Publicado"
+  },
+  {
+    "id": "news4",
+    "categoria": "IFRS",
+    "titulo": "Evolução dos reportes financeiros",
+    "resumo": "Pauta de discussão: conectar normas, processos e qualidade da informação.",
+    "conteudoCompleto": "CONTEÚDO DEMONSTRATIVO — não constitui norma, orientação regulatória ou deliberação vigente.\nEsta publicação ilustra o fluxo de comunicação da Gerência. Substitua por conteúdo revisado e aprovado, incluindo a fonte primária e a data de vigência confirmada.\nPróximos passos: avaliar os processos impactados, designar responsáveis e registrar as evidências da análise. Compartilhe o resultado no checkpoint do time.",
+    "dataPublicacao": "2026-09-14",
+    "dataVigencia": null,
+    "fonte": "Pauta editorial demonstrativa — sem notícia externa vinculada",
+    "link": null,
+    "documento": null,
+    "empresasImpactadas": [
+      "Empresa A (exemplo)",
+      "Empresa B (exemplo)"
+    ],
+    "areaResponsavel": "Normas e Reporte",
+    "responsavel": "Marina Oliveira",
+    "nivelImpacto": "Moderado",
+    "status": "Publicado"
+  }
+]

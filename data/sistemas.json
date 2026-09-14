@@ -4,8 +4,8 @@
     "nome": "IFRS 16 / CPC 06",
     "descricao": "Gestão de contratos, passivos, ativo de direito de uso, eventos contratuais e reportes.",
     "icon": "file",
-    "status": "Link não configurado",
-    "link": null,
+    "status": "Ativo",
+    "link": "https://arrendamento.contabilidade-eqtl.com/",
     "responsavel": "Contabilidade IV"
   },
   {
@@ -22,17 +22,17 @@
     "nome": "Controle de Horas",
     "descricao": "Banco de horas, folgas, compensações e acompanhamento por colaborador.",
     "icon": "clock",
-    "status": "Link não configurado",
-    "link": null,
+    "status": "Ativo",
+    "link": "https://gestorhoras.contabilidade-eqtl.com/",
     "responsavel": "Contabilidade IV"
   },
   {
     "id": "s4",
-    "nome": "Gerenciador de Demandas",
-    "descricao": "Gestão de tarefas, prazos, responsáveis e gargalos.",
+    "nome": "ProjectHub — Gerenciador de Projetos",
+    "descricao": "Gestão de projetos, tarefas, prazos, responsáveis e acompanhamento das iniciativas da área.",
     "icon": "grid",
-    "status": "Link não configurado",
-    "link": null,
+    "status": "Ativo",
+    "link": "https://projecthub.contabilidade-eqtl.com/",
     "responsavel": "Contabilidade IV"
   }
 ]

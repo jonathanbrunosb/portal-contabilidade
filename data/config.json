@@ -113,10 +113,10 @@
       "responsavel": "Administração do portal"
     },
     {
-      "nome": "OneStream / BPC",
+      "nome": "Cronograma de Fechamento",
       "icon": "briefcase",
-      "link": null,
-      "descricao": "Acesso corporativo. Cadastre o endereço validado pela organização.",
+      "link": "https://eqtl-cronograma-fechamento.pufach.easypanel.host/",
+      "descricao": "Cronograma de fechamento contábil da Gerência.",
       "responsavel": "Administração do portal"
     },
     {
@@ -129,15 +129,17 @@
     {
       "nome": "Auditoria",
       "icon": "shield",
-      "link": null,
-      "descricao": "Acesso corporativo. Cadastre o endereço validado pela organização.",
+      "link": "https://duducarinhoso.github.io/eqtl_controle_planejamento/#/p/planejamento/s/a51370da-2adb-4ee9-8cfa-52396949ae92",
+      "descricao": "Controle de planejamento da auditoria.",
       "responsavel": "Administração do portal"
     },
     {
       "nome": "Outros",
       "icon": "link",
       "link": null,
-      "descricao": "Acesso corporativo. Cadastre o endereço validado pela organização.",
+      "target": "central",
+      "tab": "sistemas",
+      "descricao": "Veja a lista completa de sistemas da área.",
       "responsavel": "Administração do portal"
     }
   ],

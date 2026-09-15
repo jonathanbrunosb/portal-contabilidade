@@ -114,7 +114,7 @@
     "sigla": "CIII",
     "nome": "Contabilidade III",
     "descricao": "Normas, reporte e obrigações",
-    "lider": "Camila Costa",
+    "lider": "",
     "quantidade": 9,
     "responsabilidades": [
       "Demonstrações financeiras",
@@ -125,9 +125,39 @@
     ],
     "responsaveis": [
       {
-        "nome": "Camila Costa",
-        "cargo": "Liderança",
-        "foto": "assets/users/default.svg"
+        "nome": "Celiomar Souza Pinheiro",
+        "cargo": "Analista",
+        "foto": "assets/users/celiomar-souza-pinheiro.png"
+      },
+      {
+        "nome": "Ingridy Cristina Ferreira Amaro",
+        "cargo": "Analista",
+        "foto": "assets/users/ingridy-cristina-ferreira-amaro.png"
+      },
+      {
+        "nome": "Paulo Walbert Maranhão M de Carvalho",
+        "cargo": "Analista",
+        "foto": "assets/users/paulo-walbert-maranhao-m-de-carvalho.png"
+      },
+      {
+        "nome": "Ana Paula Konzen",
+        "cargo": "Analista",
+        "foto": "assets/users/ana-paula-konzen.png"
+      },
+      {
+        "nome": "Emily Regina Correa Farias",
+        "cargo": "Analista",
+        "foto": "assets/users/emily-regina-correa-farias.png"
+      },
+      {
+        "nome": "Ruth Nayra Castro Gomes",
+        "cargo": "Assistente",
+        "foto": "assets/users/ruth-nayra-castro-gomes.png"
+      },
+      {
+        "nome": "Regina da Costa Almeida",
+        "cargo": "Analista",
+        "foto": "assets/users/regina-da-costa-almeida.png"
       }
     ],
     "solucoes": [

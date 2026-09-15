@@ -2,12 +2,12 @@
   {
     "id": "u1",
     "matricula": "2026001",
-    "nome": "Jonathan Bruno",
+    "nome": "Jonathan Bruno Santos Bezerra",
     "cargo": "Coordenador Corporativo de Contabilidade",
     "area": "Contabilidade IV",
     "perfil": "Gestor",
     "equipe": "Contabilidade IV",
-    "foto": "assets/users/2026001.svg",
+    "foto": "assets/users/jonathan-bruno-santos-bezerra.png",
     "permissoes": [
       "conteudo",
       "time",

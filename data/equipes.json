@@ -114,7 +114,7 @@
     "sigla": "CIII",
     "nome": "Contabilidade III",
     "descricao": "Normas, reporte e obrigações",
-    "lider": "",
+    "lider": "Luana Maria dos Santos Leitão",
     "quantidade": 9,
     "responsabilidades": [
       "Demonstrações financeiras",
@@ -124,6 +124,11 @@
       "Empresa C (exemplo)"
     ],
     "responsaveis": [
+      {
+        "nome": "Luana Maria dos Santos Leitão",
+        "cargo": "Liderança",
+        "foto": "assets/users/luana-maria-dos-santos-leitao.png"
+      },
       {
         "nome": "Celiomar Souza Pinheiro",
         "cargo": "Analista",
@@ -169,7 +174,7 @@
     "sigla": "CIV",
     "nome": "Contabilidade IV",
     "descricao": "Projetos, sistemas e melhoria contínua",
-    "lider": "Jonathan Bruno",
+    "lider": "Jonathan Bruno Santos Bezerra",
     "quantidade": 8,
     "responsabilidades": [
       "Soluções digitais",
@@ -181,9 +186,49 @@
     ],
     "responsaveis": [
       {
-        "nome": "Jonathan Bruno",
+        "nome": "Jonathan Bruno Santos Bezerra",
         "cargo": "Liderança",
-        "foto": "assets/users/default.svg"
+        "foto": "assets/users/jonathan-bruno-santos-bezerra.png"
+      },
+      {
+        "nome": "Derik dos Santos do Nascimento",
+        "cargo": "Estagiário",
+        "foto": "assets/users/derik-dos-santos-do-nascimento.png"
+      },
+      {
+        "nome": "Eduardo dos Santos Rocha",
+        "cargo": "Analista",
+        "foto": "assets/users/eduardo-dos-santos-rocha.png"
+      },
+      {
+        "nome": "Renan Cesar da Silveira Lima",
+        "cargo": "Assistente",
+        "foto": "assets/users/renan-cesar-da-silveira-lima.png"
+      },
+      {
+        "nome": "Ana Lídia Pereira de Souza",
+        "cargo": "Assistente",
+        "foto": "assets/users/ana-lidia-pereira-de-souza.png"
+      },
+      {
+        "nome": "Maira Hasnah Pereira Aragao",
+        "cargo": "Assistente",
+        "foto": "assets/users/maira-hasnah-pereira-aragao.png"
+      },
+      {
+        "nome": "Vanilza Martins dos Santos",
+        "cargo": "Analista",
+        "foto": "assets/users/vanilza-martins-dos-santos.png"
+      },
+      {
+        "nome": "Mila Araujo Moreira",
+        "cargo": "Assistente",
+        "foto": "assets/users/mila-araujo-moreira.png"
+      },
+      {
+        "nome": "Vitoria Maria Pereira dos Santos Alves",
+        "cargo": "Assistente",
+        "foto": "assets/users/vitoria-maria-pereira-dos-santos-alves.png"
       }
     ],
     "solucoes": [
@@ -198,7 +243,7 @@
     "sigla": "GC",
     "nome": "Gerência",
     "descricao": "Governança e direcionamento estratégico",
-    "lider": "Marina Oliveira",
+    "lider": "Alexandra Furtado Freire Paes Landim",
     "quantidade": 3,
     "responsabilidades": [
       "Governança contábil",
@@ -210,9 +255,9 @@
     ],
     "responsaveis": [
       {
-        "nome": "Marina Oliveira",
-        "cargo": "Gerente corporativa",
-        "foto": "assets/users/default.svg"
+        "nome": "Alexandra Furtado Freire Paes Landim",
+        "cargo": "Liderança",
+        "foto": "assets/users/alexandra-furtado-freire-paes-landim.png"
       }
     ],
     "solucoes": [

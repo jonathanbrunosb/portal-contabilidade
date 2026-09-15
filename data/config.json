@@ -106,10 +106,10 @@
       "responsavel": "Administração do portal"
     },
     {
-      "nome": "Power BI",
+      "nome": "SAP HANA - Ambiente QA",
       "icon": "chart",
-      "link": null,
-      "descricao": "Acesso corporativo. Cadastre o endereço validado pela organização.",
+      "link": "https://fiori-qass4.sap.equatorialenergia.com.br:44382/sap/bc/ui2/flp?sap-client=300&sap-language=PT#Shell-home",
+      "descricao": "Fiori Launchpad do SAP HANA — ambiente de homologação (QA).",
       "responsavel": "Administração do portal"
     },
     {

@@ -175,7 +175,7 @@
     "nome": "Contabilidade IV",
     "descricao": "Projetos, sistemas e melhoria contínua",
     "lider": "Jonathan Bruno Santos Bezerra",
-    "quantidade": 8,
+    "quantidade": 11,
     "responsabilidades": [
       "Soluções digitais",
       "Arrendamentos",
@@ -229,6 +229,16 @@
         "nome": "Vitoria Maria Pereira dos Santos Alves",
         "cargo": "Assistente",
         "foto": "assets/users/vitoria-maria-pereira-dos-santos-alves.png"
+      },
+      {
+        "nome": "Rosiane Padilha da Silva",
+        "cargo": "Analista",
+        "foto": "assets/users/rosiane-padilha-da-silva.png"
+      },
+      {
+        "nome": "Celia Cristina Rodrigues T Mendonca",
+        "cargo": "Analista",
+        "foto": "assets/users/celia-cristina-rodrigues-t-mendonca.png"
       }
     ],
     "solucoes": [

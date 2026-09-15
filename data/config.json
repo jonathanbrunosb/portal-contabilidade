@@ -55,12 +55,14 @@
     {
       "label": "Central de Conteúdo",
       "icon": "news",
-      "target": "central"
+      "target": "central",
+      "tab": "newsletter"
     },
     {
       "label": "Estrutura das Equipes",
       "icon": "users",
-      "target": "equipes"
+      "target": "equipes",
+      "view": "equipes"
     },
     {
       "label": "Processos",
@@ -152,3 +154,4 @@
   "demonstracao": true,
   "semanaLabel": "14 — 20 SETEMBRO"
 }
+

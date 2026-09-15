@@ -19,50 +19,67 @@
     "responsaveis": [
       {
         "nome": "Ana Laura do Carmo Machado",
-        "cargo": "Executiva de Contabilidade",
-        "foto": "assets/users/ana-laura-carmo-machado.webp"
+        "cargo": "Executiva Corporativa de Contabilidade",
+        "foto": "assets/users/ana-laura-carmo-machado.webp",
+        "id": "colaborador-ana-laura-do-carmo-machado",
+        "areaId": "t1"
       },
       {
         "nome": "Sara Priscila Pereira da Costa",
         "cargo": "",
-        "foto": "assets/users/sara-priscila-pereira-da-costa.png"
+        "foto": "assets/users/sara-priscila-pereira-da-costa.png",
+        "id": "colaborador-sara-priscila-pereira-da-costa",
+        "areaId": "t1"
       },
       {
         "nome": "Felipe Carnaúba Torres",
         "cargo": "",
-        "foto": "assets/users/felipe-carnauba-torres.png"
+        "foto": "assets/users/felipe-carnauba-torres.png",
+        "id": "colaborador-felipe-carnauba-torres",
+        "areaId": "t1"
       },
       {
         "nome": "Karina da Cruz Silva",
         "cargo": "",
-        "foto": "assets/users/karina-da-cruz-silva.png"
+        "foto": "assets/users/karina-da-cruz-silva.png",
+        "id": "colaborador-karina-da-cruz-silva",
+        "areaId": "t1"
       },
       {
         "nome": "Ana Carolina Fernandes da Silva",
         "cargo": "",
-        "foto": "assets/users/ana-carolina-fernandes-da-silva.png"
+        "foto": "assets/users/ana-carolina-fernandes-da-silva.png",
+        "id": "colaborador-ana-carolina-fernandes-da-silva",
+        "areaId": "t1"
       },
       {
         "nome": "Aline Andrade Cavalcante",
         "cargo": "",
-        "foto": "assets/users/aline-andrade-cavalcante.png"
+        "foto": "assets/users/aline-andrade-cavalcante.png",
+        "id": "colaborador-aline-andrade-cavalcante",
+        "areaId": "t1"
       },
       {
         "nome": "Rayane Sousa da Silva",
         "cargo": "",
-        "foto": "assets/users/rayane-sousa-da-silva.png"
+        "foto": "assets/users/rayane-sousa-da-silva.png",
+        "id": "colaborador-rayane-sousa-da-silva",
+        "areaId": "t1"
       }
     ],
     "solucoes": [
       "s4"
-    ]
+    ],
+    "tipo": "executiva",
+    "dadosAreaValidados": false,
+    "liderId": "colaborador-ana-laura-do-carmo-machado"
   },
   {
     "id": "t2",
     "sigla": "CII",
     "nome": "Contabilidade II",
     "descricao": "Contas a receber",
-    "lider": "Marcia Fernanda dos Santos Ferreira",
+    "lider": "Márcia Fernanda dos Santos Ferreira",
     "responsabilidades": [
       "Contabilização e conferência dos itens comerciais",
       "Informações gerenciais do contas a receber",
@@ -74,44 +91,61 @@
     ],
     "responsaveis": [
       {
-        "nome": "Marcia Fernanda dos Santos Ferreira",
-        "cargo": "Executiva de Contabilidade",
-        "foto": "assets/users/marcia-fernanda-dos-santos-ferreira.png"
+        "nome": "Márcia Fernanda dos Santos Ferreira",
+        "cargo": "Executiva Corporativa de Contabilidade",
+        "foto": "assets/users/marcia-fernanda-dos-santos-ferreira.png",
+        "id": "colaborador-marcia-fernanda-dos-santos-ferreira",
+        "areaId": "t2"
       },
       {
         "nome": "Lanusse Oliveira Lourenco",
         "cargo": "Especialista",
-        "foto": "assets/users/lanusse-oliveira-lourenco.jpeg"
+        "foto": "assets/users/lanusse-oliveira-lourenco.jpeg",
+        "id": "colaborador-lanusse-oliveira-lourenco",
+        "areaId": "t2"
       },
       {
         "nome": "Fábio Barbosa Monteiro",
         "cargo": "Analista",
-        "foto": "assets/users/fabio-barbosa-monteiro.png"
+        "foto": "assets/users/fabio-barbosa-monteiro.png",
+        "id": "colaborador-fabio-barbosa-monteiro",
+        "areaId": "t2"
       },
       {
         "nome": "Teresa Cristina do S de Sousa",
         "cargo": "Analista",
-        "foto": "assets/users/teresa-cristina-do-s-de-sousa.png"
+        "foto": "assets/users/teresa-cristina-do-s-de-sousa.png",
+        "id": "colaborador-teresa-cristina-do-s-de-sousa",
+        "areaId": "t2"
       },
       {
         "nome": "Mariwamblea Costa Monteiro",
         "cargo": "Analista",
-        "foto": "assets/users/mariwamblea-costa-monteiro.png"
+        "foto": "assets/users/mariwamblea-costa-monteiro.png",
+        "id": "colaborador-mariwamblea-costa-monteiro",
+        "areaId": "t2"
       },
       {
         "nome": "Larissa Karolina Amorim Pinheiro",
         "cargo": "Analista",
-        "foto": "assets/users/larissa-karolina-amorim-pinheiro.png"
+        "foto": "assets/users/larissa-karolina-amorim-pinheiro.png",
+        "id": "colaborador-larissa-karolina-amorim-pinheiro",
+        "areaId": "t2"
       },
       {
         "nome": "Larissa da Silva Viana",
         "cargo": "Assistente",
-        "foto": "assets/users/larissa-da-silva-viana.png"
+        "foto": "assets/users/larissa-da-silva-viana.png",
+        "id": "colaborador-larissa-da-silva-viana",
+        "areaId": "t2"
       }
     ],
     "solucoes": [
       "s4"
-    ]
+    ],
+    "tipo": "executiva",
+    "dadosAreaValidados": false,
+    "liderId": "colaborador-marcia-fernanda-dos-santos-ferreira"
   },
   {
     "id": "t3",
@@ -131,48 +165,67 @@
     "responsaveis": [
       {
         "nome": "Luana Maria dos Santos Leitão",
-        "cargo": "Liderança",
-        "foto": "assets/users/luana-maria-dos-santos-leitao.png"
+        "cargo": "Executiva Corporativa de Contabilidade",
+        "foto": "assets/users/luana-maria-dos-santos-leitao.png",
+        "id": "colaborador-luana-maria-dos-santos-leitao",
+        "areaId": "t3"
       },
       {
         "nome": "Celiomar Souza Pinheiro",
         "cargo": "Analista",
-        "foto": "assets/users/celiomar-souza-pinheiro.png"
+        "foto": "assets/users/celiomar-souza-pinheiro.png",
+        "id": "colaborador-celiomar-souza-pinheiro",
+        "areaId": "t3"
       },
       {
         "nome": "Ingridy Cristina Ferreira Amaro",
         "cargo": "Analista",
-        "foto": "assets/users/ingridy-cristina-ferreira-amaro.png"
+        "foto": "assets/users/ingridy-cristina-ferreira-amaro.png",
+        "id": "colaborador-ingridy-cristina-ferreira-amaro",
+        "areaId": "t3"
       },
       {
         "nome": "Paulo Walbert Maranhão M de Carvalho",
         "cargo": "Analista",
-        "foto": "assets/users/paulo-walbert-maranhao-m-de-carvalho.png"
+        "foto": "assets/users/paulo-walbert-maranhao-m-de-carvalho.png",
+        "id": "colaborador-paulo-walbert-maranhao-m-de-carvalho",
+        "areaId": "t3"
       },
       {
         "nome": "Ana Paula Konzen",
         "cargo": "Analista",
-        "foto": "assets/users/ana-paula-konzen.png"
+        "foto": "assets/users/ana-paula-konzen.png",
+        "id": "colaborador-ana-paula-konzen",
+        "areaId": "t3"
       },
       {
         "nome": "Emily Regina Correa Farias",
         "cargo": "Analista",
-        "foto": "assets/users/emily-regina-correa-farias.png"
+        "foto": "assets/users/emily-regina-correa-farias.png",
+        "id": "colaborador-emily-regina-correa-farias",
+        "areaId": "t3"
       },
       {
         "nome": "Ruth Nayra Castro Gomes",
         "cargo": "Assistente",
-        "foto": "assets/users/ruth-nayra-castro-gomes.png"
+        "foto": "assets/users/ruth-nayra-castro-gomes.png",
+        "id": "colaborador-ruth-nayra-castro-gomes",
+        "areaId": "t3"
       },
       {
         "nome": "Regina da Costa Almeida",
         "cargo": "Analista",
-        "foto": "assets/users/regina-da-costa-almeida.png"
+        "foto": "assets/users/regina-da-costa-almeida.png",
+        "id": "colaborador-regina-da-costa-almeida",
+        "areaId": "t3"
       }
     ],
     "solucoes": [
       "s4"
-    ]
+    ],
+    "tipo": "executiva",
+    "dadosAreaValidados": false,
+    "liderId": "colaborador-luana-maria-dos-santos-leitao"
   },
   {
     "id": "t4",
@@ -196,58 +249,80 @@
     "responsaveis": [
       {
         "nome": "Jonathan Bruno Santos Bezerra",
-        "cargo": "Liderança",
-        "foto": "assets/users/jonathan-bruno-santos-bezerra.png"
+        "cargo": "Executivo Corporativo de Contabilidade",
+        "foto": "assets/users/jonathan-bruno-santos-bezerra.png",
+        "id": "colaborador-jonathan-bruno-santos-bezerra",
+        "areaId": "t4"
       },
       {
         "nome": "Derik dos Santos do Nascimento",
         "cargo": "Estagiário",
-        "foto": "assets/users/derik-dos-santos-do-nascimento.png"
+        "foto": "assets/users/derik-dos-santos-do-nascimento.png",
+        "id": "colaborador-derik-dos-santos-do-nascimento",
+        "areaId": "t4"
       },
       {
         "nome": "Eduardo dos Santos Rocha",
         "cargo": "Analista",
-        "foto": "assets/users/eduardo-dos-santos-rocha.png"
+        "foto": "assets/users/eduardo-dos-santos-rocha.png",
+        "id": "colaborador-eduardo-dos-santos-rocha",
+        "areaId": "t4"
       },
       {
         "nome": "Renan Cesar da Silveira Lima",
         "cargo": "Assistente",
-        "foto": "assets/users/renan-cesar-da-silveira-lima.png"
+        "foto": "assets/users/renan-cesar-da-silveira-lima.png",
+        "id": "colaborador-renan-cesar-da-silveira-lima",
+        "areaId": "t4"
       },
       {
         "nome": "Ana Lídia Pereira de Souza",
         "cargo": "Assistente",
-        "foto": "assets/users/ana-lidia-pereira-de-souza.png"
+        "foto": "assets/users/ana-lidia-pereira-de-souza.png",
+        "id": "colaborador-ana-lidia-pereira-de-souza",
+        "areaId": "t4"
       },
       {
         "nome": "Maira Hasnah Pereira Aragao",
         "cargo": "Assistente",
-        "foto": "assets/users/maira-hasnah-pereira-aragao.png"
+        "foto": "assets/users/maira-hasnah-pereira-aragao.png",
+        "id": "colaborador-maira-hasnah-pereira-aragao",
+        "areaId": "t4"
       },
       {
         "nome": "Vanilza Martins dos Santos",
         "cargo": "Analista",
-        "foto": "assets/users/vanilza-martins-dos-santos.png"
+        "foto": "assets/users/vanilza-martins-dos-santos.png",
+        "id": "colaborador-vanilza-martins-dos-santos",
+        "areaId": "t4"
       },
       {
         "nome": "Mila Araujo Moreira",
         "cargo": "Assistente",
-        "foto": "assets/users/mila-araujo-moreira.png"
+        "foto": "assets/users/mila-araujo-moreira.png",
+        "id": "colaborador-mila-araujo-moreira",
+        "areaId": "t4"
       },
       {
         "nome": "Vitoria Maria Pereira dos Santos Alves",
         "cargo": "Assistente",
-        "foto": "assets/users/vitoria-maria-pereira-dos-santos-alves.png"
+        "foto": "assets/users/vitoria-maria-pereira-dos-santos-alves.png",
+        "id": "colaborador-vitoria-maria-pereira-dos-santos-alves",
+        "areaId": "t4"
       },
       {
         "nome": "Rosiane Padilha da Silva",
         "cargo": "Analista",
-        "foto": "assets/users/rosiane-padilha-da-silva.png"
+        "foto": "assets/users/rosiane-padilha-da-silva.png",
+        "id": "colaborador-rosiane-padilha-da-silva",
+        "areaId": "t4"
       },
       {
         "nome": "Celia Cristina Rodrigues T Mendonca",
         "cargo": "Analista",
-        "foto": "assets/users/celia-cristina-rodrigues-t-mendonca.png"
+        "foto": "assets/users/celia-cristina-rodrigues-t-mendonca.png",
+        "id": "colaborador-celia-cristina-rodrigues-t-mendonca",
+        "areaId": "t4"
       }
     ],
     "solucoes": [
@@ -255,12 +330,15 @@
       "s2",
       "s3",
       "s4"
-    ]
+    ],
+    "tipo": "executiva",
+    "dadosAreaValidados": false,
+    "liderId": "colaborador-jonathan-bruno-santos-bezerra"
   },
   {
     "id": "gerencia",
     "sigla": "GC",
-    "nome": "Gerência",
+    "nome": "Gerência de Contabilidade",
     "descricao": "Governança e direcionamento estratégico",
     "lider": "Alexandra Furtado Freire Paes Landim",
     "responsabilidades": [
@@ -274,13 +352,19 @@
     "responsaveis": [
       {
         "nome": "Alexandra Furtado Freire Paes Landim",
-        "cargo": "Liderança",
-        "foto": "assets/users/alexandra-furtado-freire-paes-landim.png"
+        "cargo": "A cadastrar",
+        "foto": "assets/users/alexandra-furtado-freire-paes-landim.png",
+        "id": "colaborador-alexandra-furtado-freire-paes-landim",
+        "areaId": "gerencia"
       }
     ],
     "solucoes": [
       "s2",
       "s4"
-    ]
+    ],
+    "tipo": "gerencia",
+    "dadosAreaValidados": false,
+    "liderId": "colaborador-alexandra-furtado-freire-paes-landim"
   }
 ]
+

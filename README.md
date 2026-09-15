@@ -46,6 +46,7 @@ portal-contabilidade/
 │   ├── data-service.js        # Carregamento das bases, futuro adaptador de API
 │   ├── navigation.js          # Menu, foco e tabs por teclado
 │   ├── newsletter.js          # Radar, cards e leitura das publicações
+│   ├── teams.js               # Janela do organograma e expansão das equipes
 │   └── ui.js                  # Ícones, escape de texto, URLs e diálogos
 ├── server/
 │   └── server.js              # Backend opcional (Fase 2) — API viva sobre os mesmos JSONs
@@ -87,7 +88,7 @@ Datas editoriais da home e competência são parametrizadas por `data/config.jso
 
 ### Usuários e identificação
 
-Não há mais parâmetro de URL: no primeiro acesso — ou a qualquer momento, clicando em "Trocar identificação" na barra lateral — o portal abre o diálogo "Quem é você?", listando os nomes de `data/usuarios.json`. A escolha fica salva neste navegador (`localStorage`, chave `portal-identity`, ver `js/auth.js`); fechar o diálogo sem escolher equivale a não se identificar. Cadastre a foto em `assets/users/` e informe o caminho em `foto`. Na ausência de fotografia foi usado um avatar de iniciais; falhas de imagem usam o avatar padrão.
+A identificação aceita `?matricula=...` e prioriza uma matrícula válida recebida pela URL. Sem esse parâmetro, no primeiro acesso — ou ao clicar em "Trocar identificação" — o portal abre o diálogo "Quem é você?", listando os nomes de `data/usuarios.json`. A escolha fica salva neste navegador (`localStorage`, chave `portal-identity`, ver `js/auth.js`). Cadastre a foto em `assets/users/` e informe o caminho em `foto`; falhas de imagem usam o avatar padrão. Esses mecanismos personalizam a interface e não constituem autenticação.
 
 | Ação | Resultado esperado | Seções visíveis |
 | --- | --- | --- |
@@ -118,11 +119,13 @@ Preencha `link` com o endereço real e validado. Valores iniciais `null` abrem u
 
 ### Equipes
 
-Cada equipe possui `lider`, `responsaveis`, `responsabilidades`, `empresas` e `solucoes`. `solucoes` contém IDs de `sistemas.json`. O organograma deriva das equipes e usa `id: "gerencia"` como raiz.
+“Estrutura das Equipes” é uma janela principal do portal, aberta por item próprio do menu. O organograma deriva de `data/equipes.json`, usa `id: "gerencia"` como raiz e mantém as quatro áreas subordinadas inicialmente recolhidas.
 
-O quantitativo de colaboradores exibido em cada card, no organograma e no diálogo de detalhes não é um campo separado no JSON — é sempre `responsaveis.length`, calculado em `js/app.js` (`teamHeadcount()`). Isso evita o número ficar desatualizado em relação à lista real de pessoas cadastradas: para manter a contagem correta, basta manter `responsaveis` completo. A raiz do organograma ("Gerência de Contabilidade") é a única exceção — mostra a soma de `responsaveis.length` de todas as equipes (incluindo a própria Gerência e os líderes de cada área, já que cada líder é um dos `responsaveis` do seu time), representando o efetivo total da Gerência de Contabilidade como um todo.
+Cada área possui um `id` estável. `liderId` aponta para o `id` do respectivo objeto em `responsaveis`, e cada colaborador possui `areaId` com o `id` da área. Dessa forma, nomes podem ser corrigidos sem romper o vínculo. O primeiro integrante não é assumido como líder na janela: a referência usada é sempre `liderId`.
 
-`responsaveis` é uma lista de objetos `{ "nome", "cargo", "foto" }`, exibidos com avatar no diálogo "Responsáveis" de cada equipe. Cadastre a foto em `assets/users/` (mesmo padrão de `usuarios.json`: arquivo quadrado, `.jpg`/`.png`/`.svg`) e informe o caminho relativo em `foto`; na ausência de foto real, use `"assets/users/default.svg"` — falhas de carregamento da imagem também caem nesse avatar padrão automaticamente. `cargo` é livre (ex.: "Liderança", "Analista Contábil Sênior") e pode ficar vazio.
+Para cadastrar um integrante, inclua em `responsaveis` um objeto `{ "id", "areaId", "nome", "cargo", "foto" }`. A interface cria o card automaticamente; cargo vazio aparece como “Cargo a cadastrar” e foto ausente ou inválida usa `assets/users/default.svg`. Não é necessário editar o HTML.
+
+Responsabilidades e empresas atendidas aparecem na janela somente quando `dadosAreaValidados` for `true`. Mantenha o valor como `false` enquanto as informações ainda forem demonstrativas ou aguardarem validação.
 
 ### Documentos
 
@@ -130,12 +133,12 @@ Troque os documentos demonstrativos por arquivos aprovados, como PDF, HTML ou DO
 
 ### Adicionar menu
 
-Inclua um objeto em `config.json > menu`: `label`, `icon`, `target` e, opcionalmente, `tab`. O `target` corresponde ao ID de uma seção HTML. `tab` pode ser `newsletter`, `noticias`, `sistemas` ou `documentos`. Para uma nova tela, adicione sua seção ao HTML e seu renderizador em `app.js`; para uma nova tab, atualize também o tablist. Os ícones disponíveis estão em `ui.js`. Se a nova seção só deve aparecer para certos perfis, registre seu `target` em `TARGET_ACCESS` e seu `id` em `SECTION_ACCESS` (`js/app.js`) com a capacidade exigida — um `target` sem entrada em `TARGET_ACCESS` cai no padrão `conteudo` (hoje liberado a todo perfil, incluindo visitante sem matrícula); um `id` de seção sem entrada em `SECTION_ACCESS` nunca é ocultado, fica visível a todos.
+Inclua um objeto em `config.json > menu`: `label`, `icon`, `target` e, opcionalmente, `tab` ou `view`. `tab` seleciona uma aba da Central de Conteúdo; `view` identifica uma janela principal, como `equipes`. Para uma nova janela, adicione sua seção ao HTML e um renderizador modular. Os ícones disponíveis estão em `ui.js`. Se a nova seção só deve aparecer para certos perfis, registre seu `target` em `TARGET_ACCESS` (`js/app.js`) com a capacidade exigida.
 
 ## Decisões técnicas e experiência
 
 - Módulos ES nativos, dados separados e sem dependências externas.
-- Layout com sidebar fixa, topbar sticky e central de conteúdo em duas colunas no desktop.
+- Layout com sidebar fixa, topbar sticky, Central de Conteúdo e janela exclusiva para as equipes.
 - Menu móvel com fechamento após seleção, Escape e controle de foco.
 - Tabs acessíveis por setas, Home e End; diálogos nativos com Escape e retorno de foco.
 - Busca sem diferenciação de acentos, abrangendo conteúdos, equipes, colaboradores, agenda e entregas.
@@ -238,3 +241,4 @@ Substituir dados ilustrativos pelos conteúdos, fotos, documentos e URLs aprovad
 ## Histórico da entrega
 
 Projeto novo: não havia arquivos de aplicação. Todos os arquivos desta pasta foram criados nesta implementação; nenhum arquivo anterior do usuário foi alterado ou removido. O registro do estado inicial foi preservado na área de trabalho da tarefa.
+

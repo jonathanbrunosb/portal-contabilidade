@@ -1844,3 +1844,349 @@ th,td {
 }
 
 
+
+/* Dedicated team structure workspace. */
+.home-columns.home-single {
+  grid-template-columns:minmax(0,1fr)}
+
+.teams-page {
+  min-height:calc(100vh - 110px)}
+
+.structure-toolbar {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:28px;
+  padding:28px 30px;
+  color:#fff;
+  background:linear-gradient(118deg,var(--navy),#0b4776 72%,#087b91);
+  border-radius:var(--radius);
+  box-shadow:0 12px 28px #071f4914}
+
+.structure-toolbar h1 {
+  margin-top:4px;
+  font-size:clamp(26px,2.4vw,38px);
+  line-height:1.18;
+  letter-spacing:-1px}
+
+.structure-toolbar p {
+  margin-top:7px;
+  color:#c2d8e9;
+  font-size:14px}
+
+.structure-toolbar .section-kicker {
+  color:#8ee5e1}
+
+.structure-actions {
+  display:flex;
+  gap:9px;
+  flex-shrink:0}
+
+.secondary-btn {
+  min-height:42px;
+  padding:9px 15px;
+  color:var(--navy);
+  background:#fff;
+  border:1px solid #ffffff80;
+  border-radius:8px;
+  font-weight:700;
+  font-size:13px}
+
+.secondary-btn:hover {
+  background:#eaf6ff;
+  transform:translateY(-1px)}
+
+.structure-frame {
+  margin-top:20px;
+  padding:24px;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:0 3px 12px #071f4905;
+  overflow:hidden}
+
+.structure-path {
+  margin-bottom:18px;
+  color:var(--muted);
+  font-size:13px;
+  font-weight:650;
+  letter-spacing:.02em}
+
+.structure-path span {
+  margin:0 7px;
+  color:var(--blue)}
+
+.structure-management {
+  display:flex;
+  justify-content:center;
+  position:relative;
+  padding:4px 0 42px}
+
+.structure-management:after {
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:0;
+  height:42px;
+  border-left:2px solid #c7d8e8}
+
+.structure-manager-card {
+  display:flex;
+  align-items:center;
+  gap:15px;
+  width:min(100%,430px);
+  padding:16px 18px;
+  color:#fff;
+  background:var(--navy);
+  border:1px solid #183d69;
+  border-radius:12px;
+  box-shadow:0 10px 22px #071f4920}
+
+.structure-manager-card img,
+.structure-leader-avatar {
+  width:58px;
+  height:58px;
+  object-fit:cover;
+  border-radius:50%;
+  background:#e8f0f8;
+  flex-shrink:0}
+
+.structure-manager-card img {
+  width:68px;
+  height:68px;
+  border:2px solid #ffffff45}
+
+.structure-manager-card div,
+.structure-leader-copy,
+.structure-member-copy {
+  display:flex;
+  flex-direction:column;
+  min-width:0}
+
+.structure-manager-card strong,
+.structure-leader strong {
+  overflow-wrap:anywhere;
+  line-height:1.35}
+
+.structure-manager-card strong {
+  font-size:17px}
+
+.structure-manager-card span,
+.structure-leader span {
+  margin-top:4px;
+  font-size:13px}
+
+.structure-manager-card small,
+.structure-leader small {
+  margin-top:7px;
+  font-weight:700;
+  letter-spacing:.04em}
+
+.structure-manager-card span {
+  color:#c4d4e5}
+
+.structure-manager-card small {
+  color:#8ee5e1}
+
+.structure-branches {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:16px;
+  position:relative;
+  padding-top:30px}
+
+.structure-branches:before {
+  content:"";
+  position:absolute;
+  top:0;
+  left:12.5%;
+  right:12.5%;
+  border-top:2px solid #c7d8e8}
+
+.structure-branch {
+  position:relative;
+  min-width:0;
+  padding:15px;
+  background:#f8fbfe;
+  border:1px solid #dbe6f0;
+  border-radius:12px}
+
+.structure-branch:before {
+  content:"";
+  position:absolute;
+  left:50%;
+  top:-31px;
+  height:30px;
+  border-left:2px solid #c7d8e8}
+
+.structure-leader {
+  display:flex;
+  align-items:center;
+  gap:11px;
+  width:100%;
+  min-height:102px;
+  padding:11px;
+  text-align:left;
+  background:#fff;
+  border:1px solid #dce7f3;
+  border-radius:10px}
+
+.structure-leader:hover {
+  border-color:#86bde5;
+  background:#f7fbff}
+
+.structure-leader strong {
+  color:var(--navy);
+  font-size:14px}
+
+.structure-leader span {
+  color:var(--muted);
+  line-height:1.4}
+
+.structure-leader small {
+  color:var(--blue)}
+
+.structure-toggle {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  width:100%;
+  min-height:42px;
+  margin-top:12px;
+  padding:9px;
+  color:var(--navy);
+  background:#eaf4fd;
+  border:1px solid #d2e3f2;
+  border-radius:8px;
+  font-size:13px;
+  font-weight:700}
+
+.structure-toggle:hover {
+  background:#dcecf9}
+
+.structure-toggle .icon {
+  width:17px;
+  height:17px;
+  transition:transform .18s ease}
+
+.structure-toggle[aria-expanded=true] .icon {
+  transform:rotate(180deg)}
+
+.structure-members {
+  padding-top:15px}
+
+.structure-members-title {
+  margin-bottom:9px;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:750;
+  letter-spacing:.07em;
+  text-transform:uppercase}
+
+.structure-members ul,
+.structure-area-details ul {
+  margin:0;
+  padding:0;
+  list-style:none}
+
+.structure-member {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 0;
+  border-top:1px solid var(--border)}
+
+.structure-member-avatar {
+  width:38px;
+  height:38px;
+  object-fit:cover;
+  border-radius:50%;
+  background:#e8f0f8;
+  flex-shrink:0}
+
+.structure-member-copy strong {
+  overflow-wrap:anywhere;
+  color:var(--navy);
+  font-size:14px}
+
+.structure-member-copy span {
+  margin-top:2px;
+  color:var(--muted);
+  font-size:13px;
+  overflow-wrap:anywhere}
+
+.structure-empty {
+  padding:13px;
+  color:var(--muted);
+  background:#fff;
+  border:1px dashed #cbd9e6;
+  border-radius:8px;
+  font-size:13px;
+  text-align:center}
+
+.structure-area-details {
+  display:grid;
+  gap:10px;
+  margin-top:12px;
+  padding:11px;
+  color:var(--muted);
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:8px;
+  font-size:13px}
+
+.structure-area-details li {
+  margin-top:4px}
+
+@media(max-width:1050px) {
+  .structure-branches {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    padding-top:8px}
+
+  .structure-branches:before,
+  .structure-branch:before,
+  .structure-management:after {
+    display:none}
+
+  .structure-management {
+    padding-bottom:20px}}
+
+@media(max-width:640px) {
+  .structure-toolbar {
+    align-items:flex-start;
+    flex-direction:column;
+    padding:22px 18px}
+
+  .structure-actions {
+    width:100%}
+
+  .secondary-btn {
+    flex:1;
+    padding-inline:9px}
+
+  .structure-frame {
+    padding:16px 12px}
+
+  .structure-branches {
+    grid-template-columns:1fr}
+
+  .structure-manager-card {
+    padding:14px}
+
+  .structure-manager-card img {
+    width:58px;
+    height:58px}
+
+  .structure-leader {
+    min-height:0}}
+
+@media(prefers-reduced-motion:reduce) {
+  .structure-toggle .icon,
+  .secondary-btn {
+    transition:none}}
+
+.no-motion .structure-toggle .icon,
+.no-motion .secondary-btn {
+  transition:none}
+

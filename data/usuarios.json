@@ -3,7 +3,7 @@
     "id": "u1",
     "matricula": "2026001",
     "nome": "Jonathan Bruno Santos Bezerra",
-    "cargo": "Coordenador Corporativo de Contabilidade",
+    "cargo": "Executivo Corporativo de Contabilidade",
     "area": "Contabilidade IV",
     "perfil": "Gestor",
     "equipe": "Contabilidade IV",
@@ -12,7 +12,8 @@
       "conteudo",
       "time",
       "administracao"
-    ]
+    ],
+    "areaId": "t4"
   },
   {
     "id": "u2",
@@ -20,6 +21,7 @@
     "nome": "Marina Oliveira",
     "cargo": "Gerente Corporativa de Contabilidade",
     "area": "Gerência",
+    "areaId": "gerencia",
     "perfil": "Gerência",
     "equipe": "Gerência",
     "foto": "assets/users/default.svg",
@@ -40,6 +42,8 @@
     "foto": "assets/users/default.svg",
     "permissoes": [
       "conteudo"
-    ]
+    ],
+    "areaId": "t1"
   }
 ]
+

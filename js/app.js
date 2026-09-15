@@ -2,9 +2,10 @@ import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdmi
 import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js';
 import { initializeNavigation,bindTabs,selectTab } from './navigation.js';
 import { renderNewsletter,articleCard,showArticle } from './newsletter.js';
+import { renderTeamStructure } from './teams.js';
 import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,notify } from './ui.js';
 import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js';
-let data,currentTab='newsletter',currentUser;
+let data,currentTab='newsletter',currentUser,currentMenu=[];
 const $=selector=>document.querySelector(selector);
 // Capability required to see each menu target / page section / searchable collection.
 const TARGET_ACCESS= {
@@ -13,7 +14,7 @@ const TARGET_ACCESS= {
 ;
 const CENTRAL_TABS=['newsletter','noticias','sistemas','documentos'];
 const SECTION_ACCESS= {
-  central:'conteudo',equipes:'time',painel:'gerencial',editorial:'gerencial',administracao:'administracao'
+  central:'conteudo',painel:'gerencial',editorial:'gerencial',administracao:'administracao'
 }
 ;
 const EDITORIAL_COLLECTIONS=['newsletter','noticias'];
@@ -36,11 +37,7 @@ function applyAccess(user) {
 function openAccess(item) {
   if(item.target) {
     track('system_access',{sistema:item.nome,configurado:true});
-    if(item.tab)renderContent(item.tab);
-    document.getElementById(item.target)?.scrollIntoView( {
-      behavior:'smooth'
-    }
-    );
+    navigate(currentMenu.find(menuItem=>menuItem.target===item.target&&(!item.tab||menuItem.tab===item.tab))||item);
     return;
   }
   const url=safeURL(item.link);
@@ -69,7 +66,7 @@ function renderContent(tab) {
   track('tab_view',{tab});
   selectTab('.tabs',$(`#tab-${tab}`));
   $('#content-view').setAttribute('aria-labelledby',`tab-${tab}`);
-  document.querySelectorAll('.nav-link').forEach(el=>el.classList.toggle('active',el.dataset.navTab===tab||(CENTRAL_TABS.includes(tab)&&el.getAttribute('href')==='#central')));
+  activateMenu(currentMenu.find(item=>item.tab===tab)||(CENTRAL_TABS.includes(tab)?currentMenu.find(item=>item.target==='central'):null));
   if(tab==='newsletter')$('#content-view').innerHTML=renderNewsletter(data.newsletter);
   if(tab==='noticias')$('#content-view').innerHTML=`<div class="card-grid">${data.noticias.filter(i=>i.status==='Publicado').map(i=>articleCard(i,'noticias')).join('')}</div><div class="content-footer">Pautas demonstrativas para acompanhamento — não representam notícias verificadas.</div>`;
   if(tab==='sistemas')$('#content-view').innerHTML=`<div class="card-grid">${data.sistemas.map(systemCard).join('')}</div><div class="content-footer">Cadastre os endereços internos para habilitar os acessos.</div>`;
@@ -88,47 +85,36 @@ function renderContent(tab) {
   }
   ;
 }
-// Headcount is always derived from the registered responsaveis, never a
-// separately maintained counter — that field used to drift out of sync
-// with the real roster. Gerência is the org-chart root, so its number is
-// the sum of every area (leaders included, since each lider is already
-// one of their team's responsaveis).
+function activateMenu(item) {
+  const index=currentMenu.indexOf(item);
+  document.querySelectorAll('#navigation .nav-link').forEach(link=>link.classList.toggle('active',Number(link.dataset.menuIndex)===index));
+}
+function navigate(item,updateHistory=true) {
+  if(!item)return;
+  const teamsView=item.view==='equipes';
+  $('#home-view').hidden=teamsView;
+  $('#equipes').hidden=!teamsView;
+  activateMenu(item);
+  if(teamsView) {
+    renderTeamStructure(data.equipes);
+    track('team_structure_view');
+  }
+  else if(item.tab)renderContent(item.tab);
+  if(updateHistory)history.pushState(null,'',`#${item.target}`);
+  requestAnimationFrame(()=> {
+    const target=teamsView?$('#equipes'):$(`#${item.target}`);
+    target?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+    $('#main').focus({preventScroll:true});
+  });
+}
+// Headcount is derived from the registered roster for administration views.
 function teamHeadcount(team) {
   if(team.id==='gerencia')return data.equipes.reduce((sum,t)=>sum+t.responsaveis.length,0);
   return team.responsaveis.length;
 }
-function renderTeams(mode='equipes') {
-  selectTab('.segmented',$(`#team-tab-${mode}`));
-  $('#teams-view').setAttribute('aria-labelledby',`team-tab-${mode}`);
-  if(mode==='equipes') {
-    $('#teams-view').innerHTML=data.equipes.map(team=>`<article class="team-card"><div class="team-top"><span class="team-icon">${e(team.sigla)}</span><div class="team-copy"><h3>${e(team.nome)}</h3><p>${e(team.descricao)}</p>${team.lider?`<small class="team-leader">${e(team.lider)}</small>`:''}</div><span class="team-count" title="${e(teamHeadcount(team))} colaboradores">${icon('users')}${e(teamHeadcount(team))}</span></div><div class="team-links">${['Equipe','Processos','Responsáveis','Empresas','Soluções'].map(f=>`<button class="text-btn" data-team="${e(team.id)}" data-facet="${e(f)}">${e(f)}</button>`).join('')}</div></article>`).join('');
-  }
-  else {
-    const manager=data.equipes.find(t=>t.id==='gerencia');
-    $('#teams-view').innerHTML=`<div class="org"><button class="org-root" data-team="gerencia">Gerência de Contabilidade<small>${e(manager.lider)} · ${e(teamHeadcount(manager))} colaboradores</small></button><div class="org-children">${data.equipes.filter(t=>t.id!=='gerencia').map(t=>`<button class="org-node" data-team="${e(t.id)}">${e(t.nome)}<small>${t.lider?`${e(t.lider)} · `:''}${e(teamHeadcount(t))} colaboradores</small></button>`).join('')}</div></div>`;
-  }
-}
-function showTeam(id,facet='Equipe') {
-  const team=data.equipes.find(t=>t.id===id);
-  track('team_view',{equipe:team.nome,facet});
-  let content=detailGrid( {
-    'Líder':team.lider,'Colaboradores':teamHeadcount(team),'Empresas atendidas':team.empresas
-  }
-  );
-  if(facet==='Equipe'||facet==='Responsáveis') {
-    content+=`<h3>Responsáveis de referência</h3><div class="person-list">${team.responsaveis.map(p=>`<div class="person-row"><img class="avatar" src="${e(safeURL(p.foto)||'assets/users/default.svg')}" alt="Foto de ${e(p.nome)}"><div><strong>${e(p.nome)}</strong>${p.cargo?`<small>${e(p.cargo)}</small>`:''}</div></div>`).join('')}</div>`;
-  }
-  if(facet==='Equipe'||facet==='Processos')content+=`<h3>Principais responsabilidades</h3><ul class="detail-list">${team.responsabilidades.map(p=>`<li>${e(p)}</li>`).join('')}</ul>`;
-  if(facet==='Soluções')content+=`<h3>Soluções do time</h3>${team.solucoes.map(id=>{const s=data.sistemas.find(s=>s.id===id);return s?`<p><button class="primary-btn" data-system="${e(s.id)}">${e(s.nome)} ↗</button></p>`:'';}).join('')}`;
-  if(facet==='Empresas')content+=`<p>O atendimento segue a distribuição demonstrativa acima. A lista pode ser substituída pelas empresas reais da organização.</p>`;
-  showDialog(team.nome,facet,`<p>${e(team.descricao)}</p>${content}`);
-  document.querySelectorAll('#dialog-body .person-row .avatar').forEach(img=>img.addEventListener('error',()=> {
-    img.src='assets/users/default.svg';
-  }
-  , {
-    once:true
-  }
-  ));
+function teamMemberId(areaId,name,index) {
+  const slug=normalize(name).replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  return `colaborador-${slug||`${areaId}-${index+1}`}`;
 }
 // Editorial dates follow the local dataset, independent of the device clock.
 function renderPeriod() {
@@ -300,7 +286,7 @@ function openEditTeam(id) {
   renderResponsaveisEditor();
   $('#admin-add-person').onclick=()=> {
     adminEditState.responsaveis.push( {
-      nome:'',cargo:'',foto:'assets/users/default.svg',_file:null
+      id:null,areaId:id,nome:'',cargo:'',foto:'assets/users/default.svg',_file:null
     }
     );
     renderResponsaveisEditor();
@@ -323,7 +309,7 @@ function openEditTeam(id) {
         }
         ):pendente.foto;
         responsaveis.push( {
-          nome,cargo:(cargos[i]||'').trim(),foto
+          id:pendente.id||teamMemberId(id,nome,i),areaId:id,nome,cargo:(cargos[i]||'').trim(),foto
         }
         );
       }
@@ -332,7 +318,9 @@ function openEditTeam(id) {
         responsabilidades:$('#admin-responsabilidades').value.split('\n').map(s=>s.trim()).filter(Boolean),
         empresas:$('#admin-empresas').value.split('\n').map(s=>s.trim()).filter(Boolean),
         responsaveis,
-        lider:responsaveis[0]?.nome||team.lider
+        lider:responsaveis[0]?.nome||team.lider,
+        liderId:responsaveis[0]?.id||team.liderId,
+        dadosAreaValidados:team.dadosAreaValidados===true
       }
       ;
       const updated=await apiWrite('equipes', {
@@ -341,7 +329,7 @@ function openEditTeam(id) {
       );
       data.equipes[data.equipes.findIndex(t=>t.id===id)]=updated;
       renderAdmin();
-      renderTeams();
+      if(!$('#equipes').hidden)renderTeamStructure(data.equipes);
       $('#detail-dialog').close();
       notify('Equipe atualizada.');
     }
@@ -374,7 +362,7 @@ function showRecord(collection,id) {
     return;
   }
   if(collection==='equipes') {
-    showTeam(id);
+    navigate(currentMenu.find(item=>item.view==='equipes'));
     return;
   }
   if(collection==='sistemas') {
@@ -482,22 +470,27 @@ async function init() {
     currentUser=identifyUser(data.usuarios);
     renderUser(currentUser);
     applyAccess(currentUser);
-    const menu=data.config.menu.filter(item=>hasAccess(currentUser,TARGET_ACCESS[item.target]||'conteudo'));
+    currentMenu=data.config.menu.filter(item=>hasAccess(currentUser,TARGET_ACCESS[item.target]||'conteudo'));
     initializeNavigation( {
-      ...data.config,menu
+      ...data.config,menu:currentMenu
     }
-    ,renderContent,openAccess);
+    ,navigate,openAccess);
     bindTabs('.tabs',tab=>renderContent(tab.dataset.tab));
-    bindTabs('.segmented',tab=>renderTeams(tab.dataset.teamTab));
     renderContent(currentTab);
-    renderTeams();
     renderDashboard();
     renderEditorial();
     renderAdmin();
     renderPeriod();
+    const route=location.hash.slice(1);
+    const initialItem=currentMenu.find(item=>item.target===route)||(route==='inicio'?currentMenu.find(item=>item.target==='central'):null);
+    if(initialItem)navigate(initialItem,false);
+    window.addEventListener('popstate',()=> {
+      const item=currentMenu.find(menuItem=>menuItem.target===location.hash.slice(1))||currentMenu.find(menuItem=>menuItem.target==='central');
+      navigate(item,false);
+    });
     track('session_start');
     $('#switch-identity').onclick=()=>openIdentityPicker(data.usuarios);
-    if(!getStoredUserId())openIdentityPicker(data.usuarios);
+    if(currentUser.perfil==='Visitante')openIdentityPicker(data.usuarios);
     $('#new-draft').onclick=openNewDraft;
     $('#search-form').onsubmit=event=> {
       event.preventDefault();
@@ -507,7 +500,10 @@ async function init() {
       if(!$('#search-section').hidden)$('#search-section').scrollIntoView();
     }
     ;
-    $('#global-search').oninput=event=>search(event.target.value);
+    $('#global-search').oninput=event=> {
+      if(event.target.value&&$('#home-view').hidden)navigate(currentMenu.find(item=>item.target==='central'),false);
+      search(event.target.value);
+    };
     $('#clear-search').onclick=()=> {
       $('#global-search').value='';
       search('');
@@ -539,8 +535,6 @@ async function init() {
         const [collection,id]=record.dataset.record.split(':');
         showRecord(collection,id);
       }
-      const team=event.target.closest('[data-team]');
-      if(team)showTeam(team.dataset.team,team.dataset.facet);
       const system=event.target.closest('[data-system]');
       if(system)openAccess(data.sistemas.find(i=>i.id===system.dataset.system));
       const editorial=event.target.closest('[data-editorial]');
@@ -555,6 +549,12 @@ async function init() {
         const article=download.closest('article');
         track('document_download',{documento:article?.querySelector('p')?.textContent||article?.querySelector('h3')?.textContent||$('#dialog-title')?.textContent||'Documento'});
       }
+      const homeLink=event.target.closest('.brand,.hero-link');
+      if(homeLink) {
+        event.preventDefault();
+        const target=homeLink.hash.slice(1);
+        navigate(currentMenu.find(item=>item.target===target)||currentMenu.find(item=>item.target==='central'));
+      }
     }
     );
   }
@@ -566,3 +566,4 @@ async function init() {
   }
 }
 init();
+

@@ -24,10 +24,14 @@ export function setStoredUserId(id) {
     /* Storage may be blocked by corporate browser policy. */
   }
 }
+export function getMatriculaFromURL() {
+  return new URLSearchParams(window.location.search).get('matricula')?.trim()||null;
+}
 export function identifyUser(users) {
+  const matricula=getMatriculaFromURL();
   const id=getStoredUserId();
-  return users.find(user=>user.id===id)|| {
-    matricula:'Não informada',nome:'Colaborador não identificado',cargo:'Escolha seu nome para personalizar',area:'Não identificada',perfil:'Visitante',equipe:'Não identificada',foto:'assets/users/default.svg'
+  return users.find(user=>matricula&&user.matricula===matricula)||users.find(user=>user.id===id)|| {
+    matricula:matricula||'Não informada',nome:'Colaborador não identificado',cargo:'Escolha seu nome para personalizar',area:'Não identificada',perfil:'Visitante',equipe:'Não identificada',foto:'assets/users/default.svg'
   }
   ;
 }
@@ -49,3 +53,4 @@ export function renderUser(user) {
   }
   ));
 }
+

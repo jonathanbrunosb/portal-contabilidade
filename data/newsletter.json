@@ -17,7 +17,18 @@
     "areaResponsavel": "Normas e Reporte",
     "responsavel": "Marina Oliveira",
     "nivelImpacto": "Alto",
-    "status": "Publicado"
+    "status": "Publicado",
+    "aprovadoPor": "Marina Oliveira",
+    "dataAprovacao": "2026-09-14",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Marina Oliveira",
+        "data": "2026-09-14"
+      }
+    ]
   },
   {
     "id": "n2",
@@ -37,7 +48,18 @@
     "areaResponsavel": "Normas e Reporte",
     "responsavel": "Marina Oliveira",
     "nivelImpacto": "Alto",
-    "status": "Publicado"
+    "status": "Publicado",
+    "aprovadoPor": "Marina Oliveira",
+    "dataAprovacao": "2026-09-13",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Marina Oliveira",
+        "data": "2026-09-13"
+      }
+    ]
   },
   {
     "id": "n3",
@@ -57,7 +79,18 @@
     "areaResponsavel": "Gerência de Contabilidade",
     "responsavel": "Marina Oliveira",
     "nivelImpacto": "Moderado",
-    "status": "Publicado"
+    "status": "Publicado",
+    "aprovadoPor": "Marina Oliveira",
+    "dataAprovacao": "2026-09-12",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Marina Oliveira",
+        "data": "2026-09-12"
+      }
+    ]
   },
   {
     "id": "n4",
@@ -77,6 +110,47 @@
     "areaResponsavel": "Gerência de Contabilidade",
     "responsavel": "Jonathan Bruno",
     "nivelImpacto": "Baixo",
-    "status": "Publicado"
+    "status": "Publicado",
+    "aprovadoPor": "Jonathan Bruno",
+    "dataAprovacao": "2026-09-11",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Jonathan Bruno",
+        "data": "2026-09-11"
+      }
+    ]
+  },
+  {
+    "id": "n5",
+    "categoria": "Comunicado Interno",
+    "titulo": "Novo roteiro de fechamento trimestral",
+    "resumo": "Rascunho em elaboração: consolidação dos ajustes de calendário para o próximo trimestre.",
+    "conteudoCompleto": "CONTEÚDO EM ELABORAÇÃO — ainda não passou por revisão nem aprovação.\nEste rascunho ilustra o fluxo editorial: Rascunho → Em revisão → Publicado, com aprovação obrigatória registrada pelo backend antes da publicação.",
+    "dataPublicacao": "2026-09-15",
+    "dataVigencia": null,
+    "fonte": "Rascunho interno — Fase 4 do roadmap",
+    "link": null,
+    "documento": null,
+    "empresasImpactadas": [
+      "Empresa A (exemplo)"
+    ],
+    "areaResponsavel": "Gerência de Contabilidade",
+    "responsavel": "Jonathan Bruno",
+    "nivelImpacto": "Moderado",
+    "status": "Rascunho",
+    "aprovadoPor": null,
+    "dataAprovacao": null,
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Rascunho",
+        "autor": "Jonathan Bruno",
+        "data": "2026-09-15T10:00:00.000Z"
+      }
+    ]
   }
 ]

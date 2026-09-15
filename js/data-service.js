@@ -57,6 +57,25 @@ async function checkAPI() {
 export function isLiveDataSource() {
   return apiAvailable===true;
 }
+// Writes (create/update) always target the live backend: there is nowhere
+// else to persist them. Callers (js/app.js) must check isLiveDataSource()
+// before offering an editing action, and surface the thrown message when
+// the API rejects a request (e.g. a governance rule in server/server.js).
+export async function apiWrite(collection, { id, method='POST', body, autor } = {}) {
+  if(!isLiveDataSource())throw new Error('O backend opcional não está ativo — ver README, "Backend opcional".');
+  const url=`${API_BASE}/${collection}${id?`/${encodeURIComponent(id)}`:''}`;
+  const response=await withTimeout(signal=>fetch(url, {
+    method,signal,cache:'no-cache',
+    headers: {
+      'Content-Type':'application/json',...(autor?{'X-Autor':autor}:{})
+    }
+    ,body:JSON.stringify(body)
+  }
+  ));
+  const payload=await response.json().catch(()=>null);
+  if(!response.ok)throw new Error(payload?.erro||`A API recusou a requisição (${response.status}).`);
+  return payload;
+}
 export async function loadData() {
   const live=await checkAPI();
   const pairs=await Promise.all(collections.map(async name=> {

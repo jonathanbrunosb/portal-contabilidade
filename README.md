@@ -96,7 +96,7 @@ Duplique um objeto e preencha: `id`, `categoria`, `titulo`, `resumo`, `conteudoC
 
 - Datas: `AAAA-MM-DD`; vigência opcional pode ser `null`.
 - Conteúdo: texto simples; use `\n` entre parágrafos. HTML não é interpretado.
-- Publicações com `status: "Publicado"` aparecem na newsletter e na busca. Rascunhos ficam fora dessas visualizações; isso não é controle de acesso.
+- `status` segue o fluxo editorial da Fase 4 — `Rascunho` → `Em revisão` → `Publicado` (ou `Recusado`). Só itens com `status: "Publicado"` aparecem na newsletter e na busca; os demais ficam fora dessas visualizações, o que organiza a interface mas não é controle de acesso — o arquivo JSON continua completo e público a quem acessa o servidor. Editar manualmente ainda funciona; o "Painel editorial" (ver seção própria) é a alternativa validada, com o backend opcional ligado.
 - Impactos: `Alto`, `Moderado`, `Baixo`.
 - Categorias sugeridas estão em `config.json`: ANEEL, CPC, IFRS, Deliberação do Grupo, Comunicado Interno, Regulatório, Auditoria, Tecnologia, IA e Processos.
 - `link` recebe a fonte primária e `documento` um arquivo local opcional.
@@ -118,7 +118,7 @@ Troque os documentos demonstrativos por arquivos aprovados, como PDF, HTML ou DO
 
 ### Adicionar menu
 
-Inclua um objeto em `config.json > menu`: `label`, `icon`, `target` e, opcionalmente, `tab`. O `target` corresponde ao ID de uma seção HTML. `tab` pode ser `newsletter`, `noticias`, `sistemas` ou `documentos`. Para uma nova tela, adicione sua seção ao HTML e seu renderizador em `app.js`; para uma nova tab, atualize também o tablist. Os ícones disponíveis estão em `ui.js`.
+Inclua um objeto em `config.json > menu`: `label`, `icon`, `target` e, opcionalmente, `tab`. O `target` corresponde ao ID de uma seção HTML. `tab` pode ser `newsletter`, `noticias`, `sistemas` ou `documentos`. Para uma nova tela, adicione sua seção ao HTML e seu renderizador em `app.js`; para uma nova tab, atualize também o tablist. Os ícones disponíveis estão em `ui.js`. Se a nova seção só deve aparecer para certos perfis, registre seu `target` em `TARGET_ACCESS` e seu `id` em `SECTION_ACCESS` (`js/app.js`) com a capacidade exigida — um `target` sem entrada em `TARGET_ACCESS` cai no padrão `conteudo` (hoje liberado a todo perfil, incluindo visitante sem matrícula); um `id` de seção sem entrada em `SECTION_ACCESS` nunca é ocultado, fica visível a todos.
 
 ## Decisões técnicas e experiência
 
@@ -179,15 +179,31 @@ Por padrão o portal continua 100% estático, exatamente como descrito acima. `s
 | `/api/config` | GET | KPIs, resumo, menu e acessos — somente leitura nesta versão |
 | `/api/_audit` | GET | Últimas 100 entradas da trilha de auditoria |
 
-Toda escrita grava em `server/audit.log` (fora do controle de versão) quem fez o quê e quando — o "quem" vem do cabeçalho opcional `X-Autor`, informado por quem chama a API, não validado. Ainda não há UI de edição no portal para essas rotas de escrita; elas existem para automações e como base para a Fase 4 (fluxo editorial de rascunho, revisão e publicação).
+Toda escrita grava em `server/audit.log` (fora do controle de versão) quem fez o quê e quando — o "quem" vem do cabeçalho opcional `X-Autor`, informado por quem chama a API, não validado. O "Painel editorial" (Fase 4, ver seção própria) já usa essas rotas para newsletter e notícias; as demais coleções seguem sem UI de edição, disponíveis para automações.
 
 ### O que isso não é
 
 Este backend **não adiciona autenticação nem autorização real**. Continua sendo, como a Fase 1 já deixa explícito na interface, uma camada de conveniência e governança (dado vivo, trilha de auditoria, validação de formato) — não um controle de acesso de verdade. Não exponha `server/server.js` fora de `localhost` ou de uma rede interna confiável sem antes adicionar autenticação, HTTPS e uma origem de CORS restrita.
 
+## Painel editorial (Fase 4 — governança de conteúdo)
+
+O risco que esta fase fecha: publicar newsletter e notícias hoje significa editar `data/newsletter.json` ou `data/noticias.json` na mão, sem revisão nem trilha de quem aprovou o quê — arriscado para conteúdo com peso regulatório (ANEEL, CPC/IFRS, deliberações). O "Painel editorial", no menu lateral (visível para perfis com a capacidade `gerencial` — ver "Usuários e matrícula"), dá um fluxo com um mínimo de controle:
+
+- **Fluxo de status**: `Rascunho` → `Em revisão` → `Publicado`, com desvio para `Recusado` (que pode reabrir como `Rascunho`). Cada item guarda um `historicoStatus` com quem moveu o quê e quando.
+- **A única regra que o backend impõe de verdade**: não existe transição para `Publicado` sem um `aprovadoPor` informado no corpo da requisição — o servidor recusa (`400`) qualquer tentativa de publicar, ou de "reafirmar" a publicação de algo já publicado, sem essa informação. É deliberadamente a única regra rígida: o resto do fluxo (enviar para revisão, recusar, reabrir) é permissivo, porque o ponto de risco identificado era especificamente "publicar sem aprovação registrada", não uma máquina de estados completa.
+- **Novo rascunho**: o botão "Novo rascunho +" abre um formulário (newsletter ou notícia) que sempre entra como `Rascunho` — mesmo que o corpo da requisição tente forçar outro status, o backend ignora e força `Rascunho`, para que criar não vire um atalho para publicar.
+- **Exige o backend opcional ligado.** Sem ele (`window.PORTAL_API_ENABLED`), o painel mostra os itens em modo somente leitura, com aviso explícito, e o botão de novo rascunho fica desabilitado — não há como persistir uma edição sem a API rodando.
+
+### Limitações conhecidas, de propósito
+
+- Qualquer perfil com `gerencial` pode rascunhar **e** aprovar — não há separação entre "quem escreve" e "quem publica" nesta versão. O modelo de `permissoes` por usuário já suportaria uma capacidade `editorial-aprovar` separada; não foi feito para não alongar o escopo desta entrega.
+- Editar o conteúdo de um item **já** `Publicado` sem alterar o campo `status` no corpo da requisição não exige nova aprovação. A regra dura é sobre a transição para `Publicado`, não sobre toda edição subsequente — considere isso ao decidir quem tem acesso de escrita à API.
+- Confirmações usam `confirm()`/`prompt()` nativos do navegador (aprovar, recusar) em vez de um diálogo próprio — pragmático para esta entrega, mas o primeiro candidato a melhorar se o painel for usado no dia a dia.
+- `usuarios`, `processos`, `sistemas`, `equipes`, `agenda`, `documentos` e `entregas` não têm esse fluxo de aprovação — continuam editáveis via API sem revisão, ou via JSON manual.
+
 ## Próxima versão
 
-Substituir dados ilustrativos pelos conteúdos, fotos, documentos e URLs aprovados. O adaptador de dados para API já existe como backend opcional (ver "Backend opcional"), mas ainda sem autenticação: os próximos passos são autenticação corporativa com SSO, permissões aplicadas de fato no servidor (hoje `hasAccess()` só organiza a interface), gestão editorial com fluxo de rascunho/revisão/publicação sobre as rotas de escrita já existentes, histórico de indicadores e organograma completo. Essas integrações não estão implementadas nesta entrega.
+Substituir dados ilustrativos pelos conteúdos, fotos, documentos e URLs aprovados. O adaptador de dados para API (Fase 2) e o fluxo editorial de rascunho/revisão/publicação (Fase 4) já existem como backend opcional — faltam: autenticação corporativa com SSO, permissões aplicadas de fato no servidor (hoje `hasAccess()` só organiza a interface), separação entre quem rascunha e quem aprova, integrações reais com SAP/Power BI/OneStream/SharePoint (Fase 3 — depende de endereços e credenciais que só a organização pode fornecer), histórico de indicadores e organograma completo. Essas integrações não estão implementadas nesta entrega.
 
 ## Histórico da entrega
 

@@ -1,11 +1,32 @@
 import { loadData } from './data-service.js';
-import { identifyUser,renderUser } from './auth.js';
+import { identifyUser,renderUser,hasAccess } from './auth.js';
 import { initializeNavigation,bindTabs,selectTab } from './navigation.js';
 import { renderNewsletter,articleCard,showArticle } from './newsletter.js';
 import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,notify } from './ui.js';
 import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js';
-let data,currentTab='newsletter';
+let data,currentTab='newsletter',currentUser;
 const $=selector=>document.querySelector(selector);
+// Capability required to see each menu target / page section / searchable collection.
+const TARGET_ACCESS= {
+  central:'conteudo',processos:'gerencial',painel:'gerencial',agenda:'gerencial'
+}
+;
+const SECTION_ACCESS= {
+  central:'conteudo',equipes:'time',painel:'gerencial'
+}
+;
+const COLLECTION_ACCESS= {
+  newsletter:'conteudo',noticias:'conteudo',sistemas:'conteudo',documentos:'conteudo',equipes:'time',usuarios:'time',processos:'gerencial',agenda:'gerencial',entregas:'gerencial'
+}
+;
+function applyAccess(user) {
+  Object.entries(SECTION_ACCESS).forEach(([id,capability])=> {
+    document.getElementById(id).hidden=!hasAccess(user,capability);
+  }
+  );
+  $('.home-columns').classList.toggle('single-column',!hasAccess(user,'time'));
+  $('#notifications').hidden=!hasAccess(user,'gerencial');
+}
 function openAccess(item) {
   const url=safeURL(item.link);
   track('system_access',{sistema:item.nome,configurado:!!url});
@@ -133,12 +154,15 @@ function search(query) {
   $('#search-section').hidden=!normalized;
   if(!normalized)return 0;
   const matches=[];
-  for(const collection of ['newsletter','noticias','processos','sistemas','documentos','equipes','usuarios','agenda','entregas'])for(const item of data[collection]) {
-    if((collection==='newsletter'||collection==='noticias')&&item.status!=='Publicado')continue;
-    if(normalize(JSON.stringify(item)).includes(normalized))matches.push( {
-      collection,item
+  for(const collection of ['newsletter','noticias','processos','sistemas','documentos','equipes','usuarios','agenda','entregas']) {
+    if(!hasAccess(currentUser,COLLECTION_ACCESS[collection]))continue;
+    for(const item of data[collection]) {
+      if((collection==='newsletter'||collection==='noticias')&&item.status!=='Publicado')continue;
+      if(normalize(JSON.stringify(item)).includes(normalized))matches.push( {
+        collection,item
+      }
+      );
     }
-    );
   }
   $('#search-count').textContent=`${matches.length} resultado${matches.length===1?'':'s'} para “${query.trim()}”`;
   $('#search-results').innerHTML=matches.map(( {
@@ -200,8 +224,14 @@ async function init() {
   preferences();
   try {
     data=await loadData();
-    renderUser(identifyUser(data.usuarios));
-    initializeNavigation(data.config,renderContent,openAccess);
+    currentUser=identifyUser(data.usuarios);
+    renderUser(currentUser);
+    applyAccess(currentUser);
+    const menu=data.config.menu.filter(item=>hasAccess(currentUser,TARGET_ACCESS[item.target]||'conteudo'));
+    initializeNavigation( {
+      ...data.config,menu
+    }
+    ,renderContent,openAccess);
     bindTabs('.tabs',tab=>renderContent(tab.dataset.tab));
     bindTabs('.segmented',tab=>renderTeams(tab.dataset.teamTab));
     renderContent(currentTab);

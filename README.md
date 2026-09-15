@@ -78,13 +78,15 @@ Datas editoriais da home e competência são parametrizadas por `data/config.jso
 
 | URL | Resultado esperado |
 | --- | --- |
-| `/?matricula=2026001` | Jonathan Bruno — Gestor |
-| `/index.html?matricula=123456` | Marina Oliveira — Gerência |
-| `/?matricula=2026002` | Ana Martins — Colaborador |
-| `/?matricula=999999` | Colaborador não identificado, avatar padrão |
-| `/` | Colaborador não identificado, matrícula não informada |
+| URL | Resultado esperado | Seções visíveis |
+| --- | --- | --- |
+| `/?matricula=2026001` | Jonathan Bruno — Gestor | Central de conteúdo, Estrutura das equipes |
+| `/index.html?matricula=123456` | Marina Oliveira — Gerência | Central de conteúdo, Estrutura das equipes, Painel da gerência |
+| `/?matricula=2026002` | Ana Martins — Colaborador | Central de conteúdo |
+| `/?matricula=999999` | Colaborador não identificado, avatar padrão | Central de conteúdo |
+| `/` | Colaborador não identificado, matrícula não informada | Central de conteúdo |
 
-A matrícula personaliza a interface; não autentica o usuário. Os perfis e o mapa `PERMISSIONS` preparam a arquitetura, sem restringir os conteúdos. Todos os JSONs são públicos para quem pode acessar o servidor local. Não coloque credenciais nesses arquivos.
+A matrícula personaliza a interface; não autentica o usuário — o próprio perfil exibido traz o aviso "Identificação local pela matrícula — não é um login corporativo". O que o perfil determina é **o que aparece na tela**, não uma barreira de segurança: `hasAccess()` (`js/auth.js`), aplicado em `js/app.js`, usa a lista `permissoes` de cada usuário (`data/usuarios.json`) — ou o mapa `PERMISSIONS` por perfil, como padrão — para filtrar o menu, ocultar as seções "Estrutura das equipes" e "Painel da gerência" e restringir os resultados da busca global às coleções permitidas (`conteudo`, `time`, `gerencial`). Um visitante sem matrícula recebe o mesmo acesso de um Colaborador. Todos os JSONs continuam públicos para quem acessa o servidor local; não coloque credenciais neles, e trate isso como organização de interface, não como controle de acesso real — esse controle só existe com autenticação no servidor (ver "Próxima versão").
 
 ### Newsletter
 

@@ -69,7 +69,7 @@ export function renderTeamStructure(areas) {
     </div>
     <div class="structure-frame">
       <p class="structure-path">Gerência <span aria-hidden="true">→</span> Executivos(as) <span aria-hidden="true">→</span> Equipes</p>
-      ${manager?`<div class="structure-management"><article class="structure-manager-card"><img src="${e(photo(manager.foto))}" alt="Foto de ${e(manager.nome)}" data-avatar-fallback><div><strong>${e(manager.nome)}</strong><span>${e(manager.cargo||'Cargo a cadastrar')}</span><small>Gerência de Contabilidade</small></div></article></div>`:'<p class="structure-empty">Gerência a cadastrar.</p>'}
+      ${manager?`<div class="structure-management"><article class="structure-manager-card"><img src="${e(photo(manager.foto))}" alt="Foto de ${e(manager.nome)}" data-avatar-fallback><div><strong>${e(manager.nome)}</strong>${manager.cargo?`<span>${e(manager.cargo)}</span>`:''}<small>Gerência de Contabilidade</small></div></article></div>`:'<p class="structure-empty">Gerência a cadastrar.</p>'}
       <div class="structure-branches">${branches.map(branchCard).join('')}</div>
     </div>`;
 

@@ -66,7 +66,7 @@ export function hasAccess(user,capability) {
 }
 export function renderUser(user) {
   const photo=safeURL(user.foto)||'assets/users/default.svg';
-  document.querySelector('#profile').innerHTML=`<img class="avatar large" src="${e(photo)}" alt="Avatar de ${e(user.nome)}"><h2>${e(user.nome)}</h2><p>${e(user.cargo)}</p><div class="profile-meta"><span>Matrícula: ${e(user.matricula)}</span><span class="profile-role">${e(user.perfil)}</span></div><span class="profile-area">Área: ${e(user.area)}</span><small class="profile-note">Identificação local, salva neste navegador — não é um login corporativo.</small><button class="text-btn profile-switch" id="switch-identity">Trocar identificação</button>`;
+  document.querySelector('#profile').innerHTML=`<img class="avatar large" src="${e(photo)}" alt="Avatar de ${e(user.nome)}"><h2>${e(user.nome)}</h2><p>${e(user.cargo)}</p><span class="profile-area">Área: ${e(user.area)}</span><button class="text-btn profile-switch" id="switch-identity">Trocar identificação</button>`;
   document.querySelector('#top-user').innerHTML=`<span>${e(user.nome)}<small>${e(user.area)}</small></span><img class="avatar" src="${e(photo)}" alt="Avatar do colaborador">`;
   document.querySelectorAll('.avatar').forEach(img=>img.addEventListener('error',()=> {
     img.src='assets/users/default.svg';

@@ -118,7 +118,9 @@ Preencha `link` com o endereço real e validado. Valores iniciais `null` abrem u
 
 ### Equipes
 
-Cada equipe possui `lider`, `quantidade`, `responsaveis`, `responsabilidades`, `empresas` e `solucoes`. `solucoes` contém IDs de `sistemas.json`. A contagem inclui a equipe completa; a lista de responsáveis é uma lista de referência, não um cadastro completo de todos os colaboradores. O organograma deriva das equipes e usa `id: "gerencia"` como raiz.
+Cada equipe possui `lider`, `responsaveis`, `responsabilidades`, `empresas` e `solucoes`. `solucoes` contém IDs de `sistemas.json`. O organograma deriva das equipes e usa `id: "gerencia"` como raiz.
+
+O quantitativo de colaboradores exibido em cada card, no organograma e no diálogo de detalhes não é um campo separado no JSON — é sempre `responsaveis.length`, calculado em `js/app.js` (`teamHeadcount()`). Isso evita o número ficar desatualizado em relação à lista real de pessoas cadastradas: para manter a contagem correta, basta manter `responsaveis` completo. A raiz do organograma ("Gerência de Contabilidade") é a única exceção — mostra a soma de `responsaveis.length` de todas as equipes (incluindo a própria Gerência e os líderes de cada área, já que cada líder é um dos `responsaveis` do seu time), representando o efetivo total da Gerência de Contabilidade como um todo.
 
 `responsaveis` é uma lista de objetos `{ "nome", "cargo", "foto" }`, exibidos com avatar no diálogo "Responsáveis" de cada equipe. Cadastre a foto em `assets/users/` (mesmo padrão de `usuarios.json`: arquivo quadrado, `.jpg`/`.png`/`.svg`) e informe o caminho relativo em `foto`; na ausência de foto real, use `"assets/users/default.svg"` — falhas de carregamento da imagem também caem nesse avatar padrão automaticamente. `cargo` é livre (ex.: "Liderança", "Analista Contábil Sênior") e pode ficar vazio.
 

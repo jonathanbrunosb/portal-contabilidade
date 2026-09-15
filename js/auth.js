@@ -27,13 +27,36 @@ export function setStoredUserId(id) {
 export function getMatriculaFromURL() {
   return new URLSearchParams(window.location.search).get('matricula')?.trim()||null;
 }
-export function identifyUser(users) {
-  const matricula=getMatriculaFromURL();
-  const id=getStoredUserId();
-  return users.find(user=>matricula&&user.matricula===matricula)||users.find(user=>user.id===id)|| {
-    matricula:matricula||'Não informada',nome:'Colaborador não identificado',cargo:'Escolha seu nome para personalizar',area:'Não identificada',perfil:'Visitante',equipe:'Não identificada',foto:'assets/users/default.svg'
+function visitanteProfile() {
+  return {
+    matricula:'Não informada',nome:'Colaborador não identificado',cargo:'Escolha sua área para se identificar',area:'Não identificada',perfil:'Visitante',equipe:'Não identificada',foto:'assets/users/default.svg'
   }
   ;
+}
+// `users` (data/usuarios.json) is a small curated set kept for special cases
+// (e.g. an elevated `administracao` permission granted beyond the profile's
+// default tier). `equipes` is the real roster — anyone picked from there via
+// the área → colaborador flow gets a profile derived from their role in that
+// team (leader vs. colaborador), without needing a manual usuarios.json entry.
+export function identifyUser(users,equipes=[]) {
+  const matricula=getMatriculaFromURL();
+  const id=getStoredUserId();
+  const byMatricula=matricula&&users.find(user=>user.matricula===matricula);
+  if(byMatricula)return byMatricula;
+  if(id==='visitante')return visitanteProfile();
+  const byId=users.find(user=>user.id===id);
+  if(byId)return byId;
+  for(const team of equipes) {
+    const person=(team.responsaveis||[]).find(p=>p.id===id);
+    if(person)return {
+      id:person.id,matricula:'Não informada',nome:person.nome,cargo:person.cargo||'Colaborador',
+      area:team.nome,areaId:team.id,
+      perfil:team.tipo==='gerencia'?'Gerência':(person.id===team.liderId?'Gestor':'Colaborador'),
+      equipe:team.nome,foto:person.foto
+    }
+    ;
+  }
+  return visitanteProfile();
 }
 export function permissionsFor(user) {
   return user?.permissoes||PERMISSIONS[user?.perfil]||[];

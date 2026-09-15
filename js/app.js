@@ -1,8 +1,8 @@
-import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams } from './data-service.js?v=20260915-4';
+import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams } from './data-service.js?v=20260915-5';
 import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js';
 import { initializeNavigation,bindTabs,selectTab } from './navigation.js';
 import { renderNewsletter,articleCard,showArticle } from './newsletter.js';
-import { renderTeamStructure } from './teams.js?v=20260915-4';
+import { renderTeamStructure } from './teams.js?v=20260915-5';
 import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,notify } from './ui.js';
 import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js';
 let data,currentTab='newsletter',currentUser,currentMenu=[];
@@ -523,14 +523,45 @@ function preferences() {
   }
   ;
 }
-function openIdentityPicker(users) {
-  const rows=users.map(u=>`<button class="identity-pick" data-user="${e(u.id)}"><img class="avatar" src="${e(safeURL(u.foto)||'assets/users/default.svg')}" alt=""><span><strong>${e(u.nome)}</strong><small>${e(u.cargo)} · ${e(u.equipe)}</small></span></button>`).join('');
-  showDialog('Quem é você?','IDENTIFICAÇÃO',`<p>Escolha seu nome para personalizar o portal e assinar suas ações no Painel Editorial e na Administração. A escolha fica salva só neste navegador — não é um login corporativo.</p><div class="identity-list">${rows}</div>`);
-  document.querySelectorAll('.identity-pick').forEach(btn=>btn.onclick=()=> {
+// First access asks for the área before the person — the área → colaborador
+// choice is what changes what shows up next, so identifying by name alone
+// (as before) forced everyone through one flat list. A visitor who isn't
+// part of any área of the Gerência de Contabilidade gets its own option.
+function openIdentityPicker() {
+  const areas=data.equipes.map(team=>`<button class="identity-pick" data-area="${e(team.id)}">${icon('users')}<span><strong>${e(team.nome)}</strong><small>${e(team.responsaveis.length)} colaborador(es)</small></span></button>`).join('');
+  showDialog('Qual área você atua?','IDENTIFICAÇÃO',`<p>Escolha sua área para localizar seu nome na lista de colaboradores. A escolha fica salva só neste navegador — não é um login corporativo.</p><div class="identity-list">${areas}<button class="identity-pick" data-visitante>${icon('globe')}<span><strong>Sou visitante</strong><small>Não faço parte da Gerência de Contabilidade</small></span></button></div>`);
+  document.querySelectorAll('[data-area]').forEach(btn=>btn.onclick=()=>openColaboradorPicker(btn.dataset.area));
+  $('[data-visitante]').onclick=()=> {
+    setStoredUserId('visitante');
+    location.reload();
+  }
+  ;
+}
+// A colaborador already registered in Administração (data/usuarios.json) —
+// used today only for the handful of profiles that need something beyond
+// their área's default permissions, like Jonathan's admin access — keeps
+// that profile when picked here, matched by name within the same área.
+function openColaboradorPicker(areaId) {
+  const team=data.equipes.find(t=>t.id===areaId);
+  const rows=team.responsaveis.map(p=> {
+    const matched=data.usuarios.find(u=>u.areaId===team.id&&normalize(u.nome)===normalize(p.nome));
+    return `<button class="identity-pick" data-user="${e(matched?matched.id:p.id)}"><img class="avatar" src="${e(safeURL(p.foto)||'assets/users/default.svg')}" alt=""><span><strong>${e(p.nome)}</strong><small>${e(p.cargo||team.nome)}</small></span></button>`;
+  }
+  ).join('')||'<p class="empty-state">Nenhum colaborador cadastrado nesta área.</p>';
+  showDialog(team.nome,'IDENTIFICAÇÃO',`<button class="text-btn" id="identity-back">← Voltar</button><div class="identity-list">${rows}</div>`);
+  $('#identity-back').onclick=openIdentityPicker;
+  document.querySelectorAll('.identity-pick[data-user]').forEach(btn=>btn.onclick=()=> {
     setStoredUserId(btn.dataset.user);
     location.reload();
   }
   );
+  document.querySelectorAll('.identity-pick .avatar').forEach(img=>img.addEventListener('error',()=> {
+    img.src='assets/users/default.svg';
+  }
+  , {
+    once:true
+  }
+  ));
 }
 async function init() {
   hydrateIcons();
@@ -538,7 +569,7 @@ async function init() {
   preferences();
   try {
     data=await loadData();
-    currentUser=identifyUser(data.usuarios);
+    currentUser=identifyUser(data.usuarios,data.equipes);
     renderUser(currentUser);
     applyAccess(currentUser);
     currentMenu=data.config.menu.filter(item=>hasAccess(currentUser,TARGET_ACCESS[item.target]||'conteudo'));
@@ -560,8 +591,8 @@ async function init() {
       navigate(item,false);
     });
     track('session_start');
-    $('#switch-identity').onclick=()=>openIdentityPicker(data.usuarios);
-    if(currentUser.perfil==='Visitante')openIdentityPicker(data.usuarios);
+    $('#switch-identity').onclick=openIdentityPicker;
+    if(!getStoredUserId())openIdentityPicker();
     $('#new-draft').onclick=openNewDraft;
     $('#search-form').onsubmit=event=> {
       event.preventDefault();

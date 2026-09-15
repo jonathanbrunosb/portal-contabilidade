@@ -30,6 +30,7 @@ portal-contabilidade/
 │   └── styles.css
 ├── js/
 │   ├── app.js                 # Composição das telas, catálogo, busca e eventos
+│   ├── analytics.js           # Registro local de uso (abas, buscas, acessos, downloads)
 │   ├── auth.js                # Matrícula e perfis demonstrativos
 │   ├── data-service.js        # Carregamento das bases, futuro adaptador de API
 │   ├── navigation.js          # Menu, foco e tabs por teclado
@@ -126,6 +127,16 @@ Inclua um objeto em `config.json > menu`: `label`, `icon`, `target` e, opcionalm
 - Preferências locais de tamanho de texto e movimento, com tolerância a armazenamento bloqueado.
 - Tratamento de erro no carregamento e nova tentativa; nenhum backend ou autenticação real.
 - Identidade visual em azul marinho, azul corporativo e teal; logo vetorial, ícones inline e fontes do sistema, sem requisições a CDNs.
+
+## Uso e métricas locais
+
+O ícone de engrenagem abre, além das preferências de acessibilidade, um painel "Uso deste navegador" com a aba mais acessada, o sistema mais buscado, o termo mais pesquisado, o conteúdo mais consultado e o documento mais baixado.
+
+- Os eventos (`js/analytics.js`) ficam somente em `localStorage`, neste navegador; nada é enviado a servidores. Não é uma medição corporativa: cada colaborador só vê o próprio uso, no próprio dispositivo.
+- Nenhum dado pessoal além do termo de busca digitado é registrado; matrícula e nome não entram nos eventos.
+- O checkbox "Registrar meu uso do portal neste navegador" permite desativar a coleta a qualquer momento; "Limpar dados locais" apaga o histórico salvo.
+- O botão "Exportar dados" baixa um JSON com os eventos brutos — útil para reunir manualmente o uso de várias máquinas até existir uma API central (ver `data-service.js`).
+- Isso resolve "o que sabemos sobre o uso do portal neste navegador", não "o que a Gerência usa como um todo". Métricas agregadas de verdade exigem um backend que receba esses eventos — está fora do escopo desta entrega estática.
 
 ## Próxima versão
 

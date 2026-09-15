@@ -3,10 +3,12 @@ import { identifyUser,renderUser } from './auth.js';
 import { initializeNavigation,bindTabs,selectTab } from './navigation.js';
 import { renderNewsletter,articleCard,showArticle } from './newsletter.js';
 import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,notify } from './ui.js';
+import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js';
 let data,currentTab='newsletter';
 const $=selector=>document.querySelector(selector);
 function openAccess(item) {
   const url=safeURL(item.link);
+  track('system_access',{sistema:item.nome,configurado:!!url});
   if(url) {
     window.open(url,'_blank','noopener,noreferrer');
     return;
@@ -27,6 +29,7 @@ function documentResults() {
 }
 function renderContent(tab) {
   currentTab=tab;
+  track('tab_view',{tab});
   selectTab('.tabs',$(`#tab-${tab}`));
   $('#content-view').setAttribute('aria-labelledby',`tab-${tab}`);
   document.querySelectorAll('.nav-link').forEach(el=>el.classList.toggle('active',el.dataset.navTab===tab));
@@ -61,6 +64,7 @@ function renderTeams(mode='equipes') {
 }
 function showTeam(id,facet='Equipe') {
   const team=data.equipes.find(t=>t.id===id);
+  track('team_view',{equipe:team.nome,facet});
   let content=detailGrid( {
     'Líder':team.lider,'Colaboradores':team.quantidade,'Empresas atendidas':team.empresas
   }
@@ -97,6 +101,7 @@ function renderDashboard() {
 function showRecord(collection,id) {
   const item=data[collection]?.find(i=>i.id===id);
   if(!item)return;
+  track('record_view',{collection,label:item.titulo||item.nome});
   if(collection==='newsletter'||collection==='noticias') {
     showArticle(item);
     return;
@@ -126,7 +131,7 @@ function showRecord(collection,id) {
 function search(query) {
   const normalized=normalize(query.trim());
   $('#search-section').hidden=!normalized;
-  if(!normalized)return;
+  if(!normalized)return 0;
   const matches=[];
   for(const collection of ['newsletter','noticias','processos','sistemas','documentos','equipes','usuarios','agenda','entregas'])for(const item of data[collection]) {
     if((collection==='newsletter'||collection==='noticias')&&item.status!=='Publicado')continue;
@@ -140,6 +145,7 @@ function search(query) {
     collection,item
   }
   )=>`<article class="content-card"><span class="section-kicker">${e(({newsletter:'Newsletter',noticias:'Notícias',usuarios:'Colaboradores'})[collection]||collection)}</span><h3>${e(item.titulo||item.nome)}</h3><p>${e(item.resumo||item.descricao||item.cargo||'')}</p><button class="text-btn" data-record="${e(collection)}:${e(item.id)}">Ver detalhes →</button></article>`).join('')||'<p class="empty-state">Nenhum resultado. Experimente “conciliações”, “IFRS” ou “Contabilidade IV”.</p>';
+  return matches.length;
 }
 function preferences() {
   let prefs= {
@@ -153,15 +159,23 @@ function preferences() {
   }
   document.body.classList.toggle('no-motion',!!prefs.noMotion);
   document.body.classList.toggle('comfortable',!!prefs.comfortable);
+  setAnalyticsEnabled(!prefs.noAnalytics);
+  const usageList=(pairs,vazio)=>pairs.length?pairs.map(([k,c])=>`${k} · ${c}×`).join(', '):vazio;
   $('#settings').onclick=()=> {
-    showDialog('Preferências de visualização','CONFIGURAÇÕES',`<p>Preferências salvas apenas neste navegador.</p><label class="settings-row"><input type="checkbox" id="pref-motion" ${document.body.classList.contains('no-motion')?'checked':''}> Reduzir movimento e pausar o radar</label><label class="settings-row"><input type="checkbox" id="pref-size" ${document.body.classList.contains('comfortable')?'checked':''}> Aumentar textos dos conteúdos</label>`);
-    ['#pref-motion','#pref-size'].forEach(selector=>$(selector).onchange=()=> {
+    const s=summary();
+    showDialog('Preferências e uso','CONFIGURAÇÕES',`<p>Preferências salvas apenas neste navegador.</p><label class="settings-row"><input type="checkbox" id="pref-motion" ${document.body.classList.contains('no-motion')?'checked':''}> Reduzir movimento e pausar o radar</label><label class="settings-row"><input type="checkbox" id="pref-size" ${document.body.classList.contains('comfortable')?'checked':''}> Aumentar textos dos conteúdos</label><label class="settings-row"><input type="checkbox" id="pref-analytics" ${prefs.noAnalytics?'':'checked'}> Registrar meu uso do portal neste navegador</label><h3>Uso deste navegador</h3><p class="muted">Sem envio a servidores; os dados ficam só neste dispositivo e podem ser exportados ou apagados a qualquer momento.</p>${detailGrid( {
+      'Eventos registrados':String(s.total),'Aba mais acessada':usageList(s.topAbas,'Sem dados ainda'),'Sistema mais acessado':usageList(s.topSistemas,'Sem dados ainda'),'Termo mais pesquisado':usageList(s.topBuscas,'Sem dados ainda'),'Conteúdo mais consultado':usageList(s.topRegistros,'Sem dados ainda'),'Documento mais baixado':usageList(s.topDocumentos,'Sem dados ainda')
+    }
+    )}<div class="doc-actions"><button class="primary-btn" id="export-analytics">Exportar dados ↓</button><button class="text-btn" id="clear-analytics">Limpar dados locais</button></div>`);
+    ['#pref-motion','#pref-size','#pref-analytics'].forEach(selector=>$(selector).onchange=()=> {
       const settings= {
-        noMotion:$('#pref-motion').checked,comfortable:$('#pref-size').checked
+        noMotion:$('#pref-motion').checked,comfortable:$('#pref-size').checked,noAnalytics:!$('#pref-analytics').checked
       }
       ;
       document.body.classList.toggle('no-motion',settings.noMotion);
       document.body.classList.toggle('comfortable',settings.comfortable);
+      setAnalyticsEnabled(!settings.noAnalytics);
+      prefs=settings;
       try {
         localStorage.setItem('portal-preferences',JSON.stringify(settings));
       }
@@ -170,6 +184,13 @@ function preferences() {
       }
     }
     );
+    $('#export-analytics').onclick=exportAnalytics;
+    $('#clear-analytics').onclick=()=> {
+      clearAnalytics();
+      notify('Dados de uso apagados deste navegador.');
+      $('#settings').click();
+    }
+    ;
   }
   ;
 }
@@ -187,9 +208,12 @@ async function init() {
     renderTeams();
     renderDashboard();
     renderPeriod();
+    track('session_start');
     $('#search-form').onsubmit=event=> {
       event.preventDefault();
-      search($('#global-search').value);
+      const query=$('#global-search').value.trim();
+      const resultados=search(query);
+      if(query)track('search',{query,resultados});
       if(!$('#search-section').hidden)$('#search-section').scrollIntoView();
     }
     ;
@@ -215,6 +239,7 @@ async function init() {
         item:p,collection:'entregas'
       }
       ))];
+      track('notifications_open',{alertas:alerts.length});
       showDialog('Central de notificações','ALERTAS DA GERÊNCIA',`<p>${alerts.length} pontos de atenção na base demonstrativa.</p>${alerts.map(({item,collection})=>`<article class="content-card"><h3>${e(item.nome)}</h3><p>${e(item.responsavel)}</p><div class="card-bottom">${badge(item.status)}<button class="text-btn" data-record="${collection}:${e(item.id)}">Ver detalhes →</button></div></article>`).join('')||'<p>Nenhum alerta.</p>'}`);
     }
     ;
@@ -228,6 +253,11 @@ async function init() {
       if(team)showTeam(team.dataset.team,team.dataset.facet);
       const system=event.target.closest('[data-system]');
       if(system)openAccess(data.sistemas.find(i=>i.id===system.dataset.system));
+      const download=event.target.closest('a[download]');
+      if(download) {
+        const article=download.closest('article');
+        track('document_download',{documento:article?.querySelector('p')?.textContent||article?.querySelector('h3')?.textContent||$('#dialog-title')?.textContent||'Documento'});
+      }
     }
     );
   }

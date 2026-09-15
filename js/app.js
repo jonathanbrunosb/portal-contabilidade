@@ -1,8 +1,8 @@
-import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams } from './data-service.js?v=20260915-3';
+import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams } from './data-service.js?v=20260915-4';
 import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js';
 import { initializeNavigation,bindTabs,selectTab } from './navigation.js';
 import { renderNewsletter,articleCard,showArticle } from './newsletter.js';
-import { renderTeamStructure } from './teams.js?v=20260915-3';
+import { renderTeamStructure } from './teams.js?v=20260915-4';
 import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,notify } from './ui.js';
 import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js';
 let data,currentTab='newsletter',currentUser,currentMenu=[];

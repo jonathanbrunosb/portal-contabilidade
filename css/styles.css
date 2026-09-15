@@ -2339,3 +2339,104 @@ th,td {
 .no-motion .secondary-btn {
   transition:none}
 
+/* Responsibilities popover on a leadership card — independent of the
+   "Visualizar equipe" expand/collapse control, which keeps its own
+   [data-team-toggle] wiring untouched. */
+.leader-info {
+  position:relative}
+
+.structure-management .leader-info {
+  width:min(100%,430px)}
+
+.structure-leader {
+  padding-right:38px}
+
+.structure-manager-card {
+  padding-right:42px}
+
+.leader-info-trigger {
+  position:absolute;
+  top:8px;
+  right:8px;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:24px;
+  height:24px;
+  padding:0;
+  color:var(--blue);
+  background:#fff;
+  border:1px solid #cfe0f0;
+  border-radius:50%;
+  box-shadow:0 2px 6px #071f4918}
+
+.leader-info-trigger:hover {
+  background:#eaf6ff}
+
+.leader-info-trigger .icon {
+  width:14px;
+  height:14px}
+
+.structure-management .leader-info-trigger {
+  color:#fff;
+  background:#0b4776cc;
+  border-color:#ffffff40}
+
+.structure-management .leader-info-trigger:hover {
+  background:#0e588f}
+
+.leader-info-panel {
+  position:fixed;
+  z-index:60;
+  overflow:auto;
+  padding:13px 15px;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:10px;
+  box-shadow:0 16px 34px #071f4926;
+  font-size:13px;
+  color:var(--muted);
+  visibility:hidden;
+  opacity:0;
+  transform:translateY(4px);
+  transition:opacity .14s ease,transform .14s ease;
+  pointer-events:none}
+
+.leader-info.hover-open .leader-info-panel,
+.leader-info.focus-open .leader-info-panel,
+.leader-info.pinned .leader-info-panel {
+  visibility:visible;
+  opacity:1;
+  transform:translateY(0);
+  pointer-events:auto}
+
+.leader-info-title {
+  margin-bottom:8px;
+  color:var(--navy);
+  font-weight:700;
+  font-size:13px}
+
+.leader-info-panel ul {
+  margin:0;
+  padding-left:18px}
+
+.leader-info-panel li {
+  margin-top:5px;
+  line-height:1.4;
+  overflow-wrap:anywhere}
+
+.leader-info-panel li:first-child {
+  margin-top:0}
+
+.leader-info-empty {
+  margin:0;
+  font-style:italic}
+
+@media(prefers-reduced-motion:reduce) {
+  .leader-info-panel {
+    transition:none}}
+
+.no-motion .leader-info-panel {
+  transition:none}
+

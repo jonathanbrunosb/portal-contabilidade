@@ -1,0 +1,18 @@
+@echo off
+cd /d "%~dp0"
+echo Portal Contabilidade - backend opcional (Fase 2/4/Administracao)
+echo.
+echo Antes de usar pela primeira vez, edite este arquivo e troque
+echo SEU_TOKEN_AQUI pelo token real combinado com a Gerencia.
+echo NUNCA envie este arquivo para o Git depois de preencher o token
+echo (ele ja esta listado no .gitignore para evitar isso por engano).
+echo.
+set PORTAL_ADMIN_TOKEN=SEU_TOKEN_AQUI
+where node >nul 2>nul
+if %errorlevel% equ 0 (
+  node server\server.js
+) else (
+  echo Node.js nao encontrado. Instale o Node.js para rodar o backend opcional.
+  echo O portal continua funcionando sem ele, so como arquivos estaticos.
+)
+pause

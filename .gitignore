@@ -6,3 +6,8 @@ Thumbs.db
 
 # Runtime data from server/server.js (Fase 2) — not source
 server/audit.log
+
+# Local copy with the real PORTAL_ADMIN_TOKEN filled in — never commit this.
+# Copy INICIAR_API.cmd.example to INICIAR_API.cmd and edit the copy instead.
+INICIAR_API.cmd
+.env

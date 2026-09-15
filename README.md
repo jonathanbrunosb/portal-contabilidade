@@ -158,6 +158,8 @@ Por padrão o portal continua 100% estático, exatamente como descrito acima. `s
 
    Por padrão sobe em `http://127.0.0.1:8787`. Variáveis de ambiente opcionais: `PORTAL_API_HOST`, `PORTAL_API_PORT`, `PORTAL_DATA_DIR` (para apontar a uma cópia dos dados, por exemplo em teste), `PORTAL_ASSETS_USERS_DIR` (destino das fotos enviadas pelo Painel Administrativo, padrão `assets/users/`), `PORTAL_ALLOWED_ORIGIN` (CORS; padrão `*`, restrinja ao endereço do portal antes de qualquer uso além do seu próprio computador) e `PORTAL_ADMIN_TOKEN` — **defina este antes de qualquer uso além do seu próprio computador**: sem ele, qualquer um que alcance o backend pode escrever; com ele, toda escrita (criar, editar, apagar, enviar foto) exige o cabeçalho `X-Admin-Token` com o valor exato.
 
+   No Windows, copie `INICIAR_API.cmd.example` para `INICIAR_API.cmd`, edite a cópia trocando `SEU_TOKEN_AQUI` pelo token real e dê dois cliques nela para subir o backend já com o token configurado. `INICIAR_API.cmd` está no `.gitignore` de propósito — a cópia com o token real nunca deve ser commitada; só o `.example`, sem segredo nenhum, faz parte do repositório.
+
 2. Ligue o frontend a ele: adicione antes de `<script type="module" src="js/app.js">` em `index.html`:
 
    ```html

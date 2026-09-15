@@ -18,6 +18,36 @@
         "nome": "Ana Laura do Carmo Machado",
         "cargo": "Executiva de Contabilidade",
         "foto": "assets/users/ana-laura-carmo-machado.webp"
+      },
+      {
+        "nome": "Sara Priscila Pereira da Costa",
+        "cargo": "",
+        "foto": "assets/users/sara-priscila-pereira-da-costa.png"
+      },
+      {
+        "nome": "Felipe Carnaúba Torres",
+        "cargo": "",
+        "foto": "assets/users/felipe-carnauba-torres.png"
+      },
+      {
+        "nome": "Karina da Cruz Silva",
+        "cargo": "",
+        "foto": "assets/users/karina-da-cruz-silva.png"
+      },
+      {
+        "nome": "Ana Carolina Fernandes da Silva",
+        "cargo": "",
+        "foto": "assets/users/ana-carolina-fernandes-da-silva.png"
+      },
+      {
+        "nome": "Aline Andrade Cavalcante",
+        "cargo": "",
+        "foto": "assets/users/aline-andrade-cavalcante.png"
+      },
+      {
+        "nome": "Rayane Sousa da Silva",
+        "cargo": "",
+        "foto": "assets/users/rayane-sousa-da-silva.png"
       }
     ],
     "solucoes": [

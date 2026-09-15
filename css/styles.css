@@ -1264,6 +1264,40 @@ dialog h2 {
   font-size:11px;
   margin-top:2px}
 
+.admin-panel #admin-view {
+  padding:0 24px 24px}
+
+.admin-token-row {
+  display:flex;
+  gap:12px;
+  align-items:flex-end;
+  flex-wrap:wrap;
+  margin-bottom:18px}
+
+.admin-token-row .field {
+  margin-bottom:0;
+  min-width:220px}
+
+.admin-person-row {
+  display:flex;
+  gap:8px;
+  align-items:center;
+  margin-bottom:10px}
+
+.admin-person-row input[type=text] {
+  flex:1;
+  min-width:0;
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:8px;
+  font-size:12px;
+  font-family:inherit;
+  color:var(--text)}
+
+.admin-person-row input[type=file] {
+  font-size:11px;
+  max-width:130px}
+
 .settings-row {
   display:flex;
   gap:12px;

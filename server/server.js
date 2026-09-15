@@ -5,11 +5,14 @@
 // (js/data-service.js, data/*.json) — there is one source of truth on disk
 // whether the portal is served with or without this backend running.
 //
-// No authentication. This is a UX/governance upgrade (an audit trail and a
-// validated write path instead of hand-editing JSON), not a security
-// boundary — do not expose this beyond localhost or a trusted internal
-// network without adding real authentication and authorization first. See
-// the "Backend opcional" section of README.md.
+// Authentication: a single shared token (PORTAL_ADMIN_TOKEN), required on every
+// write (POST/PUT/DELETE/_upload) when set. This is a shared-secret gate, not
+// individual accounts — it stops an unauthenticated stranger on the network
+// from writing, but does not tell two token-holders apart (both show up in
+// the audit log as whatever X-Autor they send, self-reported, not verified).
+// If the env var is left unset, writes stay open (matches the original Fase 2
+// behavior) — set it before letting anyone but you reach this server. See the
+// "Backend opcional" section of README.md for the full caveat.
 'use strict';
 const http = require('node:http');
 const fs = require('node:fs/promises');
@@ -18,9 +21,23 @@ const path = require('node:path');
 const HOST = process.env.PORTAL_API_HOST || '127.0.0.1';
 const PORT = Number(process.env.PORTAL_API_PORT) || 8787;
 const DATA_DIR = process.env.PORTAL_DATA_DIR || path.join(__dirname, '..', 'data');
+const ASSETS_USERS_DIR = process.env.PORTAL_ASSETS_USERS_DIR || path.join(__dirname, '..', 'assets', 'users');
 const AUDIT_LOG = process.env.PORTAL_AUDIT_LOG || path.join(__dirname, 'audit.log');
 const ALLOWED_ORIGIN = process.env.PORTAL_ALLOWED_ORIGIN || '*';
+const ADMIN_TOKEN = process.env.PORTAL_ADMIN_TOKEN || '';
 const MAX_BODY_BYTES = 2_000_000;
+const MAX_UPLOAD_BYTES = 5_000_000;
+const ALLOWED_IMAGE_EXT = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'];
+
+function isAuthorized(req) {
+  return !ADMIN_TOKEN || req.headers['x-admin-token'] === ADMIN_TOKEN;
+}
+function safeAssetFilename(rawName, fallbackExt) {
+  const noAccents = String(rawName || 'foto').normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const ext = (path.extname(noAccents).slice(1) || fallbackExt || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const stem = path.basename(noAccents, path.extname(noAccents)).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'foto';
+  return { filename: `${stem}.${ext}`, ext };
+}
 
 // Arrays of records, each with a unique "id" (matches js/data-service.js).
 const LIST_COLLECTIONS = ['usuarios', 'newsletter', 'noticias', 'equipes', 'processos', 'sistemas', 'agenda', 'documentos', 'entregas'];
@@ -86,7 +103,7 @@ function send(res, status, body) {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
     'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type,X-Autor'
+    'Access-Control-Allow-Headers': 'Content-Type,X-Autor,X-Admin-Token'
   });
   res.end(JSON.stringify(body));
 }
@@ -131,6 +148,27 @@ const server = http.createServer(async (req, res) => {
       }
       return;
     }
+    if (collection === '_upload') {
+      if (req.method !== 'POST') { send(res, 405, { erro: 'Método não suportado.' }); return; }
+      if (!isAuthorized(req)) { send(res, 401, { erro: 'Token de administração ausente ou inválido.' }); return; }
+      const { filename, ext } = safeAssetFilename(url.searchParams.get('filename'), (req.headers['content-type'] || '').split('/')[1]);
+      if (!ALLOWED_IMAGE_EXT.includes(ext)) {
+        send(res, 400, { erro: `Extensão de imagem não permitida. Use: ${ALLOWED_IMAGE_EXT.join(', ')}.` });
+        return;
+      }
+      const chunks = [];
+      let size = 0;
+      for await (const chunk of req) {
+        size += chunk.length;
+        if (size > MAX_UPLOAD_BYTES) { send(res, 413, { erro: 'Arquivo excede o limite de 5MB.' }); return; }
+        chunks.push(chunk);
+      }
+      await fs.mkdir(ASSETS_USERS_DIR, { recursive: true });
+      await fs.writeFile(path.join(ASSETS_USERS_DIR, filename), Buffer.concat(chunks));
+      await appendAudit({ acao: 'upload', colecao: 'assets/users', id: filename, autor });
+      send(res, 201, { caminho: `assets/users/${filename}` });
+      return;
+    }
     if (SINGLETON_COLLECTIONS.includes(collection)) {
       if (req.method !== 'GET') { send(res, 405, { erro: 'Esta coleção é somente leitura nesta versão.' }); return; }
       send(res, 200, await readCollection(collection));
@@ -150,6 +188,10 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && id) {
       const item = items.find(i => String(i.id) === id);
       item ? send(res, 200, item) : send(res, 404, { erro: 'Registro não encontrado.' });
+      return;
+    }
+    if (['POST', 'PUT', 'DELETE'].includes(req.method) && !isAuthorized(req)) {
+      send(res, 401, { erro: 'Token de administração ausente ou inválido.' });
       return;
     }
     if (req.method === 'POST' && !id) {

@@ -10,7 +10,8 @@
     "foto": "assets/users/2026001.svg",
     "permissoes": [
       "conteudo",
-      "time"
+      "time",
+      "administracao"
     ]
   },
   {

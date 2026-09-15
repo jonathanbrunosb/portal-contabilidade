@@ -13,14 +13,34 @@ const API_BASE=`${location.protocol}//${location.hostname}:${API_PORT}/api`;
 const API_TIMEOUT_MS=800;
 let apiAvailable=null;
 
-async function withTimeout(run) {
+async function withTimeout(run,ms=API_TIMEOUT_MS) {
   const controller=new AbortController();
-  const timer=setTimeout(()=>controller.abort(),API_TIMEOUT_MS);
+  const timer=setTimeout(()=>controller.abort(),ms);
   try {
     return await run(controller.signal);
   }
   finally {
     clearTimeout(timer);
+  }
+}
+// Shared write token (server/server.js PORTAL_ADMIN_TOKEN): one secret gates
+// every write, stored per-browser. It tells "can write" from "can't", not who
+// is writing — X-Autor stays self-reported, same as before this existed.
+const ADMIN_TOKEN_KEY='portal-admin-token';
+export function getAdminToken() {
+  try {
+    return localStorage.getItem(ADMIN_TOKEN_KEY)||'';
+  }
+  catch {
+    return '';
+  }
+}
+export function setAdminToken(token) {
+  try {
+    token?localStorage.setItem(ADMIN_TOKEN_KEY,token):localStorage.removeItem(ADMIN_TOKEN_KEY);
+  }
+  catch {
+    /* Storage may be blocked by corporate browser policy. */
   }
 }
 async function fetchStatic(name) {
@@ -67,7 +87,7 @@ export async function apiWrite(collection, { id, method='POST', body, autor } = 
   const response=await withTimeout(signal=>fetch(url, {
     method,signal,cache:'no-cache',
     headers: {
-      'Content-Type':'application/json',...(autor?{'X-Autor':autor}:{})
+      'Content-Type':'application/json',...(autor?{'X-Autor':autor}:{}),...(getAdminToken()?{'X-Admin-Token':getAdminToken()}:{})
     }
     ,body:JSON.stringify(body)
   }
@@ -75,6 +95,25 @@ export async function apiWrite(collection, { id, method='POST', body, autor } = 
   const payload=await response.json().catch(()=>null);
   if(!response.ok)throw new Error(payload?.erro||`A API recusou a requisição (${response.status}).`);
   return payload;
+}
+// Uploads a photo to server/server.js (assets/users/), returning its relative
+// path for use as a "foto" field. Raw bytes, no multipart — both ends are
+// ours, so there is no reason for that extra complexity.
+const UPLOAD_TIMEOUT_MS=15000;
+export async function apiUploadPhoto(file,{autor}= {}) {
+  if(!isLiveDataSource())throw new Error('O backend opcional não está ativo — ver README, "Backend opcional".');
+  const url=`${API_BASE}/_upload?filename=${encodeURIComponent(file.name)}`;
+  const response=await withTimeout(signal=>fetch(url, {
+    method:'POST',signal,cache:'no-cache',
+    headers: {
+      'Content-Type':file.type||'application/octet-stream',...(autor?{'X-Autor':autor}:{}),...(getAdminToken()?{'X-Admin-Token':getAdminToken()}:{})
+    }
+    ,body:file
+  }
+  ),UPLOAD_TIMEOUT_MS);
+  const payload=await response.json().catch(()=>null);
+  if(!response.ok)throw new Error(payload?.erro||`A API recusou o upload (${response.status}).`);
+  return payload.caminho;
 }
 export async function loadData() {
   const live=await checkAPI();

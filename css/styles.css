@@ -1239,6 +1239,31 @@ dialog h2 {
 .detail-list {
   padding-left:20px}
 
+.person-list {
+  display:flex;
+  flex-direction:column;
+  gap:2px}
+
+.person-row {
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:8px 0}
+
+.person-row .avatar {
+  flex-shrink:0}
+
+.person-row strong {
+  display:block;
+  font-size:13px;
+  font-weight:600}
+
+.person-row small {
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  margin-top:2px}
+
 .settings-row {
   display:flex;
   gap:12px;

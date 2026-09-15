@@ -112,6 +112,8 @@ Preencha `link` com o endereço real e validado. Valores iniciais `null` abrem u
 
 Cada equipe possui `lider`, `quantidade`, `responsaveis`, `responsabilidades`, `empresas` e `solucoes`. `solucoes` contém IDs de `sistemas.json`. A contagem inclui a equipe completa; a lista de responsáveis é uma lista de referência, não um cadastro completo de todos os colaboradores. O organograma deriva das equipes e usa `id: "gerencia"` como raiz.
 
+`responsaveis` é uma lista de objetos `{ "nome", "cargo", "foto" }`, exibidos com avatar no diálogo "Responsáveis" de cada equipe. Cadastre a foto em `assets/users/` (mesmo padrão de `usuarios.json`: arquivo quadrado, `.jpg`/`.png`/`.svg`) e informe o caminho relativo em `foto`; na ausência de foto real, use `"assets/users/default.svg"` — falhas de carregamento da imagem também caem nesse avatar padrão automaticamente. `cargo` é livre (ex.: "Liderança", "Analista Contábil Sênior") e pode ficar vazio.
+
 ### Documentos
 
 Troque os documentos demonstrativos por arquivos aprovados, como PDF, HTML ou DOCX, atualizando `arquivo`, `formato`, `versao`, `data` e `responsavel`. O navegador determina se o formato abre diretamente ou é baixado. Categoria e busca textual podem ser combinadas. Os 13 modelos locais abrem e podem ser baixados sem depender de links externos.

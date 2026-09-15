@@ -14,7 +14,11 @@
       "Empresa A (exemplo)"
     ],
     "responsaveis": [
-      "Ana Martins — liderança"
+      {
+        "nome": "Ana Martins",
+        "cargo": "Liderança",
+        "foto": "assets/users/default.svg"
+      }
     ],
     "solucoes": [
       "s4"
@@ -35,7 +39,11 @@
       "Empresa B (exemplo)"
     ],
     "responsaveis": [
-      "Rafael Santos — liderança"
+      {
+        "nome": "Rafael Santos",
+        "cargo": "Liderança",
+        "foto": "assets/users/default.svg"
+      }
     ],
     "solucoes": [
       "s4"
@@ -56,7 +64,11 @@
       "Empresa C (exemplo)"
     ],
     "responsaveis": [
-      "Camila Costa — liderança"
+      {
+        "nome": "Camila Costa",
+        "cargo": "Liderança",
+        "foto": "assets/users/default.svg"
+      }
     ],
     "solucoes": [
       "s4"
@@ -78,7 +90,11 @@
       "Empresa D (exemplo)"
     ],
     "responsaveis": [
-      "Jonathan Bruno — liderança"
+      {
+        "nome": "Jonathan Bruno",
+        "cargo": "Liderança",
+        "foto": "assets/users/default.svg"
+      }
     ],
     "solucoes": [
       "s1",
@@ -103,7 +119,11 @@
       "Todas as empresas (exemplo)"
     ],
     "responsaveis": [
-      "Marina Oliveira — gerente corporativa"
+      {
+        "nome": "Marina Oliveira",
+        "cargo": "Gerente corporativa",
+        "foto": "assets/users/default.svg"
+      }
     ],
     "solucoes": [
       "s2",

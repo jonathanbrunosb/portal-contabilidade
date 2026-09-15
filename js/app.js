@@ -33,6 +33,15 @@ function applyAccess(user) {
   $('#notifications').hidden=!hasAccess(user,'gerencial');
 }
 function openAccess(item) {
+  if(item.target) {
+    track('system_access',{sistema:item.nome,configurado:true});
+    if(item.tab)renderContent(item.tab);
+    document.getElementById(item.target)?.scrollIntoView( {
+      behavior:'smooth'
+    }
+    );
+    return;
+  }
   const url=safeURL(item.link);
   track('system_access',{sistema:item.nome,configurado:!!url});
   if(url) {

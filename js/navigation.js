@@ -1,6 +1,6 @@
 import { icon,escapeHTML as e } from './ui.js';
 export function initializeNavigation(config,onTab,onAccess) {
-  document.querySelector('#navigation').innerHTML=`<p class="nav-label">PORTAL</p>${config.menu.map((item,i)=>`<a class="nav-link ${i===0?'active':''}" href="#${e(item.target)}" ${item.tab?`data-nav-tab="${e(item.tab)}"`:''}>${icon(item.icon)}<span>${e(item.label)}</span></a>`).join('')}<p class="nav-label">ACESSOS RÁPIDOS</p>${config.links.map((item,i)=>`<button class="nav-link" data-access="${i}">${icon(item.icon)}<span>${e(item.nome)}</span><span class="external" aria-hidden="true">↗</span></button>`).join('')}`;
+  document.querySelector('#navigation').innerHTML=`<p class="nav-label">PORTAL</p>${config.menu.map((item,i)=>`<a class="nav-link ${i===0?'active':''}" href="#${e(item.target)}" ${item.tab?`data-nav-tab="${e(item.tab)}"`:''}>${icon(item.icon)}<span>${e(item.label)}</span></a>`).join('')}<p class="nav-label">ACESSOS RÁPIDOS</p>${config.links.map((item,i)=>`<button class="nav-link" data-access="${i}">${icon(item.icon)}<span>${e(item.nome)}</span>${item.target?'':'<span class="external" aria-hidden="true">↗</span>'}</button>`).join('')}`;
   document.querySelector('#menu-toggle').innerHTML=icon('menu');
   const sidebar=document.querySelector('#sidebar'),scrim=document.querySelector('#scrim'),toggle=document.querySelector('#menu-toggle');
   function menu(open,restore=true) {

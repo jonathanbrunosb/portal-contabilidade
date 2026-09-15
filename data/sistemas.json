@@ -4,6 +4,7 @@
     "nome": "IFRS 16 / CPC 06",
     "descricao": "Gestão de contratos, passivos, ativo de direito de uso, eventos contratuais e reportes.",
     "icon": "file",
+    "imagem": "assets/sistemas/ifrs16-cpc06.png",
     "status": "Ativo",
     "link": "https://arrendamento.contabilidade-eqtl.com/",
     "responsavel": "Contabilidade IV"

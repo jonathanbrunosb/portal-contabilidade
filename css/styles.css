@@ -1171,6 +1171,16 @@ tbody tr:hover {
   justify-content:center;
   margin-bottom:12px}
 
+.system-image {
+  display:block;
+  width:100%;
+  height:auto;
+  aspect-ratio:1024/300;
+  object-fit:cover;
+  border-radius:8px;
+  margin-bottom:12px;
+  background:#e7eff8}
+
 .primary-btn {
   display:inline-flex;
   align-items:center;

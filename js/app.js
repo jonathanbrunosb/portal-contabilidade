@@ -90,11 +90,11 @@ function renderTeams(mode='equipes') {
   selectTab('.segmented',$(`#team-tab-${mode}`));
   $('#teams-view').setAttribute('aria-labelledby',`team-tab-${mode}`);
   if(mode==='equipes') {
-    $('#teams-view').innerHTML=data.equipes.map(team=>`<article class="team-card"><div class="team-top"><span class="team-icon">${e(team.sigla)}</span><div class="team-copy"><h3>${e(team.nome)}</h3><p>${e(team.descricao)}</p><small class="team-leader">${e(team.lider)}</small></div><span class="team-count" title="${e(team.quantidade)} colaboradores">${icon('users')}${e(team.quantidade)}</span></div><div class="team-links">${['Equipe','Processos','Responsáveis','Empresas','Soluções'].map(f=>`<button class="text-btn" data-team="${e(team.id)}" data-facet="${e(f)}">${e(f)}</button>`).join('')}</div></article>`).join('');
+    $('#teams-view').innerHTML=data.equipes.map(team=>`<article class="team-card"><div class="team-top"><span class="team-icon">${e(team.sigla)}</span><div class="team-copy"><h3>${e(team.nome)}</h3><p>${e(team.descricao)}</p>${team.lider?`<small class="team-leader">${e(team.lider)}</small>`:''}</div><span class="team-count" title="${e(team.quantidade)} colaboradores">${icon('users')}${e(team.quantidade)}</span></div><div class="team-links">${['Equipe','Processos','Responsáveis','Empresas','Soluções'].map(f=>`<button class="text-btn" data-team="${e(team.id)}" data-facet="${e(f)}">${e(f)}</button>`).join('')}</div></article>`).join('');
   }
   else {
     const manager=data.equipes.find(t=>t.id==='gerencia');
-    $('#teams-view').innerHTML=`<div class="org"><button class="org-root" data-team="gerencia">Gerência de Contabilidade<small>${e(manager.lider)}</small></button><div class="org-children">${data.equipes.filter(t=>t.id!=='gerencia').map(t=>`<button class="org-node" data-team="${e(t.id)}">${e(t.nome)}<small>${e(t.lider)} · ${e(t.quantidade)} colaboradores</small></button>`).join('')}</div></div>`;
+    $('#teams-view').innerHTML=`<div class="org"><button class="org-root" data-team="gerencia">Gerência de Contabilidade<small>${e(manager.lider)}</small></button><div class="org-children">${data.equipes.filter(t=>t.id!=='gerencia').map(t=>`<button class="org-node" data-team="${e(t.id)}">${e(t.nome)}<small>${t.lider?`${e(t.lider)} · `:''}${e(t.quantidade)} colaboradores</small></button>`).join('')}</div></div>`;
   }
 }
 function showTeam(id,facet='Equipe') {

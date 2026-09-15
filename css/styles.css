@@ -1175,8 +1175,6 @@ tbody tr:hover {
   display:block;
   width:100%;
   height:auto;
-  aspect-ratio:1024/300;
-  object-fit:cover;
   border-radius:8px;
   margin-bottom:12px;
   background:#e7eff8}

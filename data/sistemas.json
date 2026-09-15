@@ -14,6 +14,7 @@
     "nome": "Monitor de Desempenho",
     "descricao": "Gestão da equipe, avaliações, feedbacks, carreira e desenvolvimento.",
     "icon": "chart",
+    "imagem": "assets/sistemas/monitor-de-desempenho.webp",
     "status": "Link não configurado",
     "link": null,
     "responsavel": "Contabilidade IV"
@@ -23,6 +24,7 @@
     "nome": "Controle de Horas",
     "descricao": "Banco de horas, folgas, compensações e acompanhamento por colaborador.",
     "icon": "clock",
+    "imagem": "assets/sistemas/controle-de-horas.webp",
     "status": "Ativo",
     "link": "https://gestorhoras.contabilidade-eqtl.com/",
     "responsavel": "Contabilidade IV"
@@ -32,6 +34,7 @@
     "nome": "ProjectHub — Gerenciador de Projetos",
     "descricao": "Gestão de projetos, tarefas, prazos, responsáveis e acompanhamento das iniciativas da área.",
     "icon": "grid",
+    "imagem": "assets/sistemas/projecthub.webp",
     "status": "Ativo",
     "link": "https://projecthub.contabilidade-eqtl.com/",
     "responsavel": "Contabilidade IV"

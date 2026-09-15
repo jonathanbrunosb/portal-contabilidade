@@ -11,7 +11,7 @@ Portal corporativo local em HTML5, CSS3 e JavaScript Vanilla. Não precisa de No
    python -m http.server 5500 --bind 127.0.0.1
    ```
 
-3. Abra [Portal local — Jonathan Bruno](http://localhost:5500/?matricula=2026001) no Chrome ou Edge.
+3. Abra [http://localhost:5500/](http://localhost:5500/) no Chrome ou Edge e escolha seu nome no diálogo "Quem é você?" que aparece no primeiro acesso.
 4. Mantenha o terminal aberto enquanto usa o portal. Para encerrar, pressione `Ctrl+C`.
 
 Python é apenas uma opção de servidor estático. Você pode usar qualquer servidor de arquivos corporativo já disponível, inclusive Live Server ou IIS configurado para arquivos estáticos e JSON. Não há etapa de build. Se a porta 5500 estiver ocupada, encerre seu servidor anterior ou escolha outra porta no comando e na URL. O servidor criado durante a implementação pode já estar atendendo a porta 5500.
@@ -42,7 +42,7 @@ portal-contabilidade/
 ├── js/
 │   ├── app.js                 # Composição das telas, catálogo, busca e eventos
 │   ├── analytics.js           # Registro local de uso (abas, buscas, acessos, downloads)
-│   ├── auth.js                # Matrícula e perfis demonstrativos
+│   ├── auth.js                # Identificação por seleção de nome e perfis demonstrativos
 │   ├── data-service.js        # Carregamento das bases, futuro adaptador de API
 │   ├── navigation.js          # Menu, foco e tabs por teclado
 │   ├── newsletter.js          # Radar, cards e leitura das publicações
@@ -85,21 +85,18 @@ Edite os JSONs em UTF-8, mantenha a sintaxe válida e atualize o navegador. Os a
 
 Datas editoriais da home e competência são parametrizadas por `data/config.json`. Agenda e entregas representam o calendário da base, sem atualização por serviço externo.
 
-### Usuários e matrícula
+### Usuários e identificação
 
-`getMatriculaFromURL()` está em `js/auth.js` e usa `URLSearchParams`. As matrículas são strings; mantenha zeros à esquerda quando existirem. Cadastre a foto em `assets/users/` e informe o caminho em `foto`. Na ausência de fotografia foi usado um avatar de iniciais; falhas de imagem usam o avatar padrão.
+Não há mais parâmetro de URL: no primeiro acesso — ou a qualquer momento, clicando em "Trocar identificação" na barra lateral — o portal abre o diálogo "Quem é você?", listando os nomes de `data/usuarios.json`. A escolha fica salva neste navegador (`localStorage`, chave `portal-identity`, ver `js/auth.js`); fechar o diálogo sem escolher equivale a não se identificar. Cadastre a foto em `assets/users/` e informe o caminho em `foto`. Na ausência de fotografia foi usado um avatar de iniciais; falhas de imagem usam o avatar padrão.
 
-| URL | Resultado esperado |
-| --- | --- |
-| URL | Resultado esperado | Seções visíveis |
+| Ação | Resultado esperado | Seções visíveis |
 | --- | --- | --- |
-| `/?matricula=2026001` | Jonathan Bruno — Gestor | Central de conteúdo, Estrutura das equipes |
-| `/index.html?matricula=123456` | Marina Oliveira — Gerência | Central de conteúdo, Estrutura das equipes, Painel da gerência |
-| `/?matricula=2026002` | Ana Martins — Colaborador | Central de conteúdo |
-| `/?matricula=999999` | Colaborador não identificado, avatar padrão | Central de conteúdo |
-| `/` | Colaborador não identificado, matrícula não informada | Central de conteúdo |
+| Selecionar "Jonathan Bruno Santos Bezerra" | Gestor, Contabilidade IV | Central de conteúdo, Estrutura das equipes, Administração |
+| Selecionar "Marina Oliveira" | Gerência | Central de conteúdo, Estrutura das equipes, Painel da gerência |
+| Selecionar "Ana Martins" | Colaborador | Central de conteúdo |
+| Fechar o diálogo sem escolher | Colaborador não identificado, avatar padrão | Central de conteúdo |
 
-A matrícula personaliza a interface; não autentica o usuário — o próprio perfil exibido traz o aviso "Identificação local pela matrícula — não é um login corporativo". O que o perfil determina é **o que aparece na tela**, não uma barreira de segurança: `hasAccess()` (`js/auth.js`), aplicado em `js/app.js`, usa a lista `permissoes` de cada usuário (`data/usuarios.json`) — ou o mapa `PERMISSIONS` por perfil, como padrão — para filtrar o menu, ocultar as seções "Estrutura das equipes" e "Painel da gerência" e restringir os resultados da busca global às coleções permitidas (`conteudo`, `time`, `gerencial`). Uma quarta capacidade, `administracao`, libera o "Painel administrativo" (ver seção própria) — hoje só `Jonathan Bruno` (matrícula `2026001`) tem essa capacidade adicionada em `permissoes`; conceda a outras matrículas do mesmo jeito, adicionando `"administracao"` à lista. Um visitante sem matrícula recebe o mesmo acesso de um Colaborador. Todos os JSONs continuam públicos para quem acessa o servidor local; não coloque credenciais neles, e trate isso como organização de interface, não como controle de acesso real — esse controle só existe com autenticação no servidor (ver "Próxima versão").
+A escolha personaliza a interface; não autentica o usuário — o próprio perfil exibido traz o aviso "Identificação local, salva neste navegador — não é um login corporativo". O que o perfil determina é **o que aparece na tela**, não uma barreira de segurança: `hasAccess()` (`js/auth.js`), aplicado em `js/app.js`, usa a lista `permissoes` de cada usuário (`data/usuarios.json`) — ou o mapa `PERMISSIONS` por perfil, como padrão — para filtrar o menu, ocultar as seções "Estrutura das equipes" e "Painel da gerência" e restringir os resultados da busca global às coleções permitidas (`conteudo`, `time`, `gerencial`). Uma quarta capacidade, `administracao`, libera o "Painel administrativo" (ver seção própria) — hoje só `Jonathan Bruno` tem essa capacidade adicionada em `permissoes`; conceda a outros usuários do mesmo jeito, adicionando `"administracao"` à lista. Quem fecha o diálogo sem escolher recebe o mesmo acesso de um Colaborador. Todos os JSONs continuam públicos para quem acessa o site publicado; não coloque credenciais neles, e trate isso como organização de interface, não como controle de acesso real — esse controle só existe com autenticação no servidor (ver "Próxima versão").
 
 ### Newsletter
 
@@ -209,7 +206,7 @@ Fora do token de escrita acima, este backend **não adiciona autenticação nem 
 
 ## Painel administrativo (equipes)
 
-Menu "Administração", visível só para quem tem a capacidade `administracao` (perfil Administrador, ou qualquer usuário com `"administracao"` em `permissoes` — ver "Usuários e matrícula"). Deixa editar, direto pelo portal e sem tocar em JSON, o que hoje só era possível me pedindo para editar `data/equipes.json` manualmente:
+Menu "Administração", visível só para quem tem a capacidade `administracao` (perfil Administrador, ou qualquer usuário com `"administracao"` em `permissoes` — ver "Usuários e identificação"). Deixa editar, direto pelo portal e sem tocar em JSON, o que hoje só era possível me pedindo para editar `data/equipes.json` manualmente:
 
 - Descrição da área, responsabilidades e empresas atendidas de cada equipe.
 - A lista de responsáveis: adicionar, remover, renomear, trocar cargo e **enviar uma foto pelo próprio navegador** (usa a rota `_upload` acima). O primeiro responsável da lista também define o campo `lider` da equipe.
@@ -218,7 +215,7 @@ Exige o backend opcional ligado e o token de escrita salvo (ver acima) — sem i
 
 ## Painel editorial (Fase 4 — governança de conteúdo)
 
-O risco que esta fase fecha: publicar newsletter e notícias hoje significa editar `data/newsletter.json` ou `data/noticias.json` na mão, sem revisão nem trilha de quem aprovou o quê — arriscado para conteúdo com peso regulatório (ANEEL, CPC/IFRS, deliberações). O "Painel editorial", no menu lateral (visível para perfis com a capacidade `gerencial` — ver "Usuários e matrícula"), dá um fluxo com um mínimo de controle:
+O risco que esta fase fecha: publicar newsletter e notícias hoje significa editar `data/newsletter.json` ou `data/noticias.json` na mão, sem revisão nem trilha de quem aprovou o quê — arriscado para conteúdo com peso regulatório (ANEEL, CPC/IFRS, deliberações). O "Painel editorial", no menu lateral (visível para perfis com a capacidade `gerencial` — ver "Usuários e identificação"), dá um fluxo com um mínimo de controle:
 
 - **Fluxo de status**: `Rascunho` → `Em revisão` → `Publicado`, com desvio para `Recusado` (que pode reabrir como `Rascunho`). Cada item guarda um `historicoStatus` com quem moveu o quê e quando.
 - **A única regra que o backend impõe de verdade**: não existe transição para `Publicado` sem um `aprovadoPor` informado no corpo da requisição — o servidor recusa (`400`) qualquer tentativa de publicar, ou de "reafirmar" a publicação de algo já publicado, sem essa informação. É deliberadamente a única regra rígida: o resto do fluxo (enviar para revisão, recusar, reabrir) é permissivo, porque o ponto de risco identificado era especificamente "publicar sem aprovação registrada", não uma máquina de estados completa.

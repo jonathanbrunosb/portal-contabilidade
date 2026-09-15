@@ -1,7 +1,7 @@
 @echo off
 cd /d "%~dp0"
 echo Portal Contabilidade - servidor de arquivos local
-echo Abra http://localhost:5500/?matricula=2026001
+echo Abra http://localhost:5500/ e escolha seu nome na tela inicial
 echo Para encerrar, pressione Ctrl+C nesta janela.
 where python >nul 2>nul
 if %errorlevel% equ 0 (

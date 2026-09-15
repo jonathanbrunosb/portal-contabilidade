@@ -27,6 +27,7 @@ async function withTimeout(run,ms=API_TIMEOUT_MS) {
 // every write, stored per-browser. It tells "can write" from "can't", not who
 // is writing — X-Autor stays self-reported, same as before this existed.
 const ADMIN_TOKEN_KEY='portal-admin-token';
+const LOCAL_TEAMS_KEY='portal-admin-equipes';
 export function getAdminToken() {
   try {
     return localStorage.getItem(ADMIN_TOKEN_KEY)||'';
@@ -41,6 +42,29 @@ export function setAdminToken(token) {
   }
   catch {
     /* Storage may be blocked by corporate browser policy. */
+  }
+}
+export function hasLocalTeams() {
+  try {
+    return Boolean(localStorage.getItem(LOCAL_TEAMS_KEY));
+  }
+  catch {
+    return false;
+  }
+}
+export function saveLocalTeams(teams) {
+  localStorage.setItem(LOCAL_TEAMS_KEY,JSON.stringify(teams));
+}
+export function clearLocalTeams() {
+  localStorage.removeItem(LOCAL_TEAMS_KEY);
+}
+function readLocalTeams() {
+  try {
+    const value=JSON.parse(localStorage.getItem(LOCAL_TEAMS_KEY)||'null');
+    return Array.isArray(value)?value:null;
+  }
+  catch {
+    return null;
   }
 }
 async function fetchStatic(name) {
@@ -129,5 +153,7 @@ export async function loadData() {
     return [name,await fetchStatic(name)];
   }
   ));
-  return Object.fromEntries(pairs);
+  const result=Object.fromEntries(pairs);
+  if(!live)result.equipes=readLocalTeams()||result.equipes;
+  return result;
 }

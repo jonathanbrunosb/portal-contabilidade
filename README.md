@@ -211,12 +211,14 @@ Fora do token de escrita acima, este backend **não adiciona autenticação nem 
 
 ## Painel administrativo (equipes)
 
-Menu "Administração", visível só para quem tem a capacidade `administracao` (perfil Administrador, ou qualquer usuário com `"administracao"` em `permissoes` — ver "Usuários e identificação"). Deixa editar, direto pelo portal e sem tocar em JSON, o que hoje só era possível me pedindo para editar `data/equipes.json` manualmente:
+Menu "Administração", visível só para quem tem a capacidade `administracao` (perfil Administrador, ou qualquer usuário com `"administracao"` em `permissoes` — ver "Usuários e identificação"). Permite administrar a estrutura diretamente no portal:
 
-- Descrição da área, responsabilidades e empresas atendidas de cada equipe.
-- A lista de responsáveis: adicionar, remover, renomear, trocar cargo e **enviar uma foto pelo próprio navegador** (usa a rota `_upload` acima). O primeiro responsável da lista também define o campo `lider` da equipe.
+- Criar, renomear, editar e excluir equipes. A raiz "Gerência" é protegida contra exclusão.
+- Adicionar, editar e excluir colaboradores, alterar cargo e foto e escolher explicitamente a liderança de cada equipe.
+- Editar descrição, responsabilidades, empresas atendidas e o indicador de dados validados.
+- Exportar a base consolidada como `equipes.json`, importar um backup e restaurar a base original.
 
-Exige o backend opcional ligado e o token de escrita salvo (ver acima) — sem isso, o painel mostra os dados em modo somente leitura com aviso explícito, igual ao Painel Editorial.
+No portal estático e no GitHub Pages, as alterações são salvas em `localStorage` no navegador atual. Esse modo torna o cadastro utilizável sem Node.js; para compartilhar as alterações, use **Exportar JSON** e substitua `data/equipes.json` na publicação. Fotos escolhidas nesse modo devem ter até 750 KB. Com o backend opcional ativo, as alterações são gravadas nos arquivos do servidor, o upload usa a rota `_upload` e o token de escrita continua obrigatório quando `PORTAL_ADMIN_TOKEN` estiver configurado.
 
 ## Painel editorial (Fase 4 — governança de conteúdo)
 

@@ -1328,11 +1328,125 @@ dialog h2 {
   margin-bottom:0;
   min-width:220px}
 
-.admin-person-row {
+.admin-overview {
   display:flex;
-  gap:8px;
   align-items:center;
-  margin-bottom:10px}
+  justify-content:space-between;
+  gap:24px;
+  padding:20px;
+  margin-bottom:20px;
+  border:1px solid #cfe5f7;
+  border-radius:12px;
+  background:#f4faff}
+
+.admin-overview strong {
+  display:block;
+  margin:4px 0;
+  color:var(--navy);
+  font-size:17px}
+
+.admin-overview p {
+  margin:0;
+  color:var(--muted);
+  font-size:12px}
+
+.admin-toolbar,.admin-form-actions,.admin-subheading {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap}
+
+.admin-toolbar {
+  justify-content:flex-end}
+
+.admin-import {
+  cursor:pointer}
+
+.admin-import input {
+  position:absolute;
+  inline-size:1px;
+  block-size:1px;
+  opacity:0}
+
+.admin-team-list {
+  display:grid;
+  gap:12px}
+
+.admin-team-card {
+  display:flex;
+  justify-content:space-between;
+  gap:18px;
+  padding:18px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:#fff}
+
+.admin-team-card h3,.admin-team-card p {
+  margin:4px 0}
+
+.admin-team-card p {
+  color:var(--muted);
+  font-size:12px}
+
+.admin-team-meta {
+  display:grid;
+  grid-template-columns:auto auto;
+  align-items:center;
+  gap:0 6px;
+  min-width:155px}
+
+.admin-team-meta strong {
+  color:var(--navy);
+  font-size:22px}
+
+.admin-team-meta span {
+  color:var(--muted);
+  font-size:11px}
+
+.admin-team-meta button {
+  grid-column:1/-1;
+  margin-top:7px}
+
+.admin-form-grid {
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:12px}
+
+.admin-subheading {
+  justify-content:space-between;
+  margin:18px 0 10px}
+
+.admin-subheading h3,.admin-subheading p {
+  margin:0}
+
+.admin-subheading p {
+  font-size:12px}
+
+.admin-validated,.admin-leader-choice,.admin-file-label {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  color:var(--muted);
+  font-size:12px}
+
+.admin-person-row {
+  display:grid;
+  grid-template-columns:auto minmax(170px,1.4fr) minmax(150px,1fr);
+  gap:10px;
+  align-items:center;
+  margin:0 0 12px;
+  padding:14px;
+  border:1px solid var(--border);
+  border-radius:10px}
+
+.admin-person-row legend {
+  padding:0 6px;
+  color:var(--navy);
+  font-size:11px;
+  font-weight:700}
+
+.admin-person-row .field {
+  margin:0}
 
 .admin-person-row input[type=text] {
   flex:1;
@@ -1347,6 +1461,41 @@ dialog h2 {
 .admin-person-row input[type=file] {
   font-size:11px;
   max-width:130px}
+
+.danger-btn {
+  min-height:38px;
+  padding:8px 12px;
+  border:1px solid #e7b8b8;
+  border-radius:7px;
+  background:#fff5f5;
+  color:#a93636;
+  cursor:pointer;
+  font-family:inherit;
+  font-size:12px;
+  font-weight:600}
+
+.danger-btn:hover {
+  background:#fde6e6}
+
+.admin-form-actions {
+  justify-content:space-between;
+  margin-top:18px}
+
+@media(max-width:760px) {
+  .admin-overview,.admin-team-card {
+    align-items:stretch;
+    flex-direction:column}
+  .admin-toolbar {
+    justify-content:flex-start}
+  .admin-toolbar>* {
+    flex:1}
+  .admin-form-grid,.admin-person-row {
+    grid-template-columns:1fr}
+  .admin-person-row .avatar {
+    justify-self:start}
+  .admin-team-meta {
+    grid-template-columns:auto 1fr;
+    min-width:0}}
 
 .settings-row {
   display:flex;

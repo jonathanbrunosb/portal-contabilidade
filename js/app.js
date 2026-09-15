@@ -1,8 +1,8 @@
-import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken } from './data-service.js';
+import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams } from './data-service.js?v=20260915-3';
 import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js';
 import { initializeNavigation,bindTabs,selectTab } from './navigation.js';
 import { renderNewsletter,articleCard,showArticle } from './newsletter.js';
-import { renderTeamStructure } from './teams.js?v=20260915-2';
+import { renderTeamStructure } from './teams.js?v=20260915-3';
 import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,notify } from './ui.js';
 import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js';
 let data,currentTab='newsletter',currentUser,currentMenu=[];
@@ -257,8 +257,24 @@ function openNewDraft() {
   ;
 }
 let adminEditState=null;
+const newId=prefix=>`${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,7)}`;
+const listFromTextarea=value=>value.split('\n').map(item=>item.trim()).filter(Boolean);
+function refreshTeamsUI(message) {
+  renderAdmin();
+  if(!$('#equipes').hidden)renderTeamStructure(data.equipes);
+  if(message)notify(message);
+}
+async function fileAsDataURL(file) {
+  if(file.size>750000)throw new Error('Para salvar no navegador, use uma foto de até 750 KB.');
+  return new Promise((resolve,reject)=> {
+    const reader=new FileReader();
+    reader.onload=()=>resolve(reader.result);
+    reader.onerror=()=>reject(new Error('Não foi possível ler a foto selecionada.'));
+    reader.readAsDataURL(file);
+  });
+}
 function renderResponsaveisEditor() {
-  $('#admin-responsaveis').innerHTML=adminEditState.responsaveis.map((p,i)=>`<div class="admin-person-row" data-index="${i}"><img class="avatar" src="${e(safeURL(p.foto)||'assets/users/default.svg')}" alt=""><input type="text" class="admin-person-nome" placeholder="Nome completo" value="${e(p.nome||'')}"><input type="text" class="admin-person-cargo" placeholder="Cargo" value="${e(p.cargo||'')}"><input type="file" class="admin-person-foto" accept="image/*"><button type="button" class="text-btn admin-remove-person" data-index="${i}">Remover</button></div>`).join('')||'<p class="muted">Nenhum responsável cadastrado.</p>';
+  $('#admin-responsaveis').innerHTML=adminEditState.responsaveis.map((p,i)=>`<fieldset class="admin-person-row" data-index="${i}"><legend>Colaborador ${i+1}</legend><img class="avatar" src="${e(safeURL(p.foto)||p.foto||'assets/users/default.svg')}" alt=""><label class="field">Nome completo<input type="text" class="admin-person-nome" value="${e(p.nome||'')}" required></label><label class="field">Cargo<input type="text" class="admin-person-cargo" value="${e(p.cargo||'')}" placeholder="Opcional"></label><label class="field">Foto ou caminho<input type="text" class="admin-person-foto-path" value="${e(p.foto||'')}" placeholder="assets/users/foto.png"></label><label class="admin-leader-choice"><input type="radio" name="admin-lider" value="${i}" ${p.id===adminEditState.liderId?'checked':''}> Liderança da equipe</label><label class="admin-file-label">Selecionar foto<input type="file" class="admin-person-foto" accept="image/*"></label><button type="button" class="danger-btn admin-remove-person" data-index="${i}">Excluir colaborador</button></fieldset>`).join('')||'<p class="empty-state compact">Nenhum colaborador cadastrado nesta equipe.</p>';
   $('#admin-responsaveis').querySelectorAll('.admin-remove-person').forEach(btn=>btn.onclick=()=> {
     adminEditState.responsaveis.splice(Number(btn.dataset.index),1);
     renderResponsaveisEditor();
@@ -270,68 +286,80 @@ function renderResponsaveisEditor() {
   );
 }
 function openEditTeam(id) {
-  if(!isLiveDataSource()) {
-    notify('Requer o backend opcional (Fase 2) ativo — ver README, "Backend opcional".');
-    return;
-  }
   const team=data.equipes.find(t=>t.id===id);
+  if(!team)return;
   adminEditState= {
-    teamId:id,responsaveis:team.responsaveis.map(p=>( {
+    teamId:id,isNew:false,liderId:team.liderId,responsaveis:(team.responsaveis||[]).map(p=>( {
       ...p,_file:null
     }
     ))
   }
   ;
-  showDialog(team.nome,'ADMINISTRAÇÃO',`<form id="admin-team-form"><label class="field">Descrição da área<input id="admin-descricao" value="${e(team.descricao)}"></label><label class="field">Responsabilidades (uma por linha)<textarea id="admin-responsabilidades">${e(team.responsabilidades.join('\n'))}</textarea></label><label class="field">Empresas atendidas (uma por linha)<textarea id="admin-empresas">${e(team.empresas.join('\n'))}</textarea></label><h3>Responsáveis</h3><div id="admin-responsaveis"></div><button type="button" class="text-btn" id="admin-add-person">Adicionar responsável +</button><div class="doc-actions" style="margin-top:16px"><button class="primary-btn" type="submit">Salvar alterações</button></div></form>`);
+  openTeamForm(team);
+}
+function openCreateTeam() {
+  const id=newId('equipe');
+  adminEditState={teamId:id,isNew:true,liderId:'',responsaveis:[]};
+  openTeamForm({id,nome:'',sigla:'',descricao:'',responsabilidades:[],empresas:[],dadosAreaValidados:false,tipo:'executiva'});
+}
+function openTeamForm(team) {
+  showDialog(adminEditState.isNew?'Nova equipe':team.nome,'ADMINISTRAÇÃO DE EQUIPES',`<form id="admin-team-form"><div class="admin-form-grid"><label class="field">Nome da equipe<input id="admin-nome" value="${e(team.nome||'')}" required></label><label class="field">Sigla<input id="admin-sigla" value="${e(team.sigla||'')}" maxlength="12"></label></div><label class="field">Descrição da área<input id="admin-descricao" value="${e(team.descricao||'')}"></label><label class="field">Responsabilidades (uma por linha)<textarea id="admin-responsabilidades">${e((team.responsabilidades||[]).join('\n'))}</textarea></label><label class="field">Empresas atendidas (uma por linha)<textarea id="admin-empresas">${e((team.empresas||[]).join('\n'))}</textarea></label><label class="admin-validated"><input type="checkbox" id="admin-validado" ${team.dadosAreaValidados?'checked':''}> Informações da área validadas para exibição</label><div class="admin-subheading"><div><h3>Colaboradores</h3><p>Cadastre os integrantes e marque quem lidera a equipe.</p></div><button type="button" class="secondary-btn" id="admin-add-person">Adicionar colaborador +</button></div><div id="admin-responsaveis"></div><div class="admin-form-actions"><button class="primary-btn" type="submit">${adminEditState.isNew?'Criar equipe':'Salvar alterações'}</button>${!adminEditState.isNew&&team.id!=='gerencia'?'<button class="danger-btn" type="button" id="admin-delete-team">Excluir equipe</button>':''}</div></form>`);
   renderResponsaveisEditor();
   $('#admin-add-person').onclick=()=> {
+    const personId=newId(`colaborador-${adminEditState.teamId}`);
     adminEditState.responsaveis.push( {
-      id:null,areaId:id,nome:'',cargo:'',foto:'assets/users/default.svg',_file:null
+      id:personId,areaId:adminEditState.teamId,nome:'',cargo:'',foto:'assets/users/default.svg',_file:null
     }
     );
+    if(!adminEditState.liderId)adminEditState.liderId=personId;
     renderResponsaveisEditor();
   }
   ;
+  const deleteButton=$('#admin-delete-team');
+  if(deleteButton)deleteButton.onclick=()=>deleteTeam(team.id,team.nome);
   $('#admin-team-form').onsubmit=async event=> {
     event.preventDefault();
     const submitBtn=event.target.querySelector('[type=submit]');
     submitBtn.disabled=true;
     try {
-      const nomes=[...document.querySelectorAll('.admin-person-nome')].map(i=>i.value);
-      const cargos=[...document.querySelectorAll('.admin-person-cargo')].map(i=>i.value);
       const responsaveis=[];
-      for(let i=0;i<adminEditState.responsaveis.length;i++) {
-        const nome=(nomes[i]||'').trim();
+      const rows=[...document.querySelectorAll('.admin-person-row')];
+      const leaderIndex=Number(document.querySelector('input[name="admin-lider"]:checked')?.value??-1);
+      for(let i=0;i<rows.length;i++) {
+        const nome=rows[i].querySelector('.admin-person-nome').value.trim();
         if(!nome)continue;
         const pendente=adminEditState.responsaveis[i];
-        const foto=pendente._file?await apiUploadPhoto(pendente._file, {
-          autor:currentUser.nome
-        }
-        ):pendente.foto;
+        const path=rows[i].querySelector('.admin-person-foto-path').value.trim();
+        const foto=pendente._file?(isLiveDataSource()?await apiUploadPhoto(pendente._file,{autor:currentUser.nome}):await fileAsDataURL(pendente._file)):(path||'assets/users/default.svg');
         responsaveis.push( {
-          id:pendente.id||teamMemberId(id,nome,i),areaId:id,nome,cargo:(cargos[i]||'').trim(),foto
+          id:pendente.id||teamMemberId(adminEditState.teamId,nome,i),areaId:adminEditState.teamId,nome,cargo:rows[i].querySelector('.admin-person-cargo').value.trim(),foto
         }
         );
       }
+      const selectedLeader=leaderIndex>=0?adminEditState.responsaveis[leaderIndex]?.id:'';
+      const leader=responsaveis.find(person=>person.id===selectedLeader)||responsaveis[0]||null;
       const body= {
+        id:adminEditState.teamId,
+        nome:$('#admin-nome').value.trim(),
+        sigla:$('#admin-sigla').value.trim(),
         descricao:$('#admin-descricao').value.trim(),
-        responsabilidades:$('#admin-responsabilidades').value.split('\n').map(s=>s.trim()).filter(Boolean),
-        empresas:$('#admin-empresas').value.split('\n').map(s=>s.trim()).filter(Boolean),
+        responsabilidades:listFromTextarea($('#admin-responsabilidades').value),
+        empresas:listFromTextarea($('#admin-empresas').value),
         responsaveis,
-        lider:responsaveis[0]?.nome||team.lider,
-        liderId:responsaveis[0]?.id||team.liderId,
-        dadosAreaValidados:team.dadosAreaValidados===true
+        lider:leader?.nome||'',
+        liderId:leader?.id||'',
+        dadosAreaValidados:$('#admin-validado').checked,
+        tipo:team.tipo||'executiva',
+        solucoes:team.solucoes||[]
       }
       ;
-      const updated=await apiWrite('equipes', {
-        id,method:'PUT',body,autor:currentUser.nome
-      }
-      );
-      data.equipes[data.equipes.findIndex(t=>t.id===id)]=updated;
-      renderAdmin();
-      if(!$('#equipes').hidden)renderTeamStructure(data.equipes);
+      let updated=body;
+      if(isLiveDataSource())updated=await apiWrite('equipes',{id:adminEditState.isNew?undefined:team.id,method:adminEditState.isNew?'POST':'PUT',body,autor:currentUser.nome});
+      const index=data.equipes.findIndex(item=>item.id===team.id);
+      if(adminEditState.isNew)data.equipes.push(updated);else data.equipes[index]=updated;
+      if(!isLiveDataSource())saveLocalTeams(data.equipes);
       $('#detail-dialog').close();
-      notify('Equipe atualizada.');
+      refreshTeamsUI(adminEditState.isNew?'Equipe criada.':'Equipe atualizada.');
     }
     catch(error) {
       notify(error.message);
@@ -342,16 +370,59 @@ function openEditTeam(id) {
   }
   ;
 }
+async function deleteTeam(id,name) {
+  if(id==='gerencia')return notify('A Gerência é a raiz da estrutura e não pode ser excluída.');
+  if(!confirm(`Excluir a equipe “${name}” e todos os colaboradores vinculados?`))return;
+  try {
+    if(isLiveDataSource())await apiWrite('equipes',{id,method:'DELETE',body:{},autor:currentUser.nome});
+    data.equipes=data.equipes.filter(team=>team.id!==id);
+    if(!isLiveDataSource())saveLocalTeams(data.equipes);
+    $('#detail-dialog').close();
+    refreshTeamsUI('Equipe excluída.');
+  }
+  catch(error) {
+    notify(error.message);
+  }
+}
+function exportTeams() {
+  const blob=new Blob([JSON.stringify(data.equipes,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement('a');
+  link.href=url;link.download='equipes.json';link.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  notify('Base de equipes exportada.');
+}
+async function importTeams(file) {
+  try {
+    const teams=JSON.parse(await file.text());
+    if(!Array.isArray(teams)||!teams.length)throw new Error('O arquivo deve conter uma lista de equipes.');
+    const ids=new Set();
+    teams.forEach(team=> {
+      if(!team.id||!team.nome||ids.has(team.id)||!Array.isArray(team.responsaveis))throw new Error('Arquivo inválido: revise IDs, nomes e colaboradores.');
+      ids.add(team.id);
+      team.responsaveis.forEach(person=> { if(!person.id||!person.nome)throw new Error(`Colaborador inválido em ${team.nome}.`); person.areaId=team.id; });
+    });
+    data.equipes=teams;
+    saveLocalTeams(teams);
+    refreshTeamsUI('Base de equipes importada neste navegador.');
+  }
+  catch(error) {
+    notify(error.message);
+  }
+}
 function renderAdmin() {
   const live=isLiveDataSource();
-  const notice=live?'':'<p class="empty-state">Requer o backend opcional (Fase 2) ativo para editar — ver README, "Backend opcional".</p>';
-  $('#admin-view').innerHTML=`<div class="admin-token-row"><label class="field">Token de administração<input type="password" id="admin-token" placeholder="Cole o token aqui" value="${e(getAdminToken())}"></label><button class="primary-btn" id="admin-token-save">Salvar token</button><span class="muted">${getAdminToken()?'Token salvo neste navegador.':'Nenhum token salvo neste navegador.'}</span></div>${notice}<div class="card-grid">${data.equipes.map(t=>`<article class="content-card"><h3>${e(t.nome)}</h3><p>${e(t.descricao)}</p><div class="card-bottom"><span class="muted">${t.responsaveis.length} responsável(is)</span><button class="text-btn" data-admin-team="${e(t.id)}">Editar →</button></div></article>`).join('')}</div>`;
-  $('#admin-token-save').onclick=()=> {
-    setAdminToken($('#admin-token').value.trim());
-    notify('Token salvo neste navegador.');
-    renderAdmin();
-  }
-  ;
+  const source=live?'Servidor conectado':hasLocalTeams()?'Alterações salvas neste navegador':'Base original do portal';
+  const token=live?`<div class="admin-token-row"><label class="field">Token de administração<input type="password" id="admin-token" placeholder="Cole o token aqui" value="${e(getAdminToken())}"></label><button class="primary-btn" id="admin-token-save">Salvar token</button></div>`:'';
+  $('#admin-view').innerHTML=`<div class="admin-overview"><div><span class="section-kicker">FONTE DOS DADOS</span><strong>${e(source)}</strong><p>${live?'As alterações são gravadas no servidor e compartilhadas.':'As alterações ficam neste navegador. Exporte o JSON para backup ou para atualizar a base publicada.'}</p></div><div class="admin-toolbar"><button class="primary-btn" id="admin-new-team">Nova equipe +</button><button class="secondary-btn" id="admin-export">Exportar JSON</button>${live?'':'<label class="secondary-btn admin-import">Importar JSON<input id="admin-import" type="file" accept="application/json,.json"></label>'}${hasLocalTeams()&&!live?'<button class="text-btn" id="admin-reset">Restaurar base original</button>':''}</div></div>${token}<div class="admin-team-list">${data.equipes.map(t=>`<article class="admin-team-card"><div><span class="team-code">${e(t.sigla||t.id)}</span><h3>${e(t.nome)}</h3><p>${e(t.descricao||'Sem descrição cadastrada.')}</p></div><div class="admin-team-meta"><strong>${(t.responsaveis||[]).length}</strong><span>colaborador(es)</span><button class="secondary-btn" data-admin-team="${e(t.id)}">Administrar</button></div></article>`).join('')}</div>`;
+  $('#admin-new-team').onclick=openCreateTeam;
+  $('#admin-export').onclick=exportTeams;
+  const importInput=$('#admin-import');
+  if(importInput)importInput.onchange=()=>importInput.files[0]&&importTeams(importInput.files[0]);
+  const reset=$('#admin-reset');
+  if(reset)reset.onclick=()=> { if(confirm('Descartar as alterações locais e restaurar a base original?')) { clearLocalTeams();location.reload(); } };
+  const tokenSave=$('#admin-token-save');
+  if(tokenSave)tokenSave.onclick=()=> { setAdminToken($('#admin-token').value.trim());notify('Token salvo neste navegador.');renderAdmin(); };
 }
 function showRecord(collection,id) {
   const item=data[collection]?.find(i=>i.id===id);

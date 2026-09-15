@@ -88,7 +88,7 @@ Datas editoriais da home e competência são parametrizadas por `data/config.jso
 | `/?matricula=999999` | Colaborador não identificado, avatar padrão | Central de conteúdo |
 | `/` | Colaborador não identificado, matrícula não informada | Central de conteúdo |
 
-A matrícula personaliza a interface; não autentica o usuário — o próprio perfil exibido traz o aviso "Identificação local pela matrícula — não é um login corporativo". O que o perfil determina é **o que aparece na tela**, não uma barreira de segurança: `hasAccess()` (`js/auth.js`), aplicado em `js/app.js`, usa a lista `permissoes` de cada usuário (`data/usuarios.json`) — ou o mapa `PERMISSIONS` por perfil, como padrão — para filtrar o menu, ocultar as seções "Estrutura das equipes" e "Painel da gerência" e restringir os resultados da busca global às coleções permitidas (`conteudo`, `time`, `gerencial`). Um visitante sem matrícula recebe o mesmo acesso de um Colaborador. Todos os JSONs continuam públicos para quem acessa o servidor local; não coloque credenciais neles, e trate isso como organização de interface, não como controle de acesso real — esse controle só existe com autenticação no servidor (ver "Próxima versão").
+A matrícula personaliza a interface; não autentica o usuário — o próprio perfil exibido traz o aviso "Identificação local pela matrícula — não é um login corporativo". O que o perfil determina é **o que aparece na tela**, não uma barreira de segurança: `hasAccess()` (`js/auth.js`), aplicado em `js/app.js`, usa a lista `permissoes` de cada usuário (`data/usuarios.json`) — ou o mapa `PERMISSIONS` por perfil, como padrão — para filtrar o menu, ocultar as seções "Estrutura das equipes" e "Painel da gerência" e restringir os resultados da busca global às coleções permitidas (`conteudo`, `time`, `gerencial`). Uma quarta capacidade, `administracao`, libera o "Painel administrativo" (ver seção própria) — hoje só `Jonathan Bruno` (matrícula `2026001`) tem essa capacidade adicionada em `permissoes`; conceda a outras matrículas do mesmo jeito, adicionando `"administracao"` à lista. Um visitante sem matrícula recebe o mesmo acesso de um Colaborador. Todos os JSONs continuam públicos para quem acessa o servidor local; não coloque credenciais neles, e trate isso como organização de interface, não como controle de acesso real — esse controle só existe com autenticação no servidor (ver "Próxima versão").
 
 ### Newsletter
 
@@ -156,7 +156,7 @@ Por padrão o portal continua 100% estático, exatamente como descrito acima. `s
    node server/server.js
    ```
 
-   Por padrão sobe em `http://127.0.0.1:8787`. Variáveis de ambiente opcionais: `PORTAL_API_HOST`, `PORTAL_API_PORT`, `PORTAL_DATA_DIR` (para apontar a uma cópia dos dados, por exemplo em teste) e `PORTAL_ALLOWED_ORIGIN` (CORS; padrão `*`, restrinja ao endereço do portal antes de qualquer uso além do seu próprio computador).
+   Por padrão sobe em `http://127.0.0.1:8787`. Variáveis de ambiente opcionais: `PORTAL_API_HOST`, `PORTAL_API_PORT`, `PORTAL_DATA_DIR` (para apontar a uma cópia dos dados, por exemplo em teste), `PORTAL_ASSETS_USERS_DIR` (destino das fotos enviadas pelo Painel Administrativo, padrão `assets/users/`), `PORTAL_ALLOWED_ORIGIN` (CORS; padrão `*`, restrinja ao endereço do portal antes de qualquer uso além do seu próprio computador) e `PORTAL_ADMIN_TOKEN` — **defina este antes de qualquer uso além do seu próprio computador**: sem ele, qualquer um que alcance o backend pode escrever; com ele, toda escrita (criar, editar, apagar, enviar foto) exige o cabeçalho `X-Admin-Token` com o valor exato.
 
 2. Ligue o frontend a ele: adicione antes de `<script type="module" src="js/app.js">` em `index.html`:
 
@@ -180,12 +180,28 @@ Por padrão o portal continua 100% estático, exatamente como descrito acima. `s
 | `/api/<coleção>/<id>` | DELETE | Remove um registro |
 | `/api/config` | GET | KPIs, resumo, menu e acessos — somente leitura nesta versão |
 | `/api/_audit` | GET | Últimas 100 entradas da trilha de auditoria |
+| `/api/_upload?filename=...` | POST | Envia uma foto (corpo = bytes brutos do arquivo, `Content-Type` da imagem); grava em `assets/users/` com nome normalizado e devolve `{ "caminho": "assets/users/arquivo.jpg" }`. Extensões aceitas: jpg, jpeg, png, webp, gif, svg; limite de 5MB |
 
-Toda escrita grava em `server/audit.log` (fora do controle de versão) quem fez o quê e quando — o "quem" vem do cabeçalho opcional `X-Autor`, informado por quem chama a API, não validado. O "Painel editorial" (Fase 4, ver seção própria) já usa essas rotas para newsletter e notícias; as demais coleções seguem sem UI de edição, disponíveis para automações.
+Toda escrita grava em `server/audit.log` (fora do controle de versão) quem fez o quê e quando — o "quem" vem do cabeçalho opcional `X-Autor`, informado por quem chama a API, não validado. O "Painel editorial" (Fase 4) usa essas rotas para newsletter e notícias; o "Painel administrativo" (abaixo) usa `equipes` e `_upload`. As demais coleções seguem sem UI de edição, disponíveis para automações.
+
+### Token de escrita (`PORTAL_ADMIN_TOKEN`)
+
+Quando essa variável está definida, toda rota de escrita (`POST`, `PUT`, `DELETE`, `_upload`) exige o cabeçalho `X-Admin-Token` com o mesmo valor — sem ele, responde `401`. Quem vai usar o Painel Editorial ou o Painel Administrativo cola esse token uma vez no próprio portal (campo "Token de administração", salvo em `localStorage`, só naquele navegador); o backend nunca envia o token de volta nem o expõe em nenhuma resposta.
+
+**O que isso é, e o que não é**: é um segredo compartilhado — distingue "tem o token" de "não tem", não distingue *quem*, entre os que têm, fez cada alteração (isso continua vindo do `X-Autor` autodeclarado, não verificado). Não é conta individual, não é SSO, não expira, não é revogável por pessoa — para revogar o acesso de alguém é preciso trocar o token e redistribuí-lo para quem deve continuar com acesso. Trate-o como uma senha de porta, não como um login: suficiente para barrar um estranho na rede, insuficiente para auditar quem fez o quê com confiança. Autenticação individual de verdade continua na "Próxima versão".
 
 ### O que isso não é
 
-Este backend **não adiciona autenticação nem autorização real**. Continua sendo, como a Fase 1 já deixa explícito na interface, uma camada de conveniência e governança (dado vivo, trilha de auditoria, validação de formato) — não um controle de acesso de verdade. Não exponha `server/server.js` fora de `localhost` ou de uma rede interna confiável sem antes adicionar autenticação, HTTPS e uma origem de CORS restrita.
+Fora do token de escrita acima, este backend **não adiciona autenticação nem autorização real**. Continua sendo, como a Fase 1 já deixa explícito na interface, uma camada de conveniência e governança (dado vivo, trilha de auditoria, validação de formato) — não um controle de acesso de verdade. Não exponha `server/server.js` fora de `localhost` ou de uma rede interna confiável sem definir `PORTAL_ADMIN_TOKEN` e, idealmente, HTTPS e uma origem de CORS restrita.
+
+## Painel administrativo (equipes)
+
+Menu "Administração", visível só para quem tem a capacidade `administracao` (perfil Administrador, ou qualquer usuário com `"administracao"` em `permissoes` — ver "Usuários e matrícula"). Deixa editar, direto pelo portal e sem tocar em JSON, o que hoje só era possível me pedindo para editar `data/equipes.json` manualmente:
+
+- Descrição da área, responsabilidades e empresas atendidas de cada equipe.
+- A lista de responsáveis: adicionar, remover, renomear, trocar cargo e **enviar uma foto pelo próprio navegador** (usa a rota `_upload` acima). O primeiro responsável da lista também define o campo `lider` da equipe.
+
+Exige o backend opcional ligado e o token de escrita salvo (ver acima) — sem isso, o painel mostra os dados em modo somente leitura com aviso explícito, igual ao Painel Editorial.
 
 ## Painel editorial (Fase 4 — governança de conteúdo)
 
@@ -205,7 +221,7 @@ O risco que esta fase fecha: publicar newsletter e notícias hoje significa edit
 
 ## Próxima versão
 
-Substituir dados ilustrativos pelos conteúdos, fotos, documentos e URLs aprovados. O adaptador de dados para API (Fase 2) e o fluxo editorial de rascunho/revisão/publicação (Fase 4) já existem como backend opcional — faltam: autenticação corporativa com SSO, permissões aplicadas de fato no servidor (hoje `hasAccess()` só organiza a interface), separação entre quem rascunha e quem aprova, integrações reais com SAP/Power BI/OneStream/SharePoint (Fase 3 — depende de endereços e credenciais que só a organização pode fornecer), histórico de indicadores e organograma completo. Essas integrações não estão implementadas nesta entrega.
+Substituir dados ilustrativos pelos conteúdos, fotos, documentos e URLs aprovados. O adaptador de dados para API (Fase 2), o fluxo editorial de rascunho/revisão/publicação (Fase 4) e um Painel administrativo com token de escrita compartilhado já existem como backend opcional — faltam: autenticação corporativa individual com SSO (o token de hoje é compartilhado, não distingue pessoas), permissões aplicadas de fato no servidor (hoje `hasAccess()` só organiza a interface), separação entre quem rascunha e quem aprova, integrações reais com SAP/Power BI/OneStream/SharePoint (Fase 3 — depende de endereços e credenciais que só a organização pode fornecer), histórico de indicadores e organograma completo. Essas integrações não estão implementadas nesta entrega.
 
 ## Histórico da entrega
 

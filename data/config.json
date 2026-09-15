@@ -95,6 +95,11 @@
       "label": "Painel Editorial",
       "icon": "check",
       "target": "editorial"
+    },
+    {
+      "label": "Administração",
+      "icon": "settings",
+      "target": "administracao"
     }
   ],
   "links": [

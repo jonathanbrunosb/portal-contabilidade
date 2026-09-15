@@ -1,4 +1,4 @@
-import { loadData,isLiveDataSource,apiWrite } from './data-service.js';
+import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken } from './data-service.js';
 import { identifyUser,renderUser,hasAccess } from './auth.js';
 import { initializeNavigation,bindTabs,selectTab } from './navigation.js';
 import { renderNewsletter,articleCard,showArticle } from './newsletter.js';
@@ -8,11 +8,11 @@ let data,currentTab='newsletter',currentUser;
 const $=selector=>document.querySelector(selector);
 // Capability required to see each menu target / page section / searchable collection.
 const TARGET_ACCESS= {
-  central:'conteudo',processos:'gerencial',painel:'gerencial',agenda:'gerencial',editorial:'gerencial'
+  central:'conteudo',processos:'gerencial',painel:'gerencial',agenda:'gerencial',editorial:'gerencial',administracao:'administracao'
 }
 ;
 const SECTION_ACCESS= {
-  central:'conteudo',equipes:'time',painel:'gerencial',editorial:'gerencial'
+  central:'conteudo',equipes:'time',painel:'gerencial',editorial:'gerencial',administracao:'administracao'
 }
 ;
 const EDITORIAL_COLLECTIONS=['newsletter','noticias'];
@@ -259,6 +259,101 @@ function openNewDraft() {
   }
   ;
 }
+let adminEditState=null;
+function renderResponsaveisEditor() {
+  $('#admin-responsaveis').innerHTML=adminEditState.responsaveis.map((p,i)=>`<div class="admin-person-row" data-index="${i}"><img class="avatar" src="${e(safeURL(p.foto)||'assets/users/default.svg')}" alt=""><input type="text" class="admin-person-nome" placeholder="Nome completo" value="${e(p.nome||'')}"><input type="text" class="admin-person-cargo" placeholder="Cargo" value="${e(p.cargo||'')}"><input type="file" class="admin-person-foto" accept="image/*"><button type="button" class="text-btn admin-remove-person" data-index="${i}">Remover</button></div>`).join('')||'<p class="muted">Nenhum responsável cadastrado.</p>';
+  $('#admin-responsaveis').querySelectorAll('.admin-remove-person').forEach(btn=>btn.onclick=()=> {
+    adminEditState.responsaveis.splice(Number(btn.dataset.index),1);
+    renderResponsaveisEditor();
+  }
+  );
+  $('#admin-responsaveis').querySelectorAll('.admin-person-foto').forEach((input,i)=>input.onchange=()=> {
+    adminEditState.responsaveis[i]._file=input.files[0]||null;
+  }
+  );
+}
+function openEditTeam(id) {
+  if(!isLiveDataSource()) {
+    notify('Requer o backend opcional (Fase 2) ativo — ver README, "Backend opcional".');
+    return;
+  }
+  const team=data.equipes.find(t=>t.id===id);
+  adminEditState= {
+    teamId:id,responsaveis:team.responsaveis.map(p=>( {
+      ...p,_file:null
+    }
+    ))
+  }
+  ;
+  showDialog(team.nome,'ADMINISTRAÇÃO',`<form id="admin-team-form"><label class="field">Descrição da área<input id="admin-descricao" value="${e(team.descricao)}"></label><label class="field">Responsabilidades (uma por linha)<textarea id="admin-responsabilidades">${e(team.responsabilidades.join('\n'))}</textarea></label><label class="field">Empresas atendidas (uma por linha)<textarea id="admin-empresas">${e(team.empresas.join('\n'))}</textarea></label><h3>Responsáveis</h3><div id="admin-responsaveis"></div><button type="button" class="text-btn" id="admin-add-person">Adicionar responsável +</button><div class="doc-actions" style="margin-top:16px"><button class="primary-btn" type="submit">Salvar alterações</button></div></form>`);
+  renderResponsaveisEditor();
+  $('#admin-add-person').onclick=()=> {
+    adminEditState.responsaveis.push( {
+      nome:'',cargo:'',foto:'assets/users/default.svg',_file:null
+    }
+    );
+    renderResponsaveisEditor();
+  }
+  ;
+  $('#admin-team-form').onsubmit=async event=> {
+    event.preventDefault();
+    const submitBtn=event.target.querySelector('[type=submit]');
+    submitBtn.disabled=true;
+    try {
+      const nomes=[...document.querySelectorAll('.admin-person-nome')].map(i=>i.value);
+      const cargos=[...document.querySelectorAll('.admin-person-cargo')].map(i=>i.value);
+      const responsaveis=[];
+      for(let i=0;i<adminEditState.responsaveis.length;i++) {
+        const nome=(nomes[i]||'').trim();
+        if(!nome)continue;
+        const pendente=adminEditState.responsaveis[i];
+        const foto=pendente._file?await apiUploadPhoto(pendente._file, {
+          autor:currentUser.nome
+        }
+        ):pendente.foto;
+        responsaveis.push( {
+          nome,cargo:(cargos[i]||'').trim(),foto
+        }
+        );
+      }
+      const body= {
+        descricao:$('#admin-descricao').value.trim(),
+        responsabilidades:$('#admin-responsabilidades').value.split('\n').map(s=>s.trim()).filter(Boolean),
+        empresas:$('#admin-empresas').value.split('\n').map(s=>s.trim()).filter(Boolean),
+        responsaveis,
+        lider:responsaveis[0]?.nome||team.lider
+      }
+      ;
+      const updated=await apiWrite('equipes', {
+        id,method:'PUT',body,autor:currentUser.nome
+      }
+      );
+      data.equipes[data.equipes.findIndex(t=>t.id===id)]=updated;
+      renderAdmin();
+      renderTeams();
+      $('#detail-dialog').close();
+      notify('Equipe atualizada.');
+    }
+    catch(error) {
+      notify(error.message);
+    }
+    finally {
+      submitBtn.disabled=false;
+    }
+  }
+  ;
+}
+function renderAdmin() {
+  const live=isLiveDataSource();
+  const notice=live?'':'<p class="empty-state">Requer o backend opcional (Fase 2) ativo para editar — ver README, "Backend opcional".</p>';
+  $('#admin-view').innerHTML=`<div class="admin-token-row"><label class="field">Token de administração<input type="password" id="admin-token" placeholder="Cole o token aqui" value="${e(getAdminToken())}"></label><button class="primary-btn" id="admin-token-save">Salvar token</button><span class="muted">${getAdminToken()?'Token salvo neste navegador.':'Nenhum token salvo neste navegador.'}</span></div>${notice}<div class="card-grid">${data.equipes.map(t=>`<article class="content-card"><h3>${e(t.nome)}</h3><p>${e(t.descricao)}</p><div class="card-bottom"><span class="muted">${t.responsaveis.length} responsável(is)</span><button class="text-btn" data-admin-team="${e(t.id)}">Editar →</button></div></article>`).join('')}</div>`;
+  $('#admin-token-save').onclick=()=> {
+    setAdminToken($('#admin-token').value.trim());
+    notify('Token salvo neste navegador.');
+    renderAdmin();
+  }
+  ;
+}
 function showRecord(collection,id) {
   const item=data[collection]?.find(i=>i.id===id);
   if(!item)return;
@@ -378,6 +473,7 @@ async function init() {
     renderTeams();
     renderDashboard();
     renderEditorial();
+    renderAdmin();
     renderPeriod();
     track('session_start');
     $('#new-draft').onclick=openNewDraft;
@@ -430,6 +526,8 @@ async function init() {
         const [collection,id,action]=editorial.dataset.editorial.split(':');
         handleEditorialAction(collection,id,action);
       }
+      const adminTeam=event.target.closest('[data-admin-team]');
+      if(adminTeam)openEditTeam(adminTeam.dataset.adminTeam);
       const download=event.target.closest('a[download]');
       if(download) {
         const article=download.closest('article');

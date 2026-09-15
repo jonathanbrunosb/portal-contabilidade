@@ -1,4 +1,4 @@
-import { loadData } from './data-service.js';
+import { loadData,isLiveDataSource } from './data-service.js';
 import { identifyUser,renderUser,hasAccess } from './auth.js';
 import { initializeNavigation,bindTabs,selectTab } from './navigation.js';
 import { renderNewsletter,articleCard,showArticle } from './newsletter.js';
@@ -104,7 +104,8 @@ function renderPeriod() {
   const reference = new Date(config.dataReferencia + 'T12:00:00');
   const period = new Date(config.competencia + '-01T12:00:00');
   const month = period.toLocaleDateString('pt-BR', {month: 'long'});
-  $('.context-date').innerHTML = `${e(reference.toLocaleDateString('pt-BR', {day:'numeric', month:'long', year:'numeric'}))} <span class="demo-label">${config.demonstracao ? 'Demonstração' : 'Base local'}</span>`;
+  const fonte = isLiveDataSource() ? 'Dados ao vivo' : 'Arquivo local';
+  $('.context-date').innerHTML = `${e(reference.toLocaleDateString('pt-BR', {day:'numeric', month:'long', year:'numeric'}))} <span class="demo-label" title="${isLiveDataSource() ? 'Servido pelo backend em server/server.js' : 'Servido pelos arquivos estáticos em data/'}">${e(fonte)}</span> <span class="demo-label">${config.demonstracao ? 'Demonstração' : 'Base local'}</span>`;
   $('.edition').textContent = `${month.toUpperCase()} / ${period.getFullYear()}`;
   $('.period').innerHTML = `<span class="live-dot"></span> Competência: ${e(month)} ${period.getFullYear()}`;
   $('#entregas .section-kicker').textContent = config.semanaLabel;

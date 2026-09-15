@@ -1,6 +1,6 @@
 # Portal da Gerência de Contabilidade
 
-Portal corporativo local em HTML5, CSS3 e JavaScript Vanilla. Não usa Node.js, npm, frameworks, CDN, banco de dados ou serviços em nuvem. Todo o conteúdo é servido por arquivos locais. O servidor HTTP apenas entrega arquivos; não há backend da aplicação.
+Portal corporativo local em HTML5, CSS3 e JavaScript Vanilla. Não precisa de Node.js, npm, frameworks, CDN, banco de dados ou serviços em nuvem para funcionar: por padrão, o servidor HTTP apenas entrega arquivos e todo o conteúdo vem de `data/*.json`, sem backend algum. Há, opcionalmente, um backend leve em Node.js (`server/server.js`, ver "Backend opcional") para quem quiser dados vivos e um registro de auditoria — ele continua lendo e escrevendo os mesmos JSONs, e o portal funciona exatamente igual sem ele.
 
 ## Executar
 
@@ -36,6 +36,8 @@ portal-contabilidade/
 │   ├── navigation.js          # Menu, foco e tabs por teclado
 │   ├── newsletter.js          # Radar, cards e leitura das publicações
 │   └── ui.js                  # Ícones, escape de texto, URLs e diálogos
+├── server/
+│   └── server.js              # Backend opcional (Fase 2) — API viva sobre os mesmos JSONs
 ├── data/
 │   ├── config.json            # KPIs, resumo executivo, menu e acessos rápidos
 │   ├── usuarios.json
@@ -127,7 +129,7 @@ Inclua um objeto em `config.json > menu`: `label`, `icon`, `target` e, opcionalm
 - Busca sem diferenciação de acentos, abrangendo conteúdos, equipes, colaboradores, agenda e entregas.
 - Indicadores executivos demonstrativos independentes do subconjunto de registros detalhados: 24 processos e 07 sistemas não são contagens automáticas dos cinco processos e quatro sistemas exibidos.
 - Preferências locais de tamanho de texto e movimento, com tolerância a armazenamento bloqueado.
-- Tratamento de erro no carregamento e nova tentativa; nenhum backend ou autenticação real.
+- Tratamento de erro no carregamento e nova tentativa; nenhuma autenticação real, com ou sem o backend opcional (ver "Backend opcional").
 - Identidade visual em azul marinho, azul corporativo e teal; logo vetorial, ícones inline e fontes do sistema, sem requisições a CDNs.
 
 ## Uso e métricas locais
@@ -138,11 +140,54 @@ O ícone de engrenagem abre, além das preferências de acessibilidade, um paine
 - Nenhum dado pessoal além do termo de busca digitado é registrado; matrícula e nome não entram nos eventos.
 - O checkbox "Registrar meu uso do portal neste navegador" permite desativar a coleta a qualquer momento; "Limpar dados locais" apaga o histórico salvo.
 - O botão "Exportar dados" baixa um JSON com os eventos brutos — útil para reunir manualmente o uso de várias máquinas até existir uma API central (ver `data-service.js`).
-- Isso resolve "o que sabemos sobre o uso do portal neste navegador", não "o que a Gerência usa como um todo". Métricas agregadas de verdade exigem um backend que receba esses eventos — está fora do escopo desta entrega estática.
+- Isso resolve "o que sabemos sobre o uso do portal neste navegador", não "o que a Gerência usa como um todo". Métricas agregadas de verdade exigem um backend que receba esses eventos — o backend opcional abaixo ainda não recebe analytics, apenas conteúdo; é o próximo passo natural se isso for priorizado.
+
+## Backend opcional (Fase 2 — dados vivos)
+
+Por padrão o portal continua 100% estático, exatamente como descrito acima. `server/server.js` é um backend **opcional**: um servidor HTTP em Node.js nativo (sem `npm install`, sem dependências) que lê e escreve os **mesmos arquivos** de `data/`. Ligá-lo troca "editar JSON manualmente" por uma API validada com trilha de auditoria; desligá-lo não quebra nada — o frontend volta a ler os arquivos estáticos sozinho.
+
+### Como ligar
+
+1. Rode o backend (numa porta diferente do servidor de arquivos):
+
+   ```powershell
+   node server/server.js
+   ```
+
+   Por padrão sobe em `http://127.0.0.1:8787`. Variáveis de ambiente opcionais: `PORTAL_API_HOST`, `PORTAL_API_PORT`, `PORTAL_DATA_DIR` (para apontar a uma cópia dos dados, por exemplo em teste) e `PORTAL_ALLOWED_ORIGIN` (CORS; padrão `*`, restrinja ao endereço do portal antes de qualquer uso além do seu próprio computador).
+
+2. Ligue o frontend a ele: adicione antes de `<script type="module" src="js/app.js">` em `index.html`:
+
+   ```html
+   <script>window.PORTAL_API_ENABLED = true; window.PORTAL_API_PORT = 8787;</script>
+   ```
+
+   Sem essa flag, o portal nunca tenta contatar o backend — é por isso que ligá-lo é uma escolha explícita, não um comportamento automático que poderia gerar erro de conexão no console de quem nunca vai rodar o backend.
+
+3. Continue servindo os arquivos estáticos normalmente (`INICIAR.cmd` ou `python -m http.server`). Com a flag ligada, o topo da página passa a mostrar "Dados ao vivo" (vindo da API) em vez de "Arquivo local"; se o backend cair, a badge volta sozinha para "Arquivo local" no próximo carregamento, sem quebrar a navegação.
+
+### Endpoints
+
+| Rota | Método | Efeito |
+| --- | --- | --- |
+| `/api/health` | GET | Verificação de disponibilidade, usada pelo frontend |
+| `/api/<coleção>` | GET | Lista completa (`usuarios`, `newsletter`, `noticias`, `equipes`, `processos`, `sistemas`, `agenda`, `documentos`, `entregas`) |
+| `/api/<coleção>/<id>` | GET | Um registro |
+| `/api/<coleção>` | POST | Cria um registro (corpo com `id` único, sem `:`) |
+| `/api/<coleção>/<id>` | PUT | Atualiza campos de um registro existente |
+| `/api/<coleção>/<id>` | DELETE | Remove um registro |
+| `/api/config` | GET | KPIs, resumo, menu e acessos — somente leitura nesta versão |
+| `/api/_audit` | GET | Últimas 100 entradas da trilha de auditoria |
+
+Toda escrita grava em `server/audit.log` (fora do controle de versão) quem fez o quê e quando — o "quem" vem do cabeçalho opcional `X-Autor`, informado por quem chama a API, não validado. Ainda não há UI de edição no portal para essas rotas de escrita; elas existem para automações e como base para a Fase 4 (fluxo editorial de rascunho, revisão e publicação).
+
+### O que isso não é
+
+Este backend **não adiciona autenticação nem autorização real**. Continua sendo, como a Fase 1 já deixa explícito na interface, uma camada de conveniência e governança (dado vivo, trilha de auditoria, validação de formato) — não um controle de acesso de verdade. Não exponha `server/server.js` fora de `localhost` ou de uma rede interna confiável sem antes adicionar autenticação, HTTPS e uma origem de CORS restrita.
 
 ## Próxima versão
 
-Substituir dados ilustrativos pelos conteúdos, fotos, documentos e URLs aprovados. Depois, evoluir o adaptador de dados para API e autenticação corporativa com SSO, permissões aplicadas no servidor, gestão editorial com revisão e auditoria, histórico de indicadores e organograma completo. Essas integrações não estão implementadas nesta entrega.
+Substituir dados ilustrativos pelos conteúdos, fotos, documentos e URLs aprovados. O adaptador de dados para API já existe como backend opcional (ver "Backend opcional"), mas ainda sem autenticação: os próximos passos são autenticação corporativa com SSO, permissões aplicadas de fato no servidor (hoje `hasAccess()` só organiza a interface), gestão editorial com fluxo de rascunho/revisão/publicação sobre as rotas de escrita já existentes, histórico de indicadores e organograma completo. Essas integrações não estão implementadas nesta entrega.
 
 ## Histórico da entrega
 

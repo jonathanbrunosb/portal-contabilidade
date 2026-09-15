@@ -156,32 +156,11 @@ small {
   margin:4px auto 10px;
   max-width:195px}
 
-.profile-meta {
-  display:flex;
-  justify-content:center;
-  flex-wrap:wrap;
-  gap:5px;
-  font-size:11px;
-  color:var(--muted)}
-
-.profile-role {
-  color:#087db5;
-  background:#e9f5fc;
-  border-radius:5px;
-  padding:2px 8px}
-
 .profile-area {
   display:block;
   font-size:12px;
   color:var(--muted);
   margin-top:6px}
-
-.profile-note {
-  display:block;
-  font-size:10px;
-  line-height:1.4;
-  color:#8793a5;
-  margin-top:9px}
 
 .profile-switch {
   display:inline-block;

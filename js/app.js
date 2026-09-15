@@ -105,12 +105,19 @@ function showTeam(id,facet='Equipe') {
   }
   );
   if(facet==='Equipe'||facet==='Responsáveis') {
-    content+=`<h3>Responsáveis de referência</h3><ul class="detail-list">${team.responsaveis.map(p=>`<li>${e(p)}</li>`).join('')}</ul>`;
+    content+=`<h3>Responsáveis de referência</h3><div class="person-list">${team.responsaveis.map(p=>`<div class="person-row"><img class="avatar" src="${e(safeURL(p.foto)||'assets/users/default.svg')}" alt="Foto de ${e(p.nome)}"><div><strong>${e(p.nome)}</strong>${p.cargo?`<small>${e(p.cargo)}</small>`:''}</div></div>`).join('')}</div>`;
   }
   if(facet==='Equipe'||facet==='Processos')content+=`<h3>Principais responsabilidades</h3><ul class="detail-list">${team.responsabilidades.map(p=>`<li>${e(p)}</li>`).join('')}</ul>`;
   if(facet==='Soluções')content+=`<h3>Soluções do time</h3>${team.solucoes.map(id=>{const s=data.sistemas.find(s=>s.id===id);return s?`<p><button class="primary-btn" data-system="${e(s.id)}">${e(s.nome)} ↗</button></p>`:'';}).join('')}`;
   if(facet==='Empresas')content+=`<p>O atendimento segue a distribuição demonstrativa acima. A lista pode ser substituída pelas empresas reais da organização.</p>`;
   showDialog(team.nome,facet,`<p>${e(team.descricao)}</p>${content}`);
+  document.querySelectorAll('#dialog-body .person-row .avatar').forEach(img=>img.addEventListener('error',()=> {
+    img.src='assets/users/default.svg';
+  }
+  , {
+    once:true
+  }
+  ));
 }
 // Editorial dates follow the local dataset, independent of the device clock.
 function renderPeriod() {

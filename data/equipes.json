@@ -59,7 +59,7 @@
     "sigla": "CII",
     "nome": "Contabilidade II",
     "descricao": "Ativos e gestão patrimonial",
-    "lider": "Rafael Santos",
+    "lider": "Marcia Fernanda dos Santos Ferreira",
     "quantidade": 10,
     "responsabilidades": [
       "Ativo imobilizado",
@@ -70,9 +70,39 @@
     ],
     "responsaveis": [
       {
-        "nome": "Rafael Santos",
-        "cargo": "Liderança",
-        "foto": "assets/users/default.svg"
+        "nome": "Marcia Fernanda dos Santos Ferreira",
+        "cargo": "Executiva de Contabilidade",
+        "foto": "assets/users/marcia-fernanda-dos-santos-ferreira.png"
+      },
+      {
+        "nome": "Lanusse Oliveira Lourenco",
+        "cargo": "Especialista",
+        "foto": "assets/users/lanusse-oliveira-lourenco.jpeg"
+      },
+      {
+        "nome": "Fábio Barbosa Monteiro",
+        "cargo": "Analista",
+        "foto": "assets/users/fabio-barbosa-monteiro.png"
+      },
+      {
+        "nome": "Teresa Cristina do S de Sousa",
+        "cargo": "Analista",
+        "foto": "assets/users/teresa-cristina-do-s-de-sousa.png"
+      },
+      {
+        "nome": "Mariwamblea Costa Monteiro",
+        "cargo": "Analista",
+        "foto": "assets/users/mariwamblea-costa-monteiro.png"
+      },
+      {
+        "nome": "Larissa Karolina Amorim Pinheiro",
+        "cargo": "Analista",
+        "foto": "assets/users/larissa-karolina-amorim-pinheiro.png"
+      },
+      {
+        "nome": "Larissa da Silva Viana",
+        "cargo": "Assistente",
+        "foto": "assets/users/larissa-da-silva-viana.png"
       }
     ],
     "solucoes": [

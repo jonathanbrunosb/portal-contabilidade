@@ -3,12 +3,15 @@
     "id": "t1",
     "sigla": "CI",
     "nome": "Contabilidade I",
-    "descricao": "Contabilidade Regulatória",
+    "descricao": "Regulatório e Projetos",
     "lider": "Ana Laura do Carmo Machado",
-    "quantidade": 12,
     "responsabilidades": [
-      "Fechamento mensal",
-      "Conciliações contábeis"
+      "Contabilização e conferência dos itens regulatórios",
+      "Informações gerenciais regulatórias",
+      "Demonstrações contábeis regulatórias",
+      "Fiscalizações e demandas ANEEL",
+      "Revisão das DCRs",
+      "Estudos contábeis e projetos"
     ],
     "empresas": [
       "Empresa A (exemplo)"
@@ -58,12 +61,13 @@
     "id": "t2",
     "sigla": "CII",
     "nome": "Contabilidade II",
-    "descricao": "Ativos e gestão patrimonial",
+    "descricao": "Contas a receber",
     "lider": "Marcia Fernanda dos Santos Ferreira",
-    "quantidade": 10,
     "responsabilidades": [
-      "Ativo imobilizado",
-      "Movimentação patrimonial"
+      "Contabilização e conferência dos itens comerciais",
+      "Informações gerenciais do contas a receber",
+      "Informações de faturamento",
+      "Estudos contábeis e projetos"
     ],
     "empresas": [
       "Empresa B (exemplo)"
@@ -113,12 +117,13 @@
     "id": "t3",
     "sigla": "CIII",
     "nome": "Contabilidade III",
-    "descricao": "Normas, reporte e obrigações",
+    "descricao": "Geral",
     "lider": "Luana Maria dos Santos Leitão",
-    "quantidade": 9,
     "responsabilidades": [
-      "Demonstrações financeiras",
-      "ECD e ECF"
+      "Contabilização e conferência dos itens do fechamento contábil",
+      "Elaboração das NE's para as Demonstrações contábeis",
+      "ECD para Outros negócios",
+      "Estudos contábeis e projetos"
     ],
     "empresas": [
       "Empresa C (exemplo)"
@@ -173,13 +178,17 @@
     "id": "t4",
     "sigla": "CIV",
     "nome": "Contabilidade IV",
-    "descricao": "Projetos, sistemas e melhoria contínua",
+    "descricao": "Conciliações e Auditoria",
     "lider": "Jonathan Bruno Santos Bezerra",
-    "quantidade": 11,
     "responsabilidades": [
-      "Soluções digitais",
-      "Arrendamentos",
-      "Melhoria de processos"
+      "Fechamento contábil",
+      "Atendimento à Auditoria externa",
+      "Controle e conciliação de contas",
+      "Informações gerenciais",
+      "Inventário",
+      "Elaboração da ECD",
+      "Revisão das Demonstrações financeiras",
+      "Projetos e inovação"
     ],
     "empresas": [
       "Empresa D (exemplo)"
@@ -254,7 +263,6 @@
     "nome": "Gerência",
     "descricao": "Governança e direcionamento estratégico",
     "lider": "Alexandra Furtado Freire Paes Landim",
-    "quantidade": 3,
     "responsabilidades": [
       "Governança contábil",
       "Relacionamento com auditoria",

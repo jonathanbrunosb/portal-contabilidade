@@ -53,33 +53,19 @@
   ],
   "menu": [
     {
-      "label": "Newsletter Contábil",
+      "label": "Central de Conteúdo",
       "icon": "news",
-      "target": "central",
-      "tab": "newsletter"
+      "target": "central"
     },
     {
-      "label": "Sistemas da Área",
-      "icon": "grid",
-      "target": "central",
-      "tab": "sistemas"
+      "label": "Estrutura das Equipes",
+      "icon": "users",
+      "target": "equipes"
     },
     {
       "label": "Processos",
       "icon": "flow",
       "target": "processos"
-    },
-    {
-      "label": "Documentos e Normas",
-      "icon": "file",
-      "target": "central",
-      "tab": "documentos"
-    },
-    {
-      "label": "Notícias e Impactos",
-      "icon": "globe",
-      "target": "central",
-      "tab": "noticias"
     },
     {
       "label": "Painel da Gerência",

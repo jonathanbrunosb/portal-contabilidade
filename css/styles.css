@@ -183,6 +183,42 @@ small {
   color:#8793a5;
   margin-top:9px}
 
+.profile-switch {
+  display:inline-block;
+  margin-top:8px;
+  font-size:11px}
+
+.identity-list {
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  margin-top:14px}
+
+.identity-pick {
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:10px 8px;
+  border:0;
+  border-radius:8px;
+  background:transparent;
+  text-align:left}
+
+.identity-pick:hover {
+  background:#f6faff}
+
+.identity-pick strong {
+  display:block;
+  font-size:13px;
+  font-weight:600}
+
+.identity-pick small {
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  margin-top:2px}
+
 .home-columns.single-column {
   grid-template-columns:1fr}
 

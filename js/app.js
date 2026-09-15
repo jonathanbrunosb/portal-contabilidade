@@ -1,5 +1,5 @@
 import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken } from './data-service.js';
-import { identifyUser,renderUser,hasAccess } from './auth.js';
+import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js';
 import { initializeNavigation,bindTabs,selectTab } from './navigation.js';
 import { renderNewsletter,articleCard,showArticle } from './newsletter.js';
 import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,notify } from './ui.js';
@@ -8,9 +8,10 @@ let data,currentTab='newsletter',currentUser;
 const $=selector=>document.querySelector(selector);
 // Capability required to see each menu target / page section / searchable collection.
 const TARGET_ACCESS= {
-  central:'conteudo',processos:'gerencial',painel:'gerencial',agenda:'gerencial',editorial:'gerencial',administracao:'administracao'
+  central:'conteudo',equipes:'time',processos:'gerencial',painel:'gerencial',agenda:'gerencial',editorial:'gerencial',administracao:'administracao'
 }
 ;
+const CENTRAL_TABS=['newsletter','noticias','sistemas','documentos'];
 const SECTION_ACCESS= {
   central:'conteudo',equipes:'time',painel:'gerencial',editorial:'gerencial',administracao:'administracao'
 }
@@ -67,7 +68,7 @@ function renderContent(tab) {
   track('tab_view',{tab});
   selectTab('.tabs',$(`#tab-${tab}`));
   $('#content-view').setAttribute('aria-labelledby',`tab-${tab}`);
-  document.querySelectorAll('.nav-link').forEach(el=>el.classList.toggle('active',el.dataset.navTab===tab));
+  document.querySelectorAll('.nav-link').forEach(el=>el.classList.toggle('active',el.dataset.navTab===tab||(CENTRAL_TABS.includes(tab)&&el.getAttribute('href')==='#central')));
   if(tab==='newsletter')$('#content-view').innerHTML=renderNewsletter(data.newsletter);
   if(tab==='noticias')$('#content-view').innerHTML=`<div class="card-grid">${data.noticias.filter(i=>i.status==='Publicado').map(i=>articleCard(i,'noticias')).join('')}</div><div class="content-footer">Pautas demonstrativas para acompanhamento — não representam notícias verificadas.</div>`;
   if(tab==='sistemas')$('#content-view').innerHTML=`<div class="card-grid">${data.sistemas.map(systemCard).join('')}</div><div class="content-footer">Cadastre os endereços internos para habilitar os acessos.</div>`;
@@ -453,6 +454,15 @@ function preferences() {
   }
   ;
 }
+function openIdentityPicker(users) {
+  const rows=users.map(u=>`<button class="identity-pick" data-user="${e(u.id)}"><img class="avatar" src="${e(safeURL(u.foto)||'assets/users/default.svg')}" alt=""><span><strong>${e(u.nome)}</strong><small>${e(u.cargo)} · ${e(u.equipe)}</small></span></button>`).join('');
+  showDialog('Quem é você?','IDENTIFICAÇÃO',`<p>Escolha seu nome para personalizar o portal e assinar suas ações no Painel Editorial e na Administração. A escolha fica salva só neste navegador — não é um login corporativo.</p><div class="identity-list">${rows}</div>`);
+  document.querySelectorAll('.identity-pick').forEach(btn=>btn.onclick=()=> {
+    setStoredUserId(btn.dataset.user);
+    location.reload();
+  }
+  );
+}
 async function init() {
   hydrateIcons();
   initializeDialog();
@@ -476,6 +486,8 @@ async function init() {
     renderAdmin();
     renderPeriod();
     track('session_start');
+    $('#switch-identity').onclick=()=>openIdentityPicker(data.usuarios);
+    if(!getStoredUserId())openIdentityPicker(data.usuarios);
     $('#new-draft').onclick=openNewDraft;
     $('#search-form').onsubmit=event=> {
       event.preventDefault();

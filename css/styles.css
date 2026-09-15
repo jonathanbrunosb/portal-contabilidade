@@ -520,6 +520,9 @@ main {
   gap:12px;
   padding:22px 24px 17px}
 
+.section-heading>div {
+  min-width:0}
+
 .section-kicker {
   font-size:10px;
   font-weight:700;
@@ -626,7 +629,8 @@ main {
 .card-grid {
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:14px}
+  gap:14px;
+  align-items:start}
 
 .content-card {
   border:1px solid var(--border);
@@ -965,7 +969,8 @@ main {
   color:var(--muted)}
 
 .table-scroll {
-  overflow-x:auto}
+  overflow-x:auto;
+  position:relative}
 
 table {
   border-collapse:collapse;
@@ -1048,7 +1053,8 @@ tbody tr:hover {
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
   padding:0 24px 22px;
-  gap:14px}
+  gap:14px;
+  align-items:start}
 
 .delivery {
   border:1px solid var(--border);
@@ -1216,7 +1222,7 @@ dialog h2 {
 
 .detail-grid {
   display:grid;
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:repeat(2,minmax(0,1fr));
   gap:12px;
   margin:18px 0}
 
@@ -1453,8 +1459,11 @@ main {
   font-size:10px}
 
 .home-columns,.management-columns {
-  grid-template-columns:minmax(0,1.7fr) minmax(270px,1fr);
+  grid-template-columns:1fr;
   gap:16px}
+
+th,td {
+  padding:10px 14px}
 
 .section-heading {
   padding:18px}
@@ -1538,9 +1547,6 @@ main {
 .hero-metric {
   max-width:112px}
 
-.home-columns {
-  grid-template-columns:minmax(0,1.7fr) minmax(270px,1fr)}
-
 #toast {
   left:50%}
 
@@ -1622,9 +1628,6 @@ main {
 .hero-metric small {
   font-size:10px}
 
-.home-columns,.management-columns {
-  grid-template-columns:1fr}
-
 .content-card h3 {
   font-size:15px}
 
@@ -1667,7 +1670,7 @@ main {
   padding:15px 0}
 
 .kpi-grid {
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:repeat(2,minmax(0,1fr));
   gap:11px}
 
 .kpi-top {
@@ -1712,6 +1715,22 @@ main {
 
 .filter-bar select {
   width:100%}
+
+th,td {
+  padding:8px 10px}
+
+.table-scroll {
+  scrollbar-width:thin}
+
+.table-scroll:after {
+  content:"";
+  position:absolute;
+  top:0;
+  right:0;
+  bottom:0;
+  width:22px;
+  background:linear-gradient(to right,transparent,#071f4914);
+  pointer-events:none}
 
 }
 

@@ -17,7 +17,18 @@
     "areaResponsavel": "Normas e Reporte",
     "responsavel": "Marina Oliveira",
     "nivelImpacto": "Moderado",
-    "status": "Publicado"
+    "status": "Publicado",
+    "aprovadoPor": "Marina Oliveira",
+    "dataAprovacao": "2026-09-14",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Marina Oliveira",
+        "data": "2026-09-14"
+      }
+    ]
   },
   {
     "id": "news2",
@@ -37,7 +48,18 @@
     "areaResponsavel": "Normas e Reporte",
     "responsavel": "Marina Oliveira",
     "nivelImpacto": "Moderado",
-    "status": "Publicado"
+    "status": "Publicado",
+    "aprovadoPor": "Marina Oliveira",
+    "dataAprovacao": "2026-09-14",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Marina Oliveira",
+        "data": "2026-09-14"
+      }
+    ]
   },
   {
     "id": "news3",
@@ -57,7 +79,18 @@
     "areaResponsavel": "Normas e Reporte",
     "responsavel": "Marina Oliveira",
     "nivelImpacto": "Moderado",
-    "status": "Publicado"
+    "status": "Publicado",
+    "aprovadoPor": "Marina Oliveira",
+    "dataAprovacao": "2026-09-14",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Marina Oliveira",
+        "data": "2026-09-14"
+      }
+    ]
   },
   {
     "id": "news4",
@@ -77,6 +110,54 @@
     "areaResponsavel": "Normas e Reporte",
     "responsavel": "Marina Oliveira",
     "nivelImpacto": "Moderado",
-    "status": "Publicado"
+    "status": "Publicado",
+    "aprovadoPor": "Marina Oliveira",
+    "dataAprovacao": "2026-09-14",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Marina Oliveira",
+        "data": "2026-09-14"
+      }
+    ]
+  },
+  {
+    "id": "news5",
+    "categoria": "Regulatório",
+    "titulo": "Impactos preliminares de nova instrução setorial",
+    "resumo": "Em revisão pela Gerência: primeira leitura dos possíveis efeitos nos processos de fechamento.",
+    "conteudoCompleto": "CONTEÚDO EM REVISÃO — aguardando aprovação da Gerência antes da publicação.\nEste item ilustra o estágio intermediário do fluxo editorial (Fase 4 do roadmap).",
+    "dataPublicacao": "2026-09-15",
+    "dataVigencia": null,
+    "fonte": "Pauta editorial demonstrativa — sem notícia externa vinculada",
+    "link": null,
+    "documento": null,
+    "empresasImpactadas": [
+      "Empresa A (exemplo)",
+      "Empresa B (exemplo)"
+    ],
+    "areaResponsavel": "Normas e Reporte",
+    "responsavel": "Ana Martins",
+    "nivelImpacto": "Moderado",
+    "status": "Em revisão",
+    "aprovadoPor": null,
+    "dataAprovacao": null,
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Rascunho",
+        "autor": "Ana Martins",
+        "data": "2026-09-14T09:00:00.000Z"
+      },
+      {
+        "de": "Rascunho",
+        "para": "Em revisão",
+        "autor": "Ana Martins",
+        "data": "2026-09-15T09:30:00.000Z"
+      }
+    ]
   }
 ]

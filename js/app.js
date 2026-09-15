@@ -1,11 +1,37 @@
-import { loadData } from './data-service.js';
-import { identifyUser,renderUser } from './auth.js';
+import { loadData,isLiveDataSource,apiWrite } from './data-service.js';
+import { identifyUser,renderUser,hasAccess } from './auth.js';
 import { initializeNavigation,bindTabs,selectTab } from './navigation.js';
 import { renderNewsletter,articleCard,showArticle } from './newsletter.js';
 import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,notify } from './ui.js';
 import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js';
-let data,currentTab='newsletter';
+let data,currentTab='newsletter',currentUser;
 const $=selector=>document.querySelector(selector);
+// Capability required to see each menu target / page section / searchable collection.
+const TARGET_ACCESS= {
+  central:'conteudo',processos:'gerencial',painel:'gerencial',agenda:'gerencial',editorial:'gerencial'
+}
+;
+const SECTION_ACCESS= {
+  central:'conteudo',equipes:'time',painel:'gerencial',editorial:'gerencial'
+}
+;
+const EDITORIAL_COLLECTIONS=['newsletter','noticias'];
+const EDITORIAL_CATEGORIAS= {
+  newsletter:'Newsletter',noticias:'Notícia'
+}
+;
+const COLLECTION_ACCESS= {
+  newsletter:'conteudo',noticias:'conteudo',sistemas:'conteudo',documentos:'conteudo',equipes:'time',usuarios:'time',processos:'gerencial',agenda:'gerencial',entregas:'gerencial'
+}
+;
+function applyAccess(user) {
+  Object.entries(SECTION_ACCESS).forEach(([id,capability])=> {
+    document.getElementById(id).hidden=!hasAccess(user,capability);
+  }
+  );
+  $('.home-columns').classList.toggle('single-column',!hasAccess(user,'time'));
+  $('#notifications').hidden=!hasAccess(user,'gerencial');
+}
 function openAccess(item) {
   const url=safeURL(item.link);
   track('system_access',{sistema:item.nome,configurado:!!url});
@@ -83,7 +109,8 @@ function renderPeriod() {
   const reference = new Date(config.dataReferencia + 'T12:00:00');
   const period = new Date(config.competencia + '-01T12:00:00');
   const month = period.toLocaleDateString('pt-BR', {month: 'long'});
-  $('.context-date').innerHTML = `${e(reference.toLocaleDateString('pt-BR', {day:'numeric', month:'long', year:'numeric'}))} <span class="demo-label">${config.demonstracao ? 'Demonstração' : 'Base local'}</span>`;
+  const fonte = isLiveDataSource() ? 'Dados ao vivo' : 'Arquivo local';
+  $('.context-date').innerHTML = `${e(reference.toLocaleDateString('pt-BR', {day:'numeric', month:'long', year:'numeric'}))} <span class="demo-label" title="${isLiveDataSource() ? 'Servido pelo backend em server/server.js' : 'Servido pelos arquivos estáticos em data/'}">${e(fonte)}</span> <span class="demo-label">${config.demonstracao ? 'Demonstração' : 'Base local'}</span>`;
   $('.edition').textContent = `${month.toUpperCase()} / ${period.getFullYear()}`;
   $('.period').innerHTML = `<span class="live-dot"></span> Competência: ${e(month)} ${period.getFullYear()}`;
   $('#entregas .section-kicker').textContent = config.semanaLabel;
@@ -97,6 +124,124 @@ function renderDashboard() {
   $('#process-table').innerHTML=data.processos.map(p=>`<tr><td><button class="text-btn" data-record="processos:${e(p.id)}">${e(p.nome)}</button></td><td>${e(p.responsavel)}</td><td>${e(p.prazo)}</td><td>${badge(p.status)}</td></tr>`).join('');
   $('#agenda-list').innerHTML=data.agenda.slice().sort((a,b)=>a.data.localeCompare(b.data)).map(a=>`<button class="agenda-event" data-record="agenda:${e(a.id)}"><span class="event-date">${e(a.data.slice(-2))}<small>${e(new Date(a.data+'T12:00:00').toLocaleDateString('pt-BR',{month:'short'}).replace('.','').toUpperCase())}</small></span><span class="event-copy"><strong>${e(a.nome)}</strong><small>${e(a.horario)}· ${e(a.responsavel)}</small></span></button>`).join('');
   $('#deliveries').innerHTML=data.entregas.map(d=>`<button class="delivery" data-record="entregas:${e(d.id)}"><strong>${e(d.nome)}</strong><small>${e(d.responsavel)}</small><span class="delivery-bottom"><span>${e(dateLabel(d.prazo))}</span>${badge(d.status)}</span></button>`).join('');
+}
+function editorialActions(collection,item) {
+  if(item.status==='Rascunho')return `<button class="text-btn" data-editorial="${e(collection)}:${e(item.id)}:revisao">Enviar para revisão →</button>`;
+  if(item.status==='Em revisão')return `<button class="text-btn" data-editorial="${e(collection)}:${e(item.id)}:publicar">Aprovar e publicar ✓</button><button class="text-btn" data-editorial="${e(collection)}:${e(item.id)}:recusar">Recusar ✕</button>`;
+  if(item.status==='Recusado')return `<button class="text-btn" data-editorial="${e(collection)}:${e(item.id)}:reabrir">Reabrir como rascunho ↺</button>`;
+  return '';
+}
+function editorialFooter(item) {
+  if(item.status==='Publicado')return `Aprovado por ${e(item.aprovadoPor||'—')} em ${e(dateLabel(item.dataAprovacao))}`;
+  if(item.status==='Recusado')return `Motivo: ${e(item.motivoRecusa||'Não informado')}`;
+  return `Responsável: ${e(item.responsavel)}`;
+}
+function editorialCard(collection,item) {
+  return `<article class="content-card"><div class="card-meta"><span class="tag">${e(EDITORIAL_CATEGORIAS[collection])}</span>${badge(item.status)}</div><h3>${e(item.titulo)}</h3><p>${editorialFooter(item)}</p><div class="card-bottom">${editorialActions(collection,item)}</div></article>`;
+}
+function renderEditorial() {
+  const live=isLiveDataSource();
+  $('#new-draft').disabled=!live;
+  $('#new-draft').title=live?'':'Requer o backend opcional (Fase 2) ativo — ver README, "Backend opcional".';
+  const notice=live?'':'<p class="empty-state">Somente leitura: ligue o backend opcional (Fase 2) para enviar para revisão, aprovar, recusar ou criar rascunhos por aqui — ver README, "Backend opcional".</p>';
+  const cards=EDITORIAL_COLLECTIONS.flatMap(collection=>data[collection].map(item=>editorialCard(collection,item)));
+  $('#editorial-view').innerHTML=`${notice}<div class="card-grid">${cards.join('')||'<p class="empty-state">Nenhum conteúdo editorial cadastrado.</p>'}</div>`;
+}
+async function handleEditorialAction(collection,id,action) {
+  const item=data[collection]?.find(i=>i.id===id);
+  if(!item)return;
+  let body;
+  if(action==='revisao')body= {
+    status:'Em revisão'
+  }
+  ;
+  if(action==='publicar') {
+    if(!confirm(`Aprovar e publicar "${item.titulo}" como ${currentUser.nome}?`))return;
+    body= {
+      status:'Publicado',aprovadoPor:currentUser.nome
+    }
+    ;
+  }
+  if(action==='recusar') {
+    const motivo=prompt('Motivo da recusa:');
+    if(!motivo)return;
+    body= {
+      status:'Recusado',motivoRecusa:motivo
+    }
+    ;
+  }
+  if(action==='reabrir')body= {
+    status:'Rascunho'
+  }
+  ;
+  if(!body)return;
+  try {
+    const updated=await apiWrite(collection, {
+      id,method:'PUT',body,autor:currentUser.nome
+    }
+    );
+    data[collection][data[collection].findIndex(i=>i.id===id)]=updated;
+    renderEditorial();
+    if(currentTab===collection)renderContent(collection);
+    notify('Conteúdo editorial atualizado.');
+  }
+  catch(error) {
+    notify(error.message);
+  }
+}
+function openNewDraft() {
+  if(!isLiveDataSource()) {
+    notify('Requer o backend opcional (Fase 2) ativo — ver README, "Backend opcional".');
+    return;
+  }
+  const categorias=data.config.newsletterCategorias||[];
+  showDialog('Novo rascunho','PAINEL EDITORIAL',`<form id="draft-form">
+    <label class="field">Tipo<select id="draft-tipo"><option value="newsletter">Newsletter Contábil</option><option value="noticias">Notícias &amp; Impactos</option></select></label>
+    <label class="field">Categoria<input id="draft-categoria" list="draft-categorias" required></label>
+    <datalist id="draft-categorias">${categorias.map(c=>`<option value="${e(c)}">`).join('')}</datalist>
+    <label class="field">Título<input id="draft-titulo" required></label>
+    <label class="field">Resumo<textarea id="draft-resumo" required style="min-height:50px"></textarea></label>
+    <label class="field">Conteúdo completo<textarea id="draft-conteudo" required></textarea></label>
+    <label class="field">Nível de impacto<select id="draft-impacto"><option>Baixo</option><option selected>Moderado</option><option>Alto</option></select></label>
+    <label class="field">Área responsável<input id="draft-area" value="${e(currentUser.area||'')}"></label>
+    <label class="field">Empresas impactadas (separadas por vírgula)<input id="draft-empresas" placeholder="Empresa A (exemplo), Empresa B (exemplo)"></label>
+    <button class="primary-btn" type="submit">Salvar rascunho</button>
+  </form>`);
+  $('#draft-form').onsubmit=async event=> {
+    event.preventDefault();
+    const tipo=$('#draft-tipo').value;
+    const body= {
+      id:`redacao-${Date.now()}`,
+      categoria:$('#draft-categoria').value.trim(),
+      titulo:$('#draft-titulo').value.trim(),
+      resumo:$('#draft-resumo').value.trim(),
+      conteudoCompleto:$('#draft-conteudo').value.trim(),
+      dataPublicacao:new Date().toISOString().slice(0,10),
+      dataVigencia:null,
+      fonte:'Rascunho criado pelo painel editorial',
+      link:null,
+      documento:null,
+      empresasImpactadas:$('#draft-empresas').value.split(',').map(v=>v.trim()).filter(Boolean),
+      areaResponsavel:$('#draft-area').value.trim(),
+      responsavel:currentUser.nome,
+      nivelImpacto:$('#draft-impacto').value
+    }
+    ;
+    try {
+      const created=await apiWrite(tipo, {
+        method:'POST',body,autor:currentUser.nome
+      }
+      );
+      data[tipo].push(created);
+      renderEditorial();
+      $('#detail-dialog').close();
+      notify('Rascunho criado.');
+    }
+    catch(error) {
+      notify(error.message);
+    }
+  }
+  ;
 }
 function showRecord(collection,id) {
   const item=data[collection]?.find(i=>i.id===id);
@@ -133,12 +278,15 @@ function search(query) {
   $('#search-section').hidden=!normalized;
   if(!normalized)return 0;
   const matches=[];
-  for(const collection of ['newsletter','noticias','processos','sistemas','documentos','equipes','usuarios','agenda','entregas'])for(const item of data[collection]) {
-    if((collection==='newsletter'||collection==='noticias')&&item.status!=='Publicado')continue;
-    if(normalize(JSON.stringify(item)).includes(normalized))matches.push( {
-      collection,item
+  for(const collection of ['newsletter','noticias','processos','sistemas','documentos','equipes','usuarios','agenda','entregas']) {
+    if(!hasAccess(currentUser,COLLECTION_ACCESS[collection]))continue;
+    for(const item of data[collection]) {
+      if((collection==='newsletter'||collection==='noticias')&&item.status!=='Publicado')continue;
+      if(normalize(JSON.stringify(item)).includes(normalized))matches.push( {
+        collection,item
+      }
+      );
     }
-    );
   }
   $('#search-count').textContent=`${matches.length} resultado${matches.length===1?'':'s'} para “${query.trim()}”`;
   $('#search-results').innerHTML=matches.map(( {
@@ -200,15 +348,23 @@ async function init() {
   preferences();
   try {
     data=await loadData();
-    renderUser(identifyUser(data.usuarios));
-    initializeNavigation(data.config,renderContent,openAccess);
+    currentUser=identifyUser(data.usuarios);
+    renderUser(currentUser);
+    applyAccess(currentUser);
+    const menu=data.config.menu.filter(item=>hasAccess(currentUser,TARGET_ACCESS[item.target]||'conteudo'));
+    initializeNavigation( {
+      ...data.config,menu
+    }
+    ,renderContent,openAccess);
     bindTabs('.tabs',tab=>renderContent(tab.dataset.tab));
     bindTabs('.segmented',tab=>renderTeams(tab.dataset.teamTab));
     renderContent(currentTab);
     renderTeams();
     renderDashboard();
+    renderEditorial();
     renderPeriod();
     track('session_start');
+    $('#new-draft').onclick=openNewDraft;
     $('#search-form').onsubmit=event=> {
       event.preventDefault();
       const query=$('#global-search').value.trim();
@@ -253,6 +409,11 @@ async function init() {
       if(team)showTeam(team.dataset.team,team.dataset.facet);
       const system=event.target.closest('[data-system]');
       if(system)openAccess(data.sistemas.find(i=>i.id===system.dataset.system));
+      const editorial=event.target.closest('[data-editorial]');
+      if(editorial) {
+        const [collection,id,action]=editorial.dataset.editorial.split(':');
+        handleEditorialAction(collection,id,action);
+      }
       const download=event.target.closest('a[download]');
       if(download) {
         const article=download.closest('article');

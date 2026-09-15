@@ -90,6 +90,11 @@
       "label": "Agenda e Entregas",
       "icon": "calendar",
       "target": "agenda"
+    },
+    {
+      "label": "Painel Editorial",
+      "icon": "check",
+      "target": "editorial"
     }
   ],
   "links": [

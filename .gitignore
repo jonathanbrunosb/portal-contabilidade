@@ -3,3 +3,6 @@
 Thumbs.db
 .vscode/
 .idea/
+
+# Runtime data from server/server.js (Fase 2) — not source
+server/audit.log

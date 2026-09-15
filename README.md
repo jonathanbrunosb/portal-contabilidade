@@ -18,6 +18,17 @@ Python é apenas uma opção de servidor estático. Você pode usar qualquer ser
 
 Não abra `index.html` por duplo clique: o protocolo `file://` bloqueia os módulos e/ou o carregamento dos JSONs. A execução suportada é HTTP em localhost. O vínculo `127.0.0.1` permite somente acesso no próprio computador. O teste de celular foi realizado por viewport, sem expor o portal na rede.
 
+## Publicação (GitHub Pages)
+
+O portal é publicado automaticamente pelo workflow `.github/workflows/pages.yml` a cada push em `main`, via GitHub Actions (`actions/deploy-pages`) — sem etapa de build, o conteúdo do repositório é servido como está.
+
+**Domínio próprio:** `portal.contabilidade-eqtl.com`, definido pelo arquivo `CNAME` na raiz do repositório. Para o domínio funcionar de fato, dois passos fora do repositório são necessários (não automatizáveis por aqui):
+
+1. **DNS**: no provedor do domínio `contabilidade-eqtl.com`, criar um registro **CNAME** para o subdomínio `portal` apontando para `jonathanbrunosb.github.io` (não usar registro `A`).
+2. **GitHub**: em Settings → Pages do repositório, confirmar que o domínio customizado aparece verificado (pode levar alguns minutos a algumas horas após a propagação do DNS) e habilitar "Enforce HTTPS" assim que a opção estiver disponível.
+
+Enquanto o DNS não propaga, o portal continua acessível pela URL padrão `https://jonathanbrunosb.github.io/portal-contabilidade/`.
+
 ## Estrutura
 
 ```text

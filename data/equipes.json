@@ -3,8 +3,8 @@
     "id": "t1",
     "sigla": "CI",
     "nome": "Contabilidade I",
-    "descricao": "Contabilidade geral e fechamento",
-    "lider": "Ana Martins",
+    "descricao": "Contabilidade Regulatória",
+    "lider": "Ana Laura do Carmo Machado",
     "quantidade": 12,
     "responsabilidades": [
       "Fechamento mensal",
@@ -15,9 +15,9 @@
     ],
     "responsaveis": [
       {
-        "nome": "Ana Martins",
-        "cargo": "Liderança",
-        "foto": "assets/users/default.svg"
+        "nome": "Ana Laura do Carmo Machado",
+        "cargo": "Executiva de Contabilidade",
+        "foto": "assets/users/ana-laura-carmo-machado.webp"
       }
     ],
     "solucoes": [

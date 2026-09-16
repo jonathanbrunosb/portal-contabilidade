@@ -1296,6 +1296,24 @@ dialog h2 {
 .admin-panel #admin-view {
   padding:0 24px 24px}
 
+.admin-lock {
+  max-width:320px;
+  padding:20px;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:#f8fbfe}
+
+.admin-lock p {
+  margin-bottom:12px;
+  color:var(--muted);
+  font-size:13px}
+
+.admin-lock .empty-state {
+  padding:0;
+  margin-top:10px;
+  color:var(--red);
+  text-align:left}
+
 .admin-token-row {
   display:flex;
   gap:12px;

@@ -1,8 +1,8 @@
-import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams } from './data-service.js?v=20260915-5';
+import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams } from './data-service.js?v=20260916-1';
 import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js';
 import { initializeNavigation,bindTabs,selectTab } from './navigation.js';
 import { renderNewsletter,articleCard,showArticle } from './newsletter.js';
-import { renderTeamStructure } from './teams.js?v=20260915-5';
+import { renderTeamStructure } from './teams.js?v=20260916-1';
 import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,notify } from './ui.js';
 import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js';
 let data,currentTab='newsletter',currentUser,currentMenu=[];
@@ -410,7 +410,53 @@ async function importTeams(file) {
     notify(error.message);
   }
 }
+// Selecting someone else's name in the identification picker (e.g. Jonathan,
+// who has administracao access) must not be enough to reach the edit forms —
+// this is a soft deterrent, not real authentication: it runs entirely in the
+// browser, so it can't stop someone who opens dev tools. The password itself
+// is never kept in the source as plain text, only its SHA-256 hash.
+const ADMIN_UNLOCK_HASH='b6d30367e3010f5067fd937ec1abbc5fb4e5502f55b7c9bd9b798622b785ad8e';
+const ADMIN_UNLOCK_KEY='portal-admin-unlocked';
+function isAdminUnlocked() {
+  try {
+    return sessionStorage.getItem(ADMIN_UNLOCK_KEY)==='1';
+  }
+  catch {
+    return false;
+  }
+}
+async function sha256Hex(text) {
+  const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text));
+  return [...new Uint8Array(digest)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function renderAdminLock() {
+  $('#admin-view').innerHTML=`<div class="admin-lock"><p>Área restrita da Administração. Informe o código de acesso para continuar.</p><form id="admin-unlock-form"><label class="field">Código de acesso<input type="password" id="admin-unlock-code" autocomplete="off" required></label><button class="primary-btn" type="submit">Desbloquear</button></form><p class="empty-state compact" id="admin-unlock-error" hidden>Código incorreto. Tente novamente.</p></div>`;
+  $('#admin-unlock-form').onsubmit=async event=> {
+    event.preventDefault();
+    const code=$('#admin-unlock-code').value;
+    const hash=await sha256Hex(code);
+    if(hash===ADMIN_UNLOCK_HASH) {
+      try {
+        sessionStorage.setItem(ADMIN_UNLOCK_KEY,'1');
+      }
+      catch {
+        /* Storage may be blocked by corporate browser policy. */
+      }
+      renderAdmin();
+    }
+    else {
+      $('#admin-unlock-error').hidden=false;
+      $('#admin-unlock-code').value='';
+      $('#admin-unlock-code').focus();
+    }
+  }
+  ;
+}
 function renderAdmin() {
+  if(!isAdminUnlocked()) {
+    renderAdminLock();
+    return;
+  }
   const live=isLiveDataSource();
   const source=live?'Servidor conectado':hasLocalTeams()?'Alterações salvas neste navegador':'Base original do portal';
   const token=live?`<div class="admin-token-row"><label class="field">Token de administração<input type="password" id="admin-token" placeholder="Cole o token aqui" value="${e(getAdminToken())}"></label><button class="primary-btn" id="admin-token-save">Salvar token</button></div>`:'';

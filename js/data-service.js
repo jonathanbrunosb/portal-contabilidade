@@ -2,7 +2,7 @@
 // the only module that knows whether data came from the live backend
 // (server/server.js, Fase 2) or from the static JSON files — both expose the
 // same shape, so the rest of the app doesn't need to care which one answered.
-const collections=['usuarios','newsletter','noticias','equipes','processos','sistemas','agenda','documentos','entregas','config'];
+const collections=['usuarios','newsletter','noticias','equipes','processos','sistemas','automacoes','agenda','documentos','entregas','config'];
 // Opt-in: without window.PORTAL_API_ENABLED=true (see README "Backend opcional"),
 // the portal never attempts the live backend — same zero-config static behavior
 // as before, with no extra request and no connection-refused noise in the
@@ -28,6 +28,7 @@ async function withTimeout(run,ms=API_TIMEOUT_MS) {
 // is writing — X-Autor stays self-reported, same as before this existed.
 const ADMIN_TOKEN_KEY='portal-admin-token';
 const LOCAL_TEAMS_KEY='portal-admin-equipes';
+const LOCAL_AUTOMACOES_KEY='portal-admin-automacoes';
 export function getAdminToken() {
   try {
     return localStorage.getItem(ADMIN_TOKEN_KEY)||'';
@@ -44,29 +45,55 @@ export function setAdminToken(token) {
     /* Storage may be blocked by corporate browser policy. */
   }
 }
-export function hasLocalTeams() {
-  try {
-    return Boolean(localStorage.getItem(LOCAL_TEAMS_KEY));
+// Same browser-local persistence used for equipes, parameterized by
+// collection key — a static deployment (no server/server.js) still lets an
+// admin edit a collection, kept only in that browser until exported/synced.
+function localCollection(key) {
+  return {
+    has:()=> {
+      try {
+        return Boolean(localStorage.getItem(key));
+      }
+      catch {
+        return false;
+      }
+    },
+    save:value=> {
+      try {
+        localStorage.setItem(key,JSON.stringify(value));
+      }
+      catch {
+        /* Storage may be blocked by corporate browser policy. */
+      }
+    },
+    clear:()=> {
+      try {
+        localStorage.removeItem(key);
+      }
+      catch {
+        /* Storage may be blocked by corporate browser policy. */
+      }
+    },
+    read:()=> {
+      try {
+        const value=JSON.parse(localStorage.getItem(key)||'null');
+        return Array.isArray(value)?value:null;
+      }
+      catch {
+        return null;
+      }
+    }
   }
-  catch {
-    return false;
-  }
+  ;
 }
-export function saveLocalTeams(teams) {
-  localStorage.setItem(LOCAL_TEAMS_KEY,JSON.stringify(teams));
-}
-export function clearLocalTeams() {
-  localStorage.removeItem(LOCAL_TEAMS_KEY);
-}
-function readLocalTeams() {
-  try {
-    const value=JSON.parse(localStorage.getItem(LOCAL_TEAMS_KEY)||'null');
-    return Array.isArray(value)?value:null;
-  }
-  catch {
-    return null;
-  }
-}
+const teamsLocal=localCollection(LOCAL_TEAMS_KEY);
+const automacoesLocal=localCollection(LOCAL_AUTOMACOES_KEY);
+export const hasLocalTeams=teamsLocal.has;
+export const saveLocalTeams=teamsLocal.save;
+export const clearLocalTeams=teamsLocal.clear;
+export const hasLocalAutomacoes=automacoesLocal.has;
+export const saveLocalAutomacoes=automacoesLocal.save;
+export const clearLocalAutomacoes=automacoesLocal.clear;
 async function fetchStatic(name) {
   const response=await fetch(`data/${name}.json`, {
     cache:'no-cache'
@@ -154,6 +181,9 @@ export async function loadData() {
   }
   ));
   const result=Object.fromEntries(pairs);
-  if(!live)result.equipes=readLocalTeams()||result.equipes;
+  if(!live) {
+    result.equipes=teamsLocal.read()||result.equipes;
+    result.automacoes=automacoesLocal.read()||result.automacoes;
+  }
   return result;
 }

@@ -1,8 +1,8 @@
-import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams } from './data-service.js?v=20260916-1';
+import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260916-2';
 import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js';
 import { initializeNavigation,bindTabs,selectTab } from './navigation.js';
 import { renderNewsletter,articleCard,showArticle } from './newsletter.js';
-import { renderTeamStructure } from './teams.js?v=20260916-1';
+import { renderTeamStructure } from './teams.js?v=20260916-2';
 import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,notify } from './ui.js';
 import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js';
 let data,currentTab='newsletter',currentUser,currentMenu=[];
@@ -12,7 +12,7 @@ const TARGET_ACCESS= {
   central:'conteudo',equipes:'time',processos:'gerencial',painel:'gerencial',agenda:'gerencial',editorial:'gerencial',administracao:'administracao'
 }
 ;
-const CENTRAL_TABS=['newsletter','noticias','sistemas','documentos'];
+const CENTRAL_TABS=['newsletter','noticias','sistemas','documentos','automacoes'];
 const SECTION_ACCESS= {
   central:'conteudo',painel:'gerencial',editorial:'gerencial',administracao:'administracao'
 }
@@ -61,6 +61,45 @@ function documentResults() {
   $('#document-results').innerHTML=records.map(documentCard).join('')||'<p class="empty-state">Nenhum documento encontrado. Tente outra categoria ou termo.</p>';
   $('#doc-count').textContent=`${records.length} documentos de exemplo` ;
 }
+const AUTOMATION_STATUSES=['Produção','Produção e Melhorias','Desenvolvimento e Testes'];
+const AUTOMATION_FAMILIAS= {
+  sap:'SAP / VBA',python:'Script Python',web:'RPA Web'
+}
+;
+function automationTagClass(familia) {
+  return familia==='python'?'tag purple':familia==='web'?'tag teal':'tag';
+}
+// Development status ("is it functional?") and link availability ("is there
+// somewhere to click?") are independent — a card can be em Produção with the
+// link still Acesso em configuração. The badge color only ever reflects the
+// former; the access affordance below the card is the only thing that reads
+// the URL, so the two never get mixed into one signal.
+function automationStatusColor(status) {
+  return /desenvolvimento|teste/i.test(status)?'yellow':'green';
+}
+function automationCard(item) {
+  const url=safeURL(item.url);
+  const access=url?`<a class="primary-btn" href="${e(url)}" target="_blank" rel="noopener noreferrer">Acessar automação ↗</a>`:'<p class="access-pending">Acesso em configuração</p>';
+  return `<article class="content-card" data-familia="${e(item.familia)}"><div class="card-meta"><span class="${automationTagClass(item.familia)}">${e(item.tipo)}</span></div><h3>${e(item.titulo)}</h3><p>${e(item.descricao)}</p><div class="card-bottom"><span class="badge ${automationStatusColor(item.statusDesenvolvimento)}">${e(item.statusDesenvolvimento)}</span><button class="text-btn" data-record="automacoes:${e(item.id)}">Ver detalhes →</button></div>${access}</article>`;
+}
+function activeAutomations() {
+  return data.automacoes.filter(item=>item.ativo!==false);
+}
+function renderAutomationsOverview() {
+  const ativos=activeAutomations();
+  const count=familia=>ativos.filter(item=>item.familia===familia).length;
+  $('#aut-metrics').innerHTML=`<article class="kpi"><div class="kpi-top"><span>Automações catalogadas</span>${icon('flow')}</div><div class="kpi-value">${ativos.length}</div></article><article class="kpi"><div class="kpi-top"><span>SAP / VBA</span>${icon('grid')}</div><div class="kpi-value">${count('sap')}</div></article><article class="kpi"><div class="kpi-top"><span>Script Python</span>${icon('file')}</div><div class="kpi-value">${count('python')}</div></article><article class="kpi"><div class="kpi-top"><span>RPA Web</span>${icon('globe')}</div><div class="kpi-value">${count('web')}</div></article>`;
+}
+function renderAutomationsResults() {
+  const words=normalize($('#aut-search').value).trim().split(/\s+/).filter(Boolean);
+  const familia=$('#aut-type').value,status=$('#aut-status').value;
+  const visible=activeAutomations()
+    .filter(item=>(!familia||item.familia===familia)&&(!status||item.statusDesenvolvimento===status))
+    .filter(item=>words.every(word=>normalize(`${item.titulo} ${item.descricao} ${item.tipo}`).includes(word)))
+    .sort((a,b)=>(a.ordem??0)-(b.ordem??0));
+  $('#aut-cards').innerHTML=visible.map(automationCard).join('')||'<p class="empty-state">Nenhuma automação corresponde aos filtros selecionados.</p>';
+  $('#aut-count').innerHTML=`<strong>${visible.length}</strong> ${visible.length===1?'automação encontrada':'automações encontradas'}`;
+}
 function renderContent(tab) {
   currentTab=tab;
   track('tab_view',{tab});
@@ -75,6 +114,22 @@ function renderContent(tab) {
     documentResults();
     $('#doc-search').oninput=documentResults;
     $('#doc-filter').onchange=documentResults;
+  }
+  if(tab==='automacoes') {
+    $('#content-view').innerHTML=`<div class="kpi-grid" id="aut-metrics"></div><div class="filter-bar automations-filter"><input type="search" id="aut-search" aria-label="Pesquisar automação" placeholder="Título, descrição, tecnologia ou transação SAP…"><select id="aut-type" aria-label="Tecnologia"><option value="">Todas as tecnologias</option>${Object.entries(AUTOMATION_FAMILIAS).map(([value,label])=>`<option value="${e(value)}">${e(label)}</option>`).join('')}</select><select id="aut-status" aria-label="Status de desenvolvimento"><option value="">Todos os status</option>${AUTOMATION_STATUSES.map(s=>`<option>${e(s)}</option>`).join('')}</select><button class="secondary-btn" id="aut-clear" type="button">Limpar filtros</button></div><div class="content-footer"><span id="aut-count" role="status" aria-live="polite"></span><span>As soluções estão funcionais conforme o status informado; os acessos pelo portal podem estar em configuração.</span></div><div class="card-grid automations-grid" id="aut-cards"></div>`;
+    renderAutomationsOverview();
+    renderAutomationsResults();
+    $('#aut-search').oninput=renderAutomationsResults;
+    $('#aut-type').onchange=renderAutomationsResults;
+    $('#aut-status').onchange=renderAutomationsResults;
+    $('#aut-clear').onclick=()=> {
+      $('#aut-search').value='';
+      $('#aut-type').value='';
+      $('#aut-status').value='';
+      renderAutomationsResults();
+      $('#aut-search').focus();
+    }
+    ;
   }
   const pause=$('#pause-radar');
   if(pause)pause.onclick=()=> {
@@ -410,6 +465,90 @@ async function importTeams(file) {
     notify(error.message);
   }
 }
+let automationEditState=null;
+// Same admin flow as equipes: same dialog helper, same live/local persistence
+// split, same refresh-after-save pattern — a second collection through the
+// one Administração storage path already established, not a new one.
+function refreshAutomationsUI(message) {
+  renderAdmin();
+  if(currentTab==='automacoes')renderContent('automacoes');
+  if(message)notify(message);
+}
+function openAutomationForm(item) {
+  showDialog(automationEditState.isNew?'Nova automação':item.titulo,'ADMINISTRAÇÃO DE AUTOMAÇÕES',`<form id="admin-automation-form"><div class="admin-form-grid"><label class="field">Título<input id="admin-aut-titulo" value="${e(item.titulo||'')}" required></label><label class="field">Ordem de exibição<input id="admin-aut-ordem" type="number" min="1" value="${e(item.ordem||1)}" required></label></div><label class="field">Tecnologia<select id="admin-aut-familia">${Object.entries(AUTOMATION_FAMILIAS).map(([value,label])=>`<option value="${e(value)}" ${item.familia===value?'selected':''}>${e(label)}</option>`).join('')}</select></label><label class="field">Tipo (rótulo exibido no card)<input id="admin-aut-tipo" value="${e(item.tipo||'')}" required placeholder="Ex.: RPA SAP, Script Python, RPA Web"></label><label class="field">Descrição<textarea id="admin-aut-descricao" required>${e(item.descricao||'')}</textarea></label><label class="field">Status de desenvolvimento<select id="admin-aut-status">${AUTOMATION_STATUSES.map(s=>`<option ${item.statusDesenvolvimento===s?'selected':''}>${e(s)}</option>`).join('')}</select></label><label class="field">URL de acesso (opcional)<input id="admin-aut-url" type="url" placeholder="https://…" value="${e(item.url||'')}"></label><label class="admin-validated"><input type="checkbox" id="admin-aut-ativo" ${item.ativo!==false?'checked':''}> Automação ativa (visível na tab)</label><div class="admin-form-actions"><button class="primary-btn" type="submit">${automationEditState.isNew?'Criar automação':'Salvar alterações'}</button>${!automationEditState.isNew?'<button class="danger-btn" type="button" id="admin-delete-automation">Excluir automação</button>':''}</div></form>`);
+  const deleteButton=$('#admin-delete-automation');
+  if(deleteButton)deleteButton.onclick=()=>deleteAutomation(item.id,item.titulo);
+  $('#admin-automation-form').onsubmit=async event=> {
+    event.preventDefault();
+    const submitBtn=event.target.querySelector('[type=submit]');
+    submitBtn.disabled=true;
+    try {
+      const urlRaw=$('#admin-aut-url').value.trim();
+      if(urlRaw&&!safeURL(urlRaw))throw new Error('URL inválida. Use um endereço http(s) válido.');
+      const body= {
+        id:automationEditState.id,
+        categoriaPortal:'Automações',
+        tipo:$('#admin-aut-tipo').value.trim(),
+        familia:$('#admin-aut-familia').value,
+        titulo:$('#admin-aut-titulo').value.trim(),
+        descricao:$('#admin-aut-descricao').value.trim(),
+        statusDesenvolvimento:$('#admin-aut-status').value,
+        url:urlRaw||null,
+        ativo:$('#admin-aut-ativo').checked,
+        ordem:Number($('#admin-aut-ordem').value)||1
+      }
+      ;
+      let updated=body;
+      if(isLiveDataSource())updated=await apiWrite('automacoes',{id:automationEditState.isNew?undefined:item.id,method:automationEditState.isNew?'POST':'PUT',body,autor:currentUser.nome});
+      const index=data.automacoes.findIndex(a=>a.id===item.id);
+      if(automationEditState.isNew)data.automacoes.push(updated);else data.automacoes[index]=updated;
+      if(!isLiveDataSource())saveLocalAutomacoes(data.automacoes);
+      $('#detail-dialog').close();
+      refreshAutomationsUI(automationEditState.isNew?'Automação criada.':'Automação atualizada.');
+    }
+    catch(error) {
+      notify(error.message);
+    }
+    finally {
+      submitBtn.disabled=false;
+    }
+  }
+  ;
+}
+function openCreateAutomation() {
+  const id=newId('automacao');
+  const maiorOrdem=data.automacoes.reduce((max,item)=>Math.max(max,item.ordem||0),0);
+  automationEditState= {
+    id,isNew:true
+  }
+  ;
+  openAutomationForm( {
+    id,tipo:'',familia:'sap',titulo:'',descricao:'',statusDesenvolvimento:'Produção',url:null,ativo:true,ordem:maiorOrdem+1
+  }
+  );
+}
+function openEditAutomation(id) {
+  const item=data.automacoes.find(a=>a.id===id);
+  if(!item)return;
+  automationEditState= {
+    id,isNew:false
+  }
+  ;
+  openAutomationForm(item);
+}
+async function deleteAutomation(id,titulo) {
+  if(!confirm(`Excluir a automação “${titulo}”?`))return;
+  try {
+    if(isLiveDataSource())await apiWrite('automacoes',{id,method:'DELETE',body:{},autor:currentUser.nome});
+    data.automacoes=data.automacoes.filter(item=>item.id!==id);
+    if(!isLiveDataSource())saveLocalAutomacoes(data.automacoes);
+    $('#detail-dialog').close();
+    refreshAutomationsUI('Automação excluída.');
+  }
+  catch(error) {
+    notify(error.message);
+  }
+}
 // Selecting someone else's name in the identification picker (e.g. Jonathan,
 // who has administracao access) must not be enough to reach the edit forms —
 // this is a soft deterrent, not real authentication: it runs entirely in the
@@ -460,8 +599,10 @@ function renderAdmin() {
   const live=isLiveDataSource();
   const source=live?'Servidor conectado':hasLocalTeams()?'Alterações salvas neste navegador':'Base original do portal';
   const token=live?`<div class="admin-token-row"><label class="field">Token de administração<input type="password" id="admin-token" placeholder="Cole o token aqui" value="${e(getAdminToken())}"></label><button class="primary-btn" id="admin-token-save">Salvar token</button></div>`:'';
-  $('#admin-view').innerHTML=`<div class="admin-overview"><div><span class="section-kicker">FONTE DOS DADOS</span><strong>${e(source)}</strong><p>${live?'As alterações são gravadas no servidor e compartilhadas.':'As alterações ficam neste navegador. Exporte o JSON para backup ou para atualizar a base publicada.'}</p></div><div class="admin-toolbar"><button class="primary-btn" id="admin-new-team">Nova equipe +</button><button class="secondary-btn" id="admin-export">Exportar JSON</button>${live?'':'<label class="secondary-btn admin-import">Importar JSON<input id="admin-import" type="file" accept="application/json,.json"></label>'}${hasLocalTeams()&&!live?'<button class="text-btn" id="admin-reset">Restaurar base original</button>':''}</div></div>${token}<div class="admin-team-list">${data.equipes.map(t=>`<article class="admin-team-card"><div><span class="team-code">${e(t.sigla||t.id)}</span><h3>${e(t.nome)}</h3><p>${e(t.descricao||'Sem descrição cadastrada.')}</p></div><div class="admin-team-meta"><strong>${(t.responsaveis||[]).length}</strong><span>colaborador(es)</span><button class="secondary-btn" data-admin-team="${e(t.id)}">Administrar</button></div></article>`).join('')}</div>`;
+  const automacoesOrdenadas=data.automacoes.slice().sort((a,b)=>(a.ordem??0)-(b.ordem??0));
+  $('#admin-view').innerHTML=`<div class="admin-overview"><div><span class="section-kicker">FONTE DOS DADOS</span><strong>${e(source)}</strong><p>${live?'As alterações são gravadas no servidor e compartilhadas.':'As alterações ficam neste navegador. Exporte o JSON para backup ou para atualizar a base publicada.'}</p></div><div class="admin-toolbar"><button class="primary-btn" id="admin-new-team">Nova equipe +</button><button class="secondary-btn" id="admin-export">Exportar JSON</button>${live?'':'<label class="secondary-btn admin-import">Importar JSON<input id="admin-import" type="file" accept="application/json,.json"></label>'}${hasLocalTeams()&&!live?'<button class="text-btn" id="admin-reset">Restaurar base original</button>':''}</div></div>${token}<div class="admin-team-list">${data.equipes.map(t=>`<article class="admin-team-card"><div><span class="team-code">${e(t.sigla||t.id)}</span><h3>${e(t.nome)}</h3><p>${e(t.descricao||'Sem descrição cadastrada.')}</p></div><div class="admin-team-meta"><strong>${(t.responsaveis||[]).length}</strong><span>colaborador(es)</span><button class="secondary-btn" data-admin-team="${e(t.id)}">Administrar</button></div></article>`).join('')}</div><h3 class="admin-section-title">Automações</h3><div class="admin-toolbar"><button class="primary-btn" id="admin-new-automation">Nova automação +</button></div><div class="admin-team-list">${automacoesOrdenadas.map(a=>`<article class="admin-team-card"><div><span class="tag ${automationTagClass(a.familia)}">${e(a.tipo)}</span><h3>${e(a.titulo)}</h3><p>${e(a.descricao)}</p></div><div class="admin-team-meta"><strong>${a.ativo!==false?'Ativa':'Inativa'}</strong><span>ordem ${e(a.ordem??'-')}</span><button class="secondary-btn" data-admin-automation="${e(a.id)}">Administrar</button></div></article>`).join('')||'<p class="empty-state compact">Nenhuma automação cadastrada.</p>'}</div>`;
   $('#admin-new-team').onclick=openCreateTeam;
+  $('#admin-new-automation').onclick=openCreateAutomation;
   $('#admin-export').onclick=exportTeams;
   const importInput=$('#admin-import');
   if(importInput)importInput.onchange=()=>importInput.files[0]&&importTeams(importInput.files[0]);
@@ -491,6 +632,11 @@ function showRecord(collection,id) {
       'Matrícula':item.matricula,'Cargo':item.cargo,'Área':item.area,'Equipe':item.equipe,'Perfil':item.perfil
     }
     ));
+    return;
+  }
+  if(collection==='automacoes') {
+    const url=safeURL(item.url);
+    showDialog(item.titulo,'AUTOMAÇÃO',`<p>${e(item.descricao)}</p>${detailGrid({'Categoria no portal':item.categoriaPortal,'Tecnologia':item.tipo,'Status de desenvolvimento':item.statusDesenvolvimento,'Situação do acesso':url?'Disponível':'Acesso em configuração'})}${url?`<a class="primary-btn" href="${e(url)}" target="_blank" rel="noopener noreferrer">Acessar automação ↗</a>`:'<p class="muted">O acesso pelo portal ainda está em configuração.</p>'}`);
     return;
   }
   if(collection==='documentos') {
@@ -692,6 +838,8 @@ async function init() {
       }
       const adminTeam=event.target.closest('[data-admin-team]');
       if(adminTeam)openEditTeam(adminTeam.dataset.adminTeam);
+      const adminAutomation=event.target.closest('[data-admin-automation]');
+      if(adminAutomation)openEditAutomation(adminAutomation.dataset.adminAutomation);
       const download=event.target.closest('a[download]');
       if(download) {
         const article=download.closest('article');

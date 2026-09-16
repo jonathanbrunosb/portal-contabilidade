@@ -747,6 +747,54 @@ main {
   background:#f1edfc;
   color:var(--purple)}
 
+/* Automações cards: the top accent is a discreet, secondary cue — the .tag
+   text (SAP / VBA, Script Python, RPA Web) is what actually identifies the
+   technology, same as the badge text identifies development status. */
+.content-card[data-familia] {
+  border-top:3px solid var(--blue)}
+
+.content-card[data-familia="python"] {
+  border-top-color:var(--purple)}
+
+.content-card[data-familia="web"] {
+  border-top-color:var(--teal)}
+
+.content-card[data-familia] .primary-btn {
+  width:100%;
+  justify-content:center;
+  margin-top:12px}
+
+.access-pending {
+  margin-top:12px;
+  padding:8px 10px;
+  border:1px dashed var(--border);
+  border-radius:6px;
+  background:#f6f9fc;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:600;
+  text-align:center}
+
+.automations-filter {
+  flex-wrap:wrap}
+
+.automations-filter input[type=search] {
+  flex:2 1 220px}
+
+.automations-filter select {
+  flex:1 1 170px;
+  width:auto}
+
+.automations-filter .secondary-btn {
+  flex:0 0 auto}
+
+.automations-grid {
+  grid-template-columns:repeat(3,minmax(0,1fr))}
+
+@media(max-width:1200px) {
+  .automations-grid {
+    grid-template-columns:repeat(2,minmax(0,1fr))}}
+
 .text-btn {
   border:0;
   background:none;
@@ -1313,6 +1361,9 @@ dialog h2 {
   margin-top:10px;
   color:var(--red);
   text-align:left}
+
+.admin-section-title {
+  margin:26px 0 14px}
 
 .admin-token-row {
   display:flex;

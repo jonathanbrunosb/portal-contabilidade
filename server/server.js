@@ -40,7 +40,7 @@ function safeAssetFilename(rawName, fallbackExt) {
 }
 
 // Arrays of records, each with a unique "id" (matches js/data-service.js).
-const LIST_COLLECTIONS = ['usuarios', 'newsletter', 'noticias', 'equipes', 'processos', 'sistemas', 'agenda', 'documentos', 'entregas'];
+const LIST_COLLECTIONS = ['usuarios', 'newsletter', 'noticias', 'equipes', 'processos', 'sistemas', 'automacoes', 'agenda', 'documentos', 'entregas'];
 // Singleton objects (KPIs, menu, links). Read-only for now: writing config
 // safely needs schema validation per field, left for a later pass.
 const SINGLETON_COLLECTIONS = ['config'];

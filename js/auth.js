@@ -4,7 +4,7 @@ import { escapeHTML as e,safeURL } from './ui.js';
 // is a UX consistency layer, not a security boundary: the JSON sources remain
 // public to anyone who can reach the published site (see README).
 export const PERMISSIONS= {
-  Administrador:['conteudo','gerencial','time','administracao'],Gerência:['conteudo','gerencial','time'],Gestor:['conteudo','time'],Colaborador:['conteudo'],Visitante:['conteudo']
+  Administrador:['conteudo','gerencial','time','administracao'],Gerência:['conteudo','gerencial','time'],Gestor:['conteudo','time'],Colaborador:['conteudo','time'],Visitante:['conteudo']
 }
 ;
 const IDENTITY_KEY='portal-identity';

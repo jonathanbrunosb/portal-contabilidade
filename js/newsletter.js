@@ -1,6 +1,6 @@
-import { escapeHTML as e,icon,badge,dateLabel,showDialog,detailGrid,safeURL } from './ui.js';
+import { escapeHTML as e,icon,badge,dateLabel,showDialog,detailGrid,safeURL,normalize } from './ui.js';
 const colors= {
-  'ANEEL':'','CPC / IFRS':'purple','DELIBERAÇÃO DO GRUPO':'teal','COMUNICADO INTERNO':'orange'
+  'ANEEL':'','CPC / IFRS':'purple','DELIBERAÇÃO DO GRUPO':'teal','COMUNICADO INTERNO':'orange','Grupo':'teal','Interno':'orange'
 }
 ;
 export function articleCard(item,collection) {
@@ -15,4 +15,107 @@ export function showArticle(item) {
   const link=safeURL(item.link),doc=safeURL(item.documento);
   const governanca=item.aprovadoPor?detailGrid({'Aprovado por':item.aprovadoPor,'Publicado em':dateLabel(item.dataAprovacao)}):'';
   showDialog(item.titulo,item.categoria,`${badge('Impacto '+item.nivelImpacto.toLowerCase())}<p>${e(item.resumo)}</p>${item.conteudoCompleto.split('\n').map(p=>`<p>${e(p)}</p>`).join('')}${detailGrid({'Publicação':dateLabel(item.dataPublicacao),'Vigência':dateLabel(item.dataVigencia),'Fonte':item.fonte,'Responsável':item.responsavel,'Área responsável':item.areaResponsavel,'Empresas impactadas':item.empresasImpactadas,'Status':item.status})}${governanca}${link?`<a class="primary-btn" href="${e(link)}" target="_blank" rel="noopener noreferrer">Consultar fonte ↗</a>`:''} ${doc?`<a class="primary-btn" href="${e(doc)}" download>Baixar documento</a>`:''}`);
+}
+
+// ===== Notícias & Impactos =====
+// Fixed initial chips per spec, extensible: any other categoria present in
+// the active data set gets its own chip appended automatically, so adding a
+// new categoria (Regulatório, Auditoria, Tecnologia…) needs no code change.
+const NOTICIA_CATEGORIAS_BASE=['ANEEL','CPC / IFRS','Grupo','Interno'];
+const NOTICIA_IMPACT_COLORS= {
+  baixo:'green',moderado:'blue',relevante:'yellow',alto:'orange',critico:'red'
+}
+;
+export const formatNewsDate=dateLabel;
+// Dedicated mapping — kept separate from the shared, regex-based statusColor()
+// so this 5-tier impact scale never affects status-badge coloring elsewhere.
+export function getImpactClass(impacto) {
+  return NOTICIA_IMPACT_COLORS[normalize(impacto||'')]||'blue';
+}
+function noticiaImpacto(item) {
+  return item.impacto||item.nivelImpacto||'Moderado';
+}
+// Only active, published records are eligible for the public Notícias &
+// Impactos grid; ordering by publication date keeps the most recent first
+// before destaque/category filtering is applied.
+export function loadNoticias(items) {
+  return (items||[]).filter(item=>item.status==='Publicado'&&item.ativo!==false)
+    .slice()
+    .sort((a,b)=>(b.dataPublicacao||'').localeCompare(a.dataPublicacao||''));
+}
+export function noticiaCategorias(items) {
+  const categorias=[...NOTICIA_CATEGORIAS_BASE];
+  items.forEach(item=> {
+    if(item.categoria&&!categorias.includes(item.categoria))categorias.push(item.categoria);
+  }
+  );
+  return categorias;
+}
+function ultimaAtualizacaoNoticias(items) {
+  const datas=items.map(item=>item.dataCaptura||item.dataPublicacao).filter(Boolean).sort();
+  return datas.length?datas[datas.length-1]:null;
+}
+function formatUltimaAtualizacao(value) {
+  if(!value)return 'Não disponível';
+  if(!value.includes('T'))return dateLabel(value);
+  const data=new Date(value);
+  if(Number.isNaN(data.getTime()))return dateLabel(value.slice(0,10));
+  return `${data.toLocaleDateString('pt-BR')} às ${data.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`;
+}
+export function renderNoticiasHeader(items) {
+  return `<div class="noticias-header"><div><span class="section-kicker">CENTRAL DE CONTEÚDO</span><h2>Notícias &amp; Impactos</h2><p>Atualizações regulatórias, contábeis e corporativas com leitura rápida do possível impacto para a Gerência de Contabilidade.</p></div><div class="noticias-atualizacao">Última atualização<strong>${e(formatUltimaAtualizacao(ultimaAtualizacaoNoticias(items)))}</strong></div></div>`;
+}
+export function renderNoticiaFiltros(items) {
+  const chips=['Todos',...noticiaCategorias(items)].map((categoria,index)=>`<button type="button" class="noticia-chip" data-categoria="${categoria==='Todos'?'':e(categoria)}" aria-selected="${index===0}">${e(categoria)}</button>`).join('');
+  return `<div class="noticia-filtros" role="group" aria-label="Filtrar notícias por categoria">${chips}</div>`;
+}
+// Search covers every field the spec lists — título, resumo, categoria, fonte,
+// palavras-chave, empresas impactadas, área responsável e classificação do
+// impacto — by normalizing them all into one haystack per record.
+export function filterNoticias(items,categoria,query) {
+  const q=normalize(query||'').trim();
+  return items.filter(item=> {
+    if(categoria&&item.categoria!==categoria)return false;
+    if(!q)return true;
+    const haystack=normalize([item.titulo,item.resumo,item.categoria,item.fonte,(item.palavrasChave||[]).join(' '),(item.empresasImpactadas||[]).join(' '),item.areaResponsavel,noticiaImpacto(item)].filter(Boolean).join(' '));
+    return haystack.includes(q);
+  }
+  );
+}
+function noticiaMedia(item,wrapClass) {
+  const src=item.imagem?safeURL(item.imagem):null;
+  if(!src)return `<div class="${wrapClass} noticia-media-fallback">${icon('news')}</div>`;
+  return `<div class="${wrapClass}"><img src="${e(src)}" alt="${e(item.imagemAlt||'')}" loading="lazy"><span class="noticia-media-icon">${icon('news')}</span></div>`;
+}
+export function renderIndicadoresNoticia(item) {
+  const indicadores=Array.isArray(item.indicadores)?item.indicadores.filter(ind=>ind&&(ind.label||ind.valor)):[];
+  if(!indicadores.length)return '';
+  return `<div class="noticia-indicadores">${indicadores.map(ind=>`<div class="noticia-indicador"><strong>${e(ind.valor)}</strong><span>${e(ind.label)}</span></div>`).join('')}</div>`;
+}
+export function renderNoticiaDestaque(item) {
+  if(!item)return '<p class="empty-state">Nenhuma notícia corresponde aos filtros informados.</p>';
+  const impacto=noticiaImpacto(item);
+  const fonteURL=safeURL(item.urlFonte||item.link);
+  return `<article class="content-card noticia-destaque" data-noticia-id="${e(item.id)}">${noticiaMedia(item,'noticia-destaque-media')}<div class="noticia-destaque-body"><div class="card-meta"><span class="tag ${colors[item.categoria]||''}">${e(item.categoria)}</span><time class="card-date" datetime="${e(item.dataPublicacao)}">${e(formatNewsDate(item.dataPublicacao))}</time></div><h2>${e(item.titulo)}</h2><p>${e(item.resumo)}</p><span class="badge ${getImpactClass(impacto)}">Impacto potencial: ${e(impacto)}</span>${renderIndicadoresNoticia(item)}<div class="noticia-destaque-footer"><span class="noticia-fonte">Fonte: ${e(item.fonte||'Não informada')}</span>${fonteURL?`<a class="primary-btn noticia-fonte-link" href="${e(fonteURL)}" target="_blank" rel="noopener noreferrer">Ler na fonte oficial ↗</a>`:''}</div></div></article>`;
+}
+function renderNoticiaCard(item) {
+  const impacto=noticiaImpacto(item);
+  const demonstrativo=item.demonstrativo?'<span class="noticia-demo-flag">Conteúdo demonstrativo</span>':'';
+  return `<article class="content-card noticia-card" data-noticia-id="${e(item.id)}">${noticiaMedia(item,'noticia-media')}<div class="card-meta"><span class="tag ${colors[item.categoria]||''}">${e(item.categoria)}</span><time class="card-date" datetime="${e(item.dataPublicacao)}">${e(formatNewsDate(item.dataPublicacao))}</time></div><h3>${e(item.titulo)}</h3><p>${e(item.resumo)}</p>${demonstrativo}<div class="card-bottom"><span class="badge ${getImpactClass(impacto)}">${e('Impacto '+impacto.toLowerCase())}</span><button class="text-btn" data-noticia-detalhe="${e(item.id)}">Ler notícia →</button></div></article>`;
+}
+export function renderNoticiasSecundarias(items) {
+  if(!items.length)return '';
+  return `<div class="noticias-secundarias">${items.map(renderNoticiaCard).join('')}</div>`;
+}
+// Orchestrator: applies category + search filters, promotes whichever match
+// is flagged destaque (or the most recent match otherwise) into the hero
+// slot, and renders the rest as secondary cards — never leaving the area
+// blank, per spec section 6.
+export function renderNoticias(items,categoria,query) {
+  const filtered=filterNoticias(items,categoria,query);
+  if(!filtered.length)return '<p class="empty-state">Nenhuma notícia corresponde aos filtros informados.</p>';
+  const destaqueItem=filtered.find(item=>item.destaque)||filtered[0];
+  const secundarias=filtered.filter(item=>item!==destaqueItem);
+  const secundariasHTML=renderNoticiasSecundarias(secundarias);
+  return `<div class="noticias-grid${secundariasHTML?'':' no-secundarias'}">${renderNoticiaDestaque(destaqueItem)}${secundariasHTML}</div>`;
 }

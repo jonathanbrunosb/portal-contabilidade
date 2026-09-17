@@ -1,8 +1,8 @@
-import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260917-1';
+import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260917-2';
 import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js';
 import { initializeNavigation,bindTabs,selectTab } from './navigation.js';
-import { renderNewsletter,articleCard,showArticle } from './newsletter.js';
-import { renderTeamStructure } from './teams.js?v=20260917-1';
+import { renderNewsletter,showArticle,loadNoticias,renderNoticiasHeader,renderNoticiaFiltros,renderNoticias } from './newsletter.js';
+import { renderTeamStructure } from './teams.js?v=20260917-2';
 import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,notify } from './ui.js';
 import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js';
 let data,currentTab='newsletter',currentUser,currentMenu=[];
@@ -65,6 +65,53 @@ function documentResults() {
   $('#document-results').innerHTML=records.map(documentCard).join('')||'<p class="empty-state">Nenhum documento encontrado. Tente outra categoria ou termo.</p>';
   $('#doc-count').textContent=`${records.length} documentos de exemplo` ;
 }
+// Images render with a static fallback icon already in the markup (see
+// noticiaMedia() in newsletter.js); an onerror listener just toggles which
+// one is visible, keeping error handling out of inline HTML attributes.
+function wireNoticiaImages(root) {
+  root.querySelectorAll('.noticia-media img,.noticia-destaque-media img').forEach(img=>img.addEventListener('error',()=> {
+    img.closest('.noticia-media,.noticia-destaque-media')?.classList.add('noticia-media-fallback');
+  }
+  , {
+    once:true
+  }
+  ));
+}
+function renderNoticiasResults() {
+  const query=$('#noticia-search')?.value||'';
+  const categoria=$('#content-view .noticia-chip[aria-selected="true"]')?.dataset.categoria||'';
+  const resultados=$('#noticias-resultados');
+  resultados.innerHTML=renderNoticias(loadNoticias(data.noticias),categoria,query);
+  wireNoticiaImages(resultados);
+}
+// Global search results link into the tab via showRecord('noticias', id):
+// instead of opening the read-more modal (data-noticia-detalhe does that),
+// this opens/keeps the Notícias & Impactos tab, scrolls to the matching
+// card and applies a temporary highlight, per spec section 16.
+function focusNoticia(id) {
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if($('#home-view').hidden) {
+    $('#home-view').hidden=false;
+    $('#equipes').hidden=true;
+    history.pushState(null,'','#central');
+  }
+  renderContent('noticias');
+  requestAnimationFrame(()=>$('#central').scrollIntoView( {
+    behavior:reduced?'auto':'smooth',block:'start'
+  }
+  ));
+  setTimeout(()=> {
+    const card=document.querySelector(`[data-noticia-id="${CSS.escape(id)}"]`);
+    if(!card)return;
+    card.scrollIntoView( {
+      behavior:reduced?'auto':'smooth',block:'center'
+    }
+    );
+    card.classList.add('noticia-highlight');
+    setTimeout(()=>card.classList.remove('noticia-highlight'),2200);
+  }
+  ,320);
+}
 const AUTOMATION_STATUSES=['Produção','Produção e Melhorias','Desenvolvimento e Testes'];
 const AUTOMATION_FAMILIAS= {
   sap:'SAP / VBA',python:'Script Python',web:'RPA Web'
@@ -111,7 +158,17 @@ function renderContent(tab) {
   $('#content-view').setAttribute('aria-labelledby',`tab-${tab}`);
   activateMenu(currentMenu.find(item=>item.tab===tab)||(CENTRAL_TABS.includes(tab)?currentMenu.find(item=>item.target==='central'):null));
   if(tab==='newsletter')$('#content-view').innerHTML=renderNewsletter(data.newsletter);
-  if(tab==='noticias')$('#content-view').innerHTML=`<div class="card-grid">${data.noticias.filter(i=>i.status==='Publicado').map(i=>articleCard(i,'noticias')).join('')}</div><div class="content-footer">Pautas demonstrativas para acompanhamento — não representam notícias verificadas.</div>`;
+  if(tab==='noticias') {
+    const ativos=loadNoticias(data.noticias);
+    $('#content-view').innerHTML=`${renderNoticiasHeader(ativos)}${renderNoticiaFiltros(ativos)}<div class="filter-bar noticias-searchbar"><input type="search" id="noticia-search" aria-label="Buscar notícia" placeholder="Buscar notícia..."></div><div id="noticias-resultados"></div><div class="content-footer">Conteúdo curado pela Gerência de Contabilidade — itens sinalizados como demonstrativos são apenas ilustrativos.</div>`;
+    renderNoticiasResults();
+    $('#noticia-search').oninput=renderNoticiasResults;
+    $('#content-view').querySelectorAll('.noticia-chip').forEach(chip=>chip.onclick=()=> {
+      $('#content-view').querySelectorAll('.noticia-chip').forEach(other=>other.setAttribute('aria-selected',String(other===chip)));
+      renderNoticiasResults();
+    }
+    );
+  }
   if(tab==='sistemas')$('#content-view').innerHTML=`<div class="card-grid systems-grid">${data.sistemas.map(systemCard).join('')}</div><div class="content-footer">Cadastre os endereços internos para habilitar os acessos.</div>`;
   if(tab==='documentos') {
     $('#content-view').innerHTML=`<div class="filter-bar"><input type="search" id="doc-search" aria-label="Pesquisar documentos" placeholder="Pesquisar documentos…"><select id="doc-filter" aria-label="Categoria de documento"><option value="">Todas as categorias</option>${data.documentos.map(i=>`<option>${e(i.categoria)}</option>`).join('')}</select></div><div id="document-results" class="card-grid"></div><div class="content-footer" id="doc-count" aria-live="polite"></div>`;
@@ -619,8 +676,12 @@ function showRecord(collection,id) {
   const item=data[collection]?.find(i=>i.id===id);
   if(!item)return;
   track('record_view',{collection,label:item.titulo||item.nome});
-  if(collection==='newsletter'||collection==='noticias') {
+  if(collection==='newsletter') {
     showArticle(item);
+    return;
+  }
+  if(collection==='noticias') {
+    focusNoticia(id);
     return;
   }
   if(collection==='equipes') {
@@ -835,6 +896,11 @@ async function init() {
       }
       const system=event.target.closest('[data-system]');
       if(system)openAccess(data.sistemas.find(i=>i.id===system.dataset.system));
+      const noticiaDetalhe=event.target.closest('[data-noticia-detalhe]');
+      if(noticiaDetalhe) {
+        const item=data.noticias.find(i=>i.id===noticiaDetalhe.dataset.noticiaDetalhe);
+        if(item)showArticle(item);
+      }
       const editorial=event.target.closest('[data-editorial]');
       if(editorial) {
         const [collection,id,action]=editorial.dataset.editorial.split(':');

@@ -20,10 +20,22 @@ function itemMedia(item,wrapClass) {
   const overlay=item.statusSistema?`${badge(item.statusSistema,'system-media-badge')}${item.sistemaId?`<button class="primary-btn system-media-access" data-system="${e(item.sistemaId)}">Acessar sistema ↗</button>`:''}`:'';
   return `<div class="${wrapClass}"><img src="${e(src)}" alt="${e(item.imagemAlt||'')}" loading="lazy">${overlay}<span class="noticia-media-icon">${icon('news')}</span></div>`;
 }
+// Featured/secondary hero layout, same as Notícias & Impactos: the most
+// recent publicação leads, full-width media and title, everything else
+// stacks in an equal-size column at the right — .noticias-grid/.noticia-
+// destaque/.noticias-secundarias are already generic grid/card components,
+// not specific to the noticias collection, so nothing new is added here.
+function newsletterDestaque(item) {
+  const media=itemMedia(item,'noticia-destaque-media');
+  return `<article class="content-card noticia-destaque">${media}<div class="noticia-destaque-body"><div class="card-meta"><span class="tag ${colors[item.categoria]||''}">${e(item.categoria)}</span><time class="card-date" datetime="${e(item.dataPublicacao)}">${e(dateLabel(item.dataPublicacao))}</time></div><h2>${e(item.titulo)}</h2><p>${e(item.resumo)}</p><div class="noticia-destaque-footer">${badge('Impacto '+item.nivelImpacto.toLowerCase())}<button class="text-btn" data-record="newsletter:${e(item.id)}">Ler orientação completa →</button></div></div></article>`;
+}
 export function renderNewsletter(items) {
   const news=items.filter(i=>i.status==='Publicado').sort((a,b)=>b.dataPublicacao.localeCompare(a.dataPublicacao));
   const ticker=news.map(item=>`<span><b>${e(item.categoria)}:</b> ${e(item.titulo)}</span>`).join('');
-  return `<div class="radar"><span class="radar-label">${icon('radar')} RADAR</span><div class="radar-window"><div class="radar-track"><div style="display:flex">${ticker}</div><div style="display:flex" aria-hidden="true">${ticker}</div></div></div><button id="pause-radar" aria-label="Pausar radar" aria-pressed="false" title="Pausar radar">Ⅱ</button></div><div class="card-grid">${news.map(item=>articleCard(item,'newsletter')).join('')||'<p class="empty-state">Nenhuma orientação publicada.</p>'}</div><div class="content-footer"><span>Informações de exemplo para validação do portal</span><span>${news.length} publicações</span></div>`;
+  const [destaqueItem,...secundarias]=news;
+  const secundariasHTML=secundarias.length?`<div class="noticias-secundarias">${secundarias.map(item=>articleCard(item,'newsletter')).join('')}</div>`:'';
+  const grid=destaqueItem?`<div class="noticias-grid${secundariasHTML?'':' no-secundarias'}">${newsletterDestaque(destaqueItem)}${secundariasHTML}</div>`:'<p class="empty-state">Nenhuma orientação publicada.</p>';
+  return `<div class="radar"><span class="radar-label">${icon('radar')} RADAR</span><div class="radar-window"><div class="radar-track"><div style="display:flex">${ticker}</div><div style="display:flex" aria-hidden="true">${ticker}</div></div></div><button id="pause-radar" aria-label="Pausar radar" aria-pressed="false" title="Pausar radar">Ⅱ</button></div>${grid}<div class="content-footer"><span>Informações de exemplo para validação do portal</span><span>${news.length} publicações</span></div>`;
 }
 export function showArticle(item) {
   const link=safeURL(item.link),doc=safeURL(item.documento);

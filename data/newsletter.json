@@ -152,5 +152,39 @@
         "data": "2026-09-15T10:00:00.000Z"
       }
     ]
+  },
+  {
+    "id": "n6-projecthub-lancamento",
+    "categoria": "COMUNICADO INTERNO",
+    "titulo": "ProjectHub: nova solução integra a gestão de projetos da Contabilidade",
+    "resumo": "Criado pelo time da Contabilidade, o ProjectHub concentra planejamento, execução, prazos, recursos, riscos e indicadores em uma única visão, fortalecendo a governança e a tomada de decisão.",
+    "conteudoCompleto": "A Gerência de Contabilidade apresenta o ProjectHub – Gestão Integrada de Projetos, solução desenvolvida para centralizar o planejamento, a execução e o acompanhamento das iniciativas da área em um único ambiente.\nO ProjectHub nasce para reduzir controles paralelos, ampliar a confiabilidade das informações e oferecer uma visão integrada da carteira, substituindo o acompanhamento disperso em planilhas e apresentações por uma fonte única de consulta.\nA solução conecta a visão executiva ao detalhe operacional: portfólio, cronogramas, tarefas, marcos, riscos, planos de ação, indicadores e capacidade dos recursos, conforme o perfil de acesso de cada usuário.\nO ProjectHub reúne visão executiva do portfólio, planejamento e entregas, riscos e planos de ação, indicadores e metas, recursos e capacidade, além de governança com perfis de acesso, histórico e trilha de auditoria.\nCom a implantação, a área passa a contar com mais padronização, transparência e capacidade de antecipar desvios, facilitando o acompanhamento de prazos críticos e preservando o histórico das decisões tomadas em cada iniciativa.\nProjetos como IFRS 18/CPC 51, Reforma Tributária, Migração SAP e iniciativas de inovação já podem ser acompanhados pela plataforma, respeitando suas características e níveis de acesso.",
+    "dataPublicacao": "2026-09-17",
+    "dataVigencia": null,
+    "fonte": "Gerência de Contabilidade",
+    "link": "https://projecthub.contabilidade-eqtl.com/",
+    "documento": null,
+    "imagem": "assets/images/comunicados/projecthub-lancamento.webp",
+    "imagemAlt": "Ilustração do ProjectHub, plataforma de gestão integrada de projetos da Contabilidade, reunindo portfólio, tarefas, recursos, riscos, indicadores e governança",
+    "statusSistema": "Ativo",
+    "sistemaId": "s4",
+    "empresasImpactadas": [
+      "Gerência de Contabilidade"
+    ],
+    "areaResponsavel": "Gerência de Contabilidade",
+    "responsavel": "Jonathan Bruno",
+    "nivelImpacto": "Moderado",
+    "status": "Publicado",
+    "aprovadoPor": "Jonathan Bruno",
+    "dataAprovacao": "2026-09-17",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Jonathan Bruno",
+        "data": "2026-09-17"
+      }
+    ]
   }
 ]

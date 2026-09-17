@@ -1,8 +1,8 @@
-import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260917-2';
+import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260917-3';
 import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js';
 import { initializeNavigation,bindTabs,selectTab } from './navigation.js';
 import { renderNewsletter,showArticle,loadNoticias,renderNoticiasHeader,renderNoticiaFiltros,renderNoticias } from './newsletter.js';
-import { renderTeamStructure } from './teams.js?v=20260917-2';
+import { renderTeamStructure } from './teams.js?v=20260917-3';
 import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,notify } from './ui.js';
 import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js';
 let data,currentTab='newsletter',currentUser,currentMenu=[];
@@ -66,7 +66,7 @@ function documentResults() {
   $('#doc-count').textContent=`${records.length} documentos de exemplo` ;
 }
 // Images render with a static fallback icon already in the markup (see
-// noticiaMedia() in newsletter.js); an onerror listener just toggles which
+// itemMedia() in newsletter.js); an onerror listener just toggles which
 // one is visible, keeping error handling out of inline HTML attributes.
 function wireNoticiaImages(root) {
   root.querySelectorAll('.noticia-media img,.noticia-destaque-media img').forEach(img=>img.addEventListener('error',()=> {
@@ -157,7 +157,10 @@ function renderContent(tab) {
   selectTab('.tabs',$(`#tab-${tab}`));
   $('#content-view').setAttribute('aria-labelledby',`tab-${tab}`);
   activateMenu(currentMenu.find(item=>item.tab===tab)||(CENTRAL_TABS.includes(tab)?currentMenu.find(item=>item.target==='central'):null));
-  if(tab==='newsletter')$('#content-view').innerHTML=renderNewsletter(data.newsletter);
+  if(tab==='newsletter') {
+    $('#content-view').innerHTML=renderNewsletter(data.newsletter);
+    wireNoticiaImages($('#content-view'));
+  }
   if(tab==='noticias') {
     const ativos=loadNoticias(data.noticias);
     $('#content-view').innerHTML=`${renderNoticiasHeader(ativos)}${renderNoticiaFiltros(ativos)}<div class="filter-bar noticias-searchbar"><input type="search" id="noticia-search" aria-label="Buscar notícia" placeholder="Buscar notícia..."></div><div id="noticias-resultados"></div><div class="content-footer">Conteúdo curado pela Gerência de Contabilidade — itens sinalizados como demonstrativos são apenas ilustrativos.</div>`;

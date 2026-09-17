@@ -4,7 +4,21 @@ const colors= {
 }
 ;
 export function articleCard(item,collection) {
-  return `<article class="content-card"><div class="card-meta"><span class="tag ${colors[item.categoria]||''}">${e(item.categoria)}</span><time class="card-date" datetime="${e(item.dataPublicacao)}">${e(dateLabel(item.dataPublicacao))}</time></div><h3>${e(item.titulo)}</h3><p>${e(item.resumo)}</p><div class="card-bottom">${badge('Impacto '+item.nivelImpacto.toLowerCase())}<button class="text-btn" data-record="${e(collection)}:${e(item.id)}">Ler ${collection==='newsletter'?'orientação':'notícia'} →</button></div></article>`;
+  const media=item.imagem?itemMedia(item,'noticia-media'):'';
+  return `<article class="content-card">${media}<div class="card-meta"><span class="tag ${colors[item.categoria]||''}">${e(item.categoria)}</span><time class="card-date" datetime="${e(item.dataPublicacao)}">${e(dateLabel(item.dataPublicacao))}</time></div><h3>${e(item.titulo)}</h3><p>${e(item.resumo)}</p><div class="card-bottom">${badge('Impacto '+item.nivelImpacto.toLowerCase())}<button class="text-btn" data-record="${e(collection)}:${e(item.id)}">Ler ${collection==='newsletter'?'orientação':'notícia'} →</button></div></article>`;
+}
+// Shared by Newsletter and Notícias cards: renders the image with a fallback
+// icon already in the markup (toggled by CSS on the img's error — see
+// wireNoticiaImages() in app.js), and, when the record references a
+// registered sistema, the same status+access overlay used by Sistemas da
+// Área (.system-media-badge/.system-media-access). The button reuses
+// data-system, so the click goes through the existing openAccess() handler
+// instead of duplicating the sistema's link/status here.
+function itemMedia(item,wrapClass) {
+  const src=item.imagem?safeURL(item.imagem):null;
+  if(!src)return `<div class="${wrapClass} noticia-media-fallback">${icon('news')}</div>`;
+  const overlay=item.statusSistema?`${badge(item.statusSistema,'system-media-badge')}${item.sistemaId?`<button class="primary-btn system-media-access" data-system="${e(item.sistemaId)}">Acessar sistema ↗</button>`:''}`:'';
+  return `<div class="${wrapClass}"><img src="${e(src)}" alt="${e(item.imagemAlt||'')}" loading="lazy">${overlay}<span class="noticia-media-icon">${icon('news')}</span></div>`;
 }
 export function renderNewsletter(items) {
   const news=items.filter(i=>i.status==='Publicado').sort((a,b)=>b.dataPublicacao.localeCompare(a.dataPublicacao));
@@ -82,11 +96,6 @@ export function filterNoticias(items,categoria,query) {
   }
   );
 }
-function noticiaMedia(item,wrapClass) {
-  const src=item.imagem?safeURL(item.imagem):null;
-  if(!src)return `<div class="${wrapClass} noticia-media-fallback">${icon('news')}</div>`;
-  return `<div class="${wrapClass}"><img src="${e(src)}" alt="${e(item.imagemAlt||'')}" loading="lazy"><span class="noticia-media-icon">${icon('news')}</span></div>`;
-}
 export function renderIndicadoresNoticia(item) {
   const indicadores=Array.isArray(item.indicadores)?item.indicadores.filter(ind=>ind&&(ind.label||ind.valor)):[];
   if(!indicadores.length)return '';
@@ -96,12 +105,12 @@ export function renderNoticiaDestaque(item) {
   if(!item)return '<p class="empty-state">Nenhuma notícia corresponde aos filtros informados.</p>';
   const impacto=noticiaImpacto(item);
   const fonteURL=safeURL(item.urlFonte||item.link);
-  return `<article class="content-card noticia-destaque" data-noticia-id="${e(item.id)}">${noticiaMedia(item,'noticia-destaque-media')}<div class="noticia-destaque-body"><div class="card-meta"><span class="tag ${colors[item.categoria]||''}">${e(item.categoria)}</span><time class="card-date" datetime="${e(item.dataPublicacao)}">${e(formatNewsDate(item.dataPublicacao))}</time></div><h2>${e(item.titulo)}</h2><p>${e(item.resumo)}</p><span class="badge ${getImpactClass(impacto)}">Impacto potencial: ${e(impacto)}</span>${renderIndicadoresNoticia(item)}<div class="noticia-destaque-footer"><span class="noticia-fonte">Fonte: ${e(item.fonte||'Não informada')}</span>${fonteURL?`<a class="primary-btn noticia-fonte-link" href="${e(fonteURL)}" target="_blank" rel="noopener noreferrer">Ler na fonte oficial ↗</a>`:''}</div></div></article>`;
+  return `<article class="content-card noticia-destaque" data-noticia-id="${e(item.id)}">${itemMedia(item,'noticia-destaque-media')}<div class="noticia-destaque-body"><div class="card-meta"><span class="tag ${colors[item.categoria]||''}">${e(item.categoria)}</span><time class="card-date" datetime="${e(item.dataPublicacao)}">${e(formatNewsDate(item.dataPublicacao))}</time></div><h2>${e(item.titulo)}</h2><p>${e(item.resumo)}</p><span class="badge ${getImpactClass(impacto)}">Impacto potencial: ${e(impacto)}</span>${renderIndicadoresNoticia(item)}<div class="noticia-destaque-footer"><span class="noticia-fonte">Fonte: ${e(item.fonte||'Não informada')}</span>${fonteURL?`<a class="primary-btn noticia-fonte-link" href="${e(fonteURL)}" target="_blank" rel="noopener noreferrer">Ler na fonte oficial ↗</a>`:''}</div></div></article>`;
 }
 function renderNoticiaCard(item) {
   const impacto=noticiaImpacto(item);
   const demonstrativo=item.demonstrativo?'<span class="noticia-demo-flag">Conteúdo demonstrativo</span>':'';
-  return `<article class="content-card noticia-card" data-noticia-id="${e(item.id)}">${noticiaMedia(item,'noticia-media')}<div class="card-meta"><span class="tag ${colors[item.categoria]||''}">${e(item.categoria)}</span><time class="card-date" datetime="${e(item.dataPublicacao)}">${e(formatNewsDate(item.dataPublicacao))}</time></div><h3>${e(item.titulo)}</h3><p>${e(item.resumo)}</p>${demonstrativo}<div class="card-bottom"><span class="badge ${getImpactClass(impacto)}">${e('Impacto '+impacto.toLowerCase())}</span><button class="text-btn" data-noticia-detalhe="${e(item.id)}">Ler notícia →</button></div></article>`;
+  return `<article class="content-card noticia-card" data-noticia-id="${e(item.id)}">${itemMedia(item,'noticia-media')}<div class="card-meta"><span class="tag ${colors[item.categoria]||''}">${e(item.categoria)}</span><time class="card-date" datetime="${e(item.dataPublicacao)}">${e(formatNewsDate(item.dataPublicacao))}</time></div><h3>${e(item.titulo)}</h3><p>${e(item.resumo)}</p>${demonstrativo}<div class="card-bottom"><span class="badge ${getImpactClass(impacto)}">${e('Impacto '+impacto.toLowerCase())}</span><button class="text-btn" data-noticia-detalhe="${e(item.id)}">Ler notícia →</button></div></article>`;
 }
 export function renderNoticiasSecundarias(items) {
   if(!items.length)return '';

@@ -431,7 +431,8 @@ main {
 
 .hero {
   color:white;
-  background:linear-gradient(115deg,#071f49 0%,#0b376a 66%,#075c80 100%);
+  background:linear-gradient(100deg,#071f49f2 0%,#071f49d9 38%,#0b376aa6 62%,#075c8070 85%,#075c8047 100%),url("../assets/images/banner/portal-gerencia-contabilidade.webp") center/cover no-repeat;
+  background-color:#071f49;
   border-radius:var(--radius);
   padding:30px 34px;
   display:flex;

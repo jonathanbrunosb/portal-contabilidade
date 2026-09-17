@@ -94,8 +94,8 @@
     {
       "nome": "SAP",
       "icon": "grid",
-      "link": null,
-      "descricao": "Acesso corporativo. Cadastre o endereço validado pela organização.",
+      "link": "https://unifica.equatorialenergia.com.br:9230/sap/bc/nwbc/nwbc_sapguilink?sap-language=PT",
+      "descricao": "Acesso corporativo ao SAP (NWBC).",
       "responsavel": "Administração do portal"
     },
     {

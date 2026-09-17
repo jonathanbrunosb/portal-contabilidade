@@ -1,8 +1,8 @@
-import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260917-4';
+import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260917-5';
 import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js';
 import { initializeNavigation,bindTabs,selectTab } from './navigation.js';
 import { renderNewsletter,showArticle,loadNoticias,renderNoticiasHeader,renderNoticiaFiltros,renderNoticias } from './newsletter.js';
-import { renderTeamStructure } from './teams.js?v=20260917-4';
+import { renderTeamStructure } from './teams.js?v=20260917-5';
 import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,notify } from './ui.js';
 import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js';
 let data,currentTab='newsletter',currentUser,currentMenu=[];
@@ -235,14 +235,15 @@ function teamMemberId(areaId,name,index) {
   const slug=normalize(name).replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
   return `colaborador-${slug||`${areaId}-${index+1}`}`;
 }
-// Editorial dates follow the local dataset, independent of the device clock.
+// Editorial dates (competência, atualização da base) follow the local
+// dataset, independent of the device clock. The top page-context date is the
+// one exception: it always shows today, read straight from the device clock.
 function renderPeriod() {
   const config = data.config;
   const reference = new Date(config.dataReferencia + 'T12:00:00');
   const period = new Date(config.competencia + '-01T12:00:00');
   const month = period.toLocaleDateString('pt-BR', {month: 'long'});
-  const fonte = isLiveDataSource() ? 'Dados ao vivo' : 'Arquivo local';
-  $('.context-date').innerHTML = `${e(reference.toLocaleDateString('pt-BR', {day:'numeric', month:'long', year:'numeric'}))} <span class="demo-label" title="${isLiveDataSource() ? 'Servido pelo backend em server/server.js' : 'Servido pelos arquivos estáticos em data/'}">${e(fonte)}</span> <span class="demo-label">${config.demonstracao ? 'Demonstração' : 'Base local'}</span>`;
+  $('.context-date').textContent = new Date().toLocaleDateString('pt-BR', {day:'numeric', month:'long', year:'numeric'});
   $('.edition').textContent = `${month.toUpperCase()} / ${period.getFullYear()}`;
   $('.period').innerHTML = `<span class="live-dot"></span> Competência: ${e(month)} ${period.getFullYear()}`;
   $('#entregas .section-kicker').textContent = config.semanaLabel;

@@ -87,7 +87,8 @@
     {
       "label": "Administração",
       "icon": "settings",
-      "target": "administracao"
+      "target": "administracao",
+      "view": "administracao"
     }
   ],
   "links": [

@@ -1,11 +1,11 @@
-import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260917-5';
+import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260917-6';
 import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js';
 import { initializeNavigation,bindTabs,selectTab } from './navigation.js';
 import { renderNewsletter,showArticle,loadNoticias,renderNoticiasHeader,renderNoticiaFiltros,renderNoticias } from './newsletter.js';
-import { renderTeamStructure } from './teams.js?v=20260917-5';
+import { renderTeamStructure } from './teams.js?v=20260917-6';
 import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,notify } from './ui.js';
 import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js';
-let data,currentTab='newsletter',currentUser,currentMenu=[];
+let data,currentTab='newsletter',currentAdminTab='equipes',currentUser,currentMenu=[];
 const $=selector=>document.querySelector(selector);
 // Capability required to see each menu target / page section / searchable collection.
 const TARGET_ACCESS= {
@@ -14,7 +14,7 @@ const TARGET_ACCESS= {
 ;
 const CENTRAL_TABS=['newsletter','noticias','sistemas','documentos','automacoes'];
 const SECTION_ACCESS= {
-  central:'conteudo',painel:'gerencial',editorial:'gerencial',administracao:'administracao'
+  central:'conteudo',painel:'gerencial',editorial:'gerencial'
 }
 ;
 const EDITORIAL_COLLECTIONS=['newsletter','noticias'];
@@ -208,20 +208,29 @@ function activateMenu(item) {
   const index=currentMenu.indexOf(item);
   document.querySelectorAll('#navigation .nav-link').forEach(link=>link.classList.toggle('active',Number(link.dataset.menuIndex)===index));
 }
+// A menu item with a `view` opens as its own dedicated screen (#home-view
+// hidden entirely) instead of scrolling to a panel inside it — Estrutura das
+// Equipes and Administração both work this way, so neither ever shows mixed
+// in with Central de Conteúdo or the rest of the home page.
 function navigate(item,updateHistory=true) {
   if(!item)return;
-  const teamsView=item.view==='equipes';
-  $('#home-view').hidden=teamsView;
-  $('#equipes').hidden=!teamsView;
+  const dedicatedView=item.view;
+  $('#home-view').hidden=Boolean(dedicatedView);
+  $('#equipes').hidden=dedicatedView!=='equipes';
+  $('#administracao').hidden=dedicatedView!=='administracao';
   activateMenu(item);
-  if(teamsView) {
+  if(dedicatedView==='equipes') {
     renderTeamStructure(data.equipes);
     track('team_structure_view');
+  }
+  else if(dedicatedView==='administracao') {
+    renderAdmin();
+    track('admin_view');
   }
   else if(item.tab)renderContent(item.tab);
   if(updateHistory)history.pushState(null,'',`#${item.target}`);
   requestAnimationFrame(()=> {
-    const target=teamsView?$('#equipes'):$(`#${item.target}`);
+    const target=dedicatedView?$(`#${dedicatedView}`):$(`#${item.target}`);
     target?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
     $('#main').focus({preventScroll:true});
   });
@@ -656,25 +665,42 @@ function renderAdminLock() {
   }
   ;
 }
+function renderAdminEquipes() {
+  const live=isLiveDataSource();
+  $('#admin-view').innerHTML=`<div class="admin-toolbar"><button class="primary-btn" id="admin-new-team">Nova equipe +</button><button class="secondary-btn" id="admin-export">Exportar JSON</button>${live?'':'<label class="secondary-btn admin-import">Importar JSON<input id="admin-import" type="file" accept="application/json,.json"></label>'}${hasLocalTeams()&&!live?'<button class="text-btn" id="admin-reset">Restaurar base original</button>':''}</div><div class="admin-team-list">${data.equipes.map(t=>`<article class="admin-team-card"><div><span class="team-code">${e(t.sigla||t.id)}</span><h3>${e(t.nome)}</h3><p>${e(t.descricao||'Sem descrição cadastrada.')}</p></div><div class="admin-team-meta"><strong>${(t.responsaveis||[]).length}</strong><span>colaborador(es)</span><button class="secondary-btn" data-admin-team="${e(t.id)}">Administrar</button></div></article>`).join('')}</div>`;
+  $('#admin-new-team').onclick=openCreateTeam;
+  $('#admin-export').onclick=exportTeams;
+  const importInput=$('#admin-import');
+  if(importInput)importInput.onchange=()=>importInput.files[0]&&importTeams(importInput.files[0]);
+  const reset=$('#admin-reset');
+  if(reset)reset.onclick=()=> { if(confirm('Descartar as alterações locais e restaurar a base original?')) { clearLocalTeams();location.reload(); } };
+}
+function renderAdminAutomacoes() {
+  const automacoesOrdenadas=data.automacoes.slice().sort((a,b)=>(a.ordem??0)-(b.ordem??0));
+  $('#admin-view').innerHTML=`<div class="admin-toolbar"><button class="primary-btn" id="admin-new-automation">Nova automação +</button></div><div class="admin-team-list">${automacoesOrdenadas.map(a=>`<article class="admin-team-card"><div><span class="tag ${automationTagClass(a.familia)}">${e(a.tipo)}</span><h3>${e(a.titulo)}</h3><p>${e(a.descricao)}</p></div><div class="admin-team-meta"><strong>${a.ativo!==false?'Ativa':'Inativa'}</strong><span>ordem ${e(a.ordem??'-')}</span><button class="secondary-btn" data-admin-automation="${e(a.id)}">Administrar</button></div></article>`).join('')||'<p class="empty-state compact">Nenhuma automação cadastrada.</p>'}</div>`;
+  $('#admin-new-automation').onclick=openCreateAutomation;
+}
+// Equipes and Automações are separate tabs (same .tabs component as Central
+// de Conteúdo) instead of one long stacked list — currentAdminTab is the
+// only piece of state that needs to survive a re-render (e.g. after a
+// create/edit/delete refresh) so the active tab doesn't reset.
 function renderAdmin() {
-  if(!isAdminUnlocked()) {
+  const unlocked=isAdminUnlocked();
+  $('#admin-summary').hidden=!unlocked;
+  $('#admin-tabs').hidden=!unlocked;
+  if(!unlocked) {
     renderAdminLock();
     return;
   }
   const live=isLiveDataSource();
   const source=live?'Servidor conectado':hasLocalTeams()?'Alterações salvas neste navegador':'Base original do portal';
   const token=live?`<div class="admin-token-row"><label class="field">Token de administração<input type="password" id="admin-token" placeholder="Cole o token aqui" value="${e(getAdminToken())}"></label><button class="primary-btn" id="admin-token-save">Salvar token</button></div>`:'';
-  const automacoesOrdenadas=data.automacoes.slice().sort((a,b)=>(a.ordem??0)-(b.ordem??0));
-  $('#admin-view').innerHTML=`<div class="admin-overview"><div><span class="section-kicker">FONTE DOS DADOS</span><strong>${e(source)}</strong><p>${live?'As alterações são gravadas no servidor e compartilhadas.':'As alterações ficam neste navegador. Exporte o JSON para backup ou para atualizar a base publicada.'}</p></div><div class="admin-toolbar"><button class="primary-btn" id="admin-new-team">Nova equipe +</button><button class="secondary-btn" id="admin-export">Exportar JSON</button>${live?'':'<label class="secondary-btn admin-import">Importar JSON<input id="admin-import" type="file" accept="application/json,.json"></label>'}${hasLocalTeams()&&!live?'<button class="text-btn" id="admin-reset">Restaurar base original</button>':''}</div></div>${token}<div class="admin-team-list">${data.equipes.map(t=>`<article class="admin-team-card"><div><span class="team-code">${e(t.sigla||t.id)}</span><h3>${e(t.nome)}</h3><p>${e(t.descricao||'Sem descrição cadastrada.')}</p></div><div class="admin-team-meta"><strong>${(t.responsaveis||[]).length}</strong><span>colaborador(es)</span><button class="secondary-btn" data-admin-team="${e(t.id)}">Administrar</button></div></article>`).join('')}</div><h3 class="admin-section-title">Automações</h3><div class="admin-toolbar"><button class="primary-btn" id="admin-new-automation">Nova automação +</button></div><div class="admin-team-list">${automacoesOrdenadas.map(a=>`<article class="admin-team-card"><div><span class="tag ${automationTagClass(a.familia)}">${e(a.tipo)}</span><h3>${e(a.titulo)}</h3><p>${e(a.descricao)}</p></div><div class="admin-team-meta"><strong>${a.ativo!==false?'Ativa':'Inativa'}</strong><span>ordem ${e(a.ordem??'-')}</span><button class="secondary-btn" data-admin-automation="${e(a.id)}">Administrar</button></div></article>`).join('')||'<p class="empty-state compact">Nenhuma automação cadastrada.</p>'}</div>`;
-  $('#admin-new-team').onclick=openCreateTeam;
-  $('#admin-new-automation').onclick=openCreateAutomation;
-  $('#admin-export').onclick=exportTeams;
-  const importInput=$('#admin-import');
-  if(importInput)importInput.onchange=()=>importInput.files[0]&&importTeams(importInput.files[0]);
-  const reset=$('#admin-reset');
-  if(reset)reset.onclick=()=> { if(confirm('Descartar as alterações locais e restaurar a base original?')) { clearLocalTeams();location.reload(); } };
+  $('#admin-summary').innerHTML=`<div class="admin-overview"><div><span class="section-kicker">FONTE DOS DADOS</span><strong>${e(source)}</strong><p>${live?'As alterações são gravadas no servidor e compartilhadas.':'As alterações ficam neste navegador. Exporte o JSON para backup ou para atualizar a base publicada.'}</p></div></div>${token}`;
   const tokenSave=$('#admin-token-save');
   if(tokenSave)tokenSave.onclick=()=> { setAdminToken($('#admin-token').value.trim());notify('Token salvo neste navegador.');renderAdmin(); };
+  selectTab('#admin-tabs',$(`#admin-tab-${currentAdminTab}`));
+  $('#admin-view').setAttribute('aria-labelledby',`admin-tab-${currentAdminTab}`);
+  if(currentAdminTab==='automacoes')renderAdminAutomacoes();else renderAdminEquipes();
 }
 function showRecord(collection,id) {
   const item=data[collection]?.find(i=>i.id===id);
@@ -839,6 +865,11 @@ async function init() {
     }
     ,navigate,openAccess);
     bindTabs('.tabs',tab=>renderContent(tab.dataset.tab));
+    bindTabs('#admin-tabs',tab=> {
+      currentAdminTab=tab.dataset.adminTab;
+      renderAdmin();
+    }
+    );
     renderContent(currentTab);
     renderDashboard();
     renderEditorial();

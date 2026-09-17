@@ -1652,6 +1652,9 @@ dialog h2 {
   font-size:11px;
   margin-top:2px}
 
+.admin-panel #admin-summary {
+  padding:0 24px}
+
 .admin-panel #admin-view {
   padding:0 24px 24px}
 
@@ -2365,6 +2368,11 @@ th,td {
   grid-template-columns:minmax(0,1fr)}
 
 .teams-page {
+  min-height:calc(100vh - 110px)}
+
+/* Dedicated Administração workspace — same full-screen treatment as
+   Estrutura das Equipes, so it never mixes with Central de Conteúdo. */
+.admin-page {
   min-height:calc(100vh - 110px)}
 
 .structure-toolbar {

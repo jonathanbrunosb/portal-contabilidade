@@ -1652,6 +1652,9 @@ dialog h2 {
   font-size:11px;
   margin-top:2px}
 
+.admin-panel #admin-summary {
+  padding:0 24px}
+
 .admin-panel #admin-view {
   padding:0 24px 24px}
 

@@ -1,8 +1,8 @@
-import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260916-2';
+import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260917-1';
 import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js';
 import { initializeNavigation,bindTabs,selectTab } from './navigation.js';
 import { renderNewsletter,articleCard,showArticle } from './newsletter.js';
-import { renderTeamStructure } from './teams.js?v=20260916-2';
+import { renderTeamStructure } from './teams.js?v=20260917-1';
 import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,notify } from './ui.js';
 import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js';
 let data,currentTab='newsletter',currentUser,currentMenu=[];
@@ -48,9 +48,13 @@ function openAccess(item) {
   }
   showDialog(item.nome,'ACESSO CORPORATIVO',`<p>${e(item.descricao||'Acesso utilizado pela Gerência de Contabilidade.')}</p><p>O endereço deste acesso ainda não foi cadastrado. Solicite o link ao responsável da área.</p>${detailGrid({'Status':'Aguardando configuração','Responsável':item.responsavel||'Administração do portal'})}`);
 }
+// A system with a corporate image gets the status and the access button laid
+// over the image itself (object-fit:cover keeps it from distorting); a
+// system without one keeps the original icon + badge/button-below layout —
+// that fallback must keep working since not every registered system has art.
 function systemCard(item) {
-  const media=item.imagem?`<img class="system-image" src="${e(safeURL(item.imagem)||'')}" alt="Ilustração do sistema ${e(item.nome)}" loading="lazy">`:`<div class="system-symbol">${icon(item.icon)}</div>`;
-  return `<article class="content-card">${media}<h3>${e(item.nome)}</h3><p>${e(item.descricao)}</p><div class="card-bottom">${badge(item.status)}<button class="text-btn" data-system="${e(item.id)}">Acessar sistema ↗</button></div></article>`;
+  if(!item.imagem)return `<article class="content-card"><div class="system-symbol">${icon(item.icon)}</div><h3>${e(item.nome)}</h3><p>${e(item.descricao)}</p><div class="card-bottom">${badge(item.status)}<button class="text-btn" data-system="${e(item.id)}">Acessar sistema ↗</button></div></article>`;
+  return `<article class="content-card"><div class="system-media"><img class="system-image" src="${e(safeURL(item.imagem)||'')}" alt="Ilustração do sistema ${e(item.nome)}" loading="lazy">${badge(item.status,'system-media-badge')}<button class="primary-btn system-media-access" data-system="${e(item.id)}">Acessar sistema ↗</button></div><h3>${e(item.nome)}</h3><p>${e(item.descricao)}</p></article>`;
 }
 function documentCard(item) {
   return `<article class="content-card doc-card"><div class="card-meta"><span class="system-symbol">${icon('file')}</span><span class="muted">${e(item.formato)}</span></div><h3>${e(item.categoria)}</h3><p>${e(item.titulo)}</p><div class="doc-actions"><button class="text-btn" data-record="documentos:${e(item.id)}">Abrir →</button><a class="text-btn" href="${e(safeURL(item.arquivo)||'')}" download>Baixar ↓</a></div></article>`;
@@ -108,7 +112,7 @@ function renderContent(tab) {
   activateMenu(currentMenu.find(item=>item.tab===tab)||(CENTRAL_TABS.includes(tab)?currentMenu.find(item=>item.target==='central'):null));
   if(tab==='newsletter')$('#content-view').innerHTML=renderNewsletter(data.newsletter);
   if(tab==='noticias')$('#content-view').innerHTML=`<div class="card-grid">${data.noticias.filter(i=>i.status==='Publicado').map(i=>articleCard(i,'noticias')).join('')}</div><div class="content-footer">Pautas demonstrativas para acompanhamento — não representam notícias verificadas.</div>`;
-  if(tab==='sistemas')$('#content-view').innerHTML=`<div class="card-grid">${data.sistemas.map(systemCard).join('')}</div><div class="content-footer">Cadastre os endereços internos para habilitar os acessos.</div>`;
+  if(tab==='sistemas')$('#content-view').innerHTML=`<div class="card-grid systems-grid">${data.sistemas.map(systemCard).join('')}</div><div class="content-footer">Cadastre os endereços internos para habilitar os acessos.</div>`;
   if(tab==='documentos') {
     $('#content-view').innerHTML=`<div class="filter-bar"><input type="search" id="doc-search" aria-label="Pesquisar documentos" placeholder="Pesquisar documentos…"><select id="doc-filter" aria-label="Categoria de documento"><option value="">Todas as categorias</option>${data.documentos.map(i=>`<option>${e(i.categoria)}</option>`).join('')}</select></div><div id="document-results" class="card-grid"></div><div class="content-footer" id="doc-count" aria-live="polite"></div>`;
     documentResults();

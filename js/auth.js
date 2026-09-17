@@ -8,6 +8,7 @@ export const PERMISSIONS= {
 }
 ;
 const IDENTITY_KEY='portal-identity';
+const VISITOR_ID='visitante';
 export function getStoredUserId() {
   try {
     return localStorage.getItem(IDENTITY_KEY);
@@ -27,7 +28,25 @@ export function setStoredUserId(id) {
 export function getMatriculaFromURL() {
   return new URLSearchParams(window.location.search).get('matricula')?.trim()||null;
 }
-function visitanteProfile() {
+// A deliberately chosen "Visitante" is a valid, intentional access tier —
+// not a placeholder for a failed or missing identification. isVisitor marks
+// that intent explicitly, since perfil alone ('Visitante') is also reused as
+// the least-privilege fallback in unidentifiedProfile() below.
+export function getVisitorUser() {
+  return {
+    id:VISITOR_ID,matricula:null,nome:'Visitante',cargo:'Acesso ao Portal da Contabilidade',
+    area:'Externa à Contabilidade',perfil:'Visitante',equipe:'Externa à Contabilidade',
+    foto:'assets/users/avatar-visitante-portal.png',isVisitor:true
+  }
+  ;
+}
+export function isVisitorUser(user) {
+  return Boolean(user?.isVisitor);
+}
+// Shown only when nothing could be identified at all (no matrícula, no
+// stored id, or a stored id that no longer matches anyone) — distinct from
+// getVisitorUser(), which represents an intentional, positive choice.
+function unidentifiedProfile() {
   return {
     matricula:'Não informada',nome:'Colaborador não identificado',cargo:'Escolha sua área para se identificar',area:'Não identificada',perfil:'Visitante',equipe:'Não identificada',foto:'assets/users/default.svg'
   }
@@ -43,7 +62,7 @@ export function identifyUser(users,equipes=[]) {
   const id=getStoredUserId();
   const byMatricula=matricula&&users.find(user=>user.matricula===matricula);
   if(byMatricula)return byMatricula;
-  if(id==='visitante')return visitanteProfile();
+  if(id===VISITOR_ID)return getVisitorUser();
   const byId=users.find(user=>user.id===id);
   if(byId)return byId;
   for(const team of equipes) {
@@ -56,7 +75,7 @@ export function identifyUser(users,equipes=[]) {
     }
     ;
   }
-  return visitanteProfile();
+  return unidentifiedProfile();
 }
 export function permissionsFor(user) {
   return user?.permissoes||PERMISSIONS[user?.perfil]||[];
@@ -65,9 +84,15 @@ export function hasAccess(user,capability) {
   return permissionsFor(user).includes(capability);
 }
 export function renderUser(user) {
+  const visitor=isVisitorUser(user);
   const photo=safeURL(user.foto)||'assets/users/default.svg';
-  document.querySelector('#profile').innerHTML=`<img class="avatar large" src="${e(photo)}" alt="Avatar de ${e(user.nome)}"><h2>${e(user.nome)}</h2><p>${e(user.cargo)}</p><span class="profile-area">Área: ${e(user.area)}</span><button class="text-btn profile-switch" id="switch-identity">Trocar identificação</button>`;
-  document.querySelector('#top-user').innerHTML=`<span>${e(user.nome)}<small>${e(user.area)}</small></span><img class="avatar" src="${e(photo)}" alt="Avatar do colaborador">`;
+  const avatarAlt=visitor?'Avatar corporativo do perfil de visitante':`Avatar de ${e(user.nome)}`;
+  const avatarTitle=visitor?' title="Visitante"':'';
+  const support=visitor?'<p>Conteúdos disponíveis conforme o perfil de visitante.</p>':'';
+  const perfilLine=visitor?`<span class="profile-area">Perfil: ${e(user.perfil)}</span>`:'';
+  const switchLabel=visitor?'Identificar colaborador':'Trocar identificação';
+  document.querySelector('#profile').innerHTML=`<img class="avatar large" src="${e(photo)}" alt="${avatarAlt}"${avatarTitle}><h2>${e(user.nome)}</h2><p>${e(user.cargo)}</p>${support}<span class="profile-area">Área: ${e(user.area)}</span>${perfilLine}<button class="text-btn profile-switch" id="switch-identity">${switchLabel}</button>`;
+  document.querySelector('#top-user').innerHTML=`<span>${e(user.nome)}<small>${e(user.area)}</small></span><img class="avatar" src="${e(photo)}" alt="${avatarAlt}"${avatarTitle}>`;
   document.querySelectorAll('.avatar').forEach(img=>img.addEventListener('error',()=> {
     img.src='assets/users/default.svg';
   }

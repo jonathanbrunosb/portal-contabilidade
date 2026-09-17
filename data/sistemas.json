@@ -38,5 +38,25 @@
     "status": "Ativo",
     "link": "https://projecthub.contabilidade-eqtl.com/",
     "responsavel": "Contabilidade IV"
+  },
+  {
+    "id": "s5",
+    "nome": "Cronograma de Fechamento",
+    "descricao": "Fluxo de fechamento contábil, acompanhamento de processos e reportes finais da competência.",
+    "icon": "calendar",
+    "imagem": "assets/sistemas/cronograma-de-fechamento.webp",
+    "status": "Ativo",
+    "link": "https://eqtl-cronograma-fechamento.pufach.easypanel.host/",
+    "responsavel": "Contabilidade IV"
+  },
+  {
+    "id": "s6",
+    "nome": "Portal de Auditoria",
+    "descricao": "Solicitações, etapas anuais, visão global e relatórios de desempenho por área da auditoria.",
+    "icon": "shield",
+    "imagem": "assets/sistemas/portal-de-auditoria.webp",
+    "status": "Ativo",
+    "link": "https://duducarinhoso.github.io/eqtl_controle_planejamento/#/p/planejamento/s/a51370da-2adb-4ee9-8cfa-52396949ae92",
+    "responsavel": "Contabilidade IV"
   }
 ]

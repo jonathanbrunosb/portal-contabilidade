@@ -17,7 +17,7 @@ export function hydrateIcons(root=document) {
   root.querySelectorAll('[data-icon]').forEach(el=>el.innerHTML=icon(el.dataset.icon));
 }
 export const statusColor = status => /atenção|alto|alerta/i.test(status) ? 'yellow' : /pendente|crítico|recusado/i.test(status) ? 'red' : /andamento|moderado|revisão/i.test(status) ? 'purple' : /dia|prazo|concluído|ativo|baixo|publicado/i.test(status) ? 'green' : '';
-export const badge = text => `<span class="badge ${statusColor(text)}">${escapeHTML(text)}</span>`;
+export const badge = (text,extraClass='') => `<span class="badge ${statusColor(text)}${extraClass?' '+extraClass:''}">${escapeHTML(text)}</span>`;
 // Only HTTP(S) and same-origin relative links are supported; reject script/data URLs.
 export function safeURL(value) {
   if(!value)return null;

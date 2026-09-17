@@ -1206,6 +1206,50 @@ tbody tr:hover {
   margin-bottom:12px;
   background:#e7eff8}
 
+/* Systems with a corporate image: status badge and access button sit on top
+   of the artwork instead of below it. object-fit:cover fills the quadrant
+   without distorting the image; the 16:9 box is a close match to the source
+   art's own ratio, so cropping stays minimal. */
+.system-media {
+  position:relative;
+  margin-bottom:12px;
+  border-radius:8px;
+  overflow:hidden}
+
+.system-media .system-image {
+  margin-bottom:0;
+  border-radius:0;
+  aspect-ratio:16/9;
+  object-fit:cover}
+
+.system-media:after {
+  content:"";
+  position:absolute;
+  inset:auto 0 0 0;
+  height:56px;
+  background:linear-gradient(to top,#071f49b3,transparent);
+  pointer-events:none}
+
+.system-media-badge {
+  position:absolute;
+  top:10px;
+  right:10px;
+  z-index:1}
+
+.system-media-access {
+  position:absolute;
+  right:10px;
+  bottom:10px;
+  z-index:1;
+  box-shadow:0 6px 16px #071f4940}
+
+.systems-grid {
+  grid-template-columns:repeat(3,minmax(0,1fr))}
+
+@media(max-width:1200px) {
+  .systems-grid {
+    grid-template-columns:repeat(2,minmax(0,1fr))}}
+
 .primary-btn {
   display:inline-flex;
   align-items:center;

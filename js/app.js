@@ -14,7 +14,7 @@ const TARGET_ACCESS= {
 ;
 const CENTRAL_TABS=['newsletter','noticias','sistemas','documentos','automacoes'];
 const SECTION_ACCESS= {
-  central:'conteudo',painel:'gerencial',editorial:'gerencial',administracao:'administracao'
+  central:'conteudo',painel:'gerencial',editorial:'gerencial'
 }
 ;
 const EDITORIAL_COLLECTIONS=['newsletter','noticias'];
@@ -208,20 +208,29 @@ function activateMenu(item) {
   const index=currentMenu.indexOf(item);
   document.querySelectorAll('#navigation .nav-link').forEach(link=>link.classList.toggle('active',Number(link.dataset.menuIndex)===index));
 }
+// A menu item with a `view` opens as its own dedicated screen (#home-view
+// hidden entirely) instead of scrolling to a panel inside it — Estrutura das
+// Equipes and Administração both work this way, so neither ever shows mixed
+// in with Central de Conteúdo or the rest of the home page.
 function navigate(item,updateHistory=true) {
   if(!item)return;
-  const teamsView=item.view==='equipes';
-  $('#home-view').hidden=teamsView;
-  $('#equipes').hidden=!teamsView;
+  const dedicatedView=item.view;
+  $('#home-view').hidden=Boolean(dedicatedView);
+  $('#equipes').hidden=dedicatedView!=='equipes';
+  $('#administracao').hidden=dedicatedView!=='administracao';
   activateMenu(item);
-  if(teamsView) {
+  if(dedicatedView==='equipes') {
     renderTeamStructure(data.equipes);
     track('team_structure_view');
+  }
+  else if(dedicatedView==='administracao') {
+    renderAdmin();
+    track('admin_view');
   }
   else if(item.tab)renderContent(item.tab);
   if(updateHistory)history.pushState(null,'',`#${item.target}`);
   requestAnimationFrame(()=> {
-    const target=teamsView?$('#equipes'):$(`#${item.target}`);
+    const target=dedicatedView?$(`#${dedicatedView}`):$(`#${item.target}`);
     target?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
     $('#main').focus({preventScroll:true});
   });

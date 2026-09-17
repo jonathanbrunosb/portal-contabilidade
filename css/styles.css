@@ -2367,6 +2367,11 @@ th,td {
 .teams-page {
   min-height:calc(100vh - 110px)}
 
+/* Dedicated Administração workspace — same full-screen treatment as
+   Estrutura das Equipes, so it never mixes with Central de Conteúdo. */
+.admin-page {
+  min-height:calc(100vh - 110px)}
+
 .structure-toolbar {
   display:flex;
   align-items:flex-end;

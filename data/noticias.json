@@ -159,5 +159,204 @@
         "data": "2026-09-15T09:30:00.000Z"
       }
     ]
+  },
+  {
+    "id": "aneel-tarifas-equatorial-para-2026",
+    "categoria": "ANEEL",
+    "titulo": "Aprovadas as novas tarifas da Equatorial Pará",
+    "resumo": "O reajuste tarifário anual da Equatorial Pará foi aprovado pela ANEEL e alcança aproximadamente 3,12 milhões de unidades consumidoras em 228 municípios. A tarifa residencial terá variação de 6,70%, enquanto o efeito médio para o consumidor será de 6,94%.",
+    "conteudoCompleto": "A Agência Nacional de Energia Elétrica (ANEEL) aprovou o reajuste tarifário anual da Equatorial Pará, que passa a vigorar para aproximadamente 3,12 milhões de unidades consumidoras distribuídas em 228 municípios do estado.\nA tarifa residencial (grupo B1) terá variação de +6,70%, enquanto o efeito médio percebido pelo conjunto de consumidores será de +6,94%. Para o segmento de alta tensão, a variação divulgada foi de +8,09%.\nPara a Gerência de Contabilidade, o reajuste é um evento regulatório relevante: recomenda-se avaliar eventuais efeitos em contratos de fornecimento de energia, rubricas de despesas administrativas e nas premissas usadas em projeções orçamentárias que considerem o custo de energia elétrica.\nAcompanhe a publicação oficial da ANEEL para os detalhes completos da resolução homologatória.",
+    "dataPublicacao": "2026-09-15",
+    "dataVigencia": null,
+    "dataCaptura": "2026-09-17T08:30:00-03:00",
+    "fonte": "Agência Nacional de Energia Elétrica — ANEEL",
+    "urlFonte": "https://www.gov.br/aneel/pt-br/assuntos/noticias/2026-defeso-eleitoral/aprovadas-as-novas-tarifas-da-equatorial-para",
+    "link": "https://www.gov.br/aneel/pt-br/assuntos/noticias/2026-defeso-eleitoral/aprovadas-as-novas-tarifas-da-equatorial-para",
+    "documento": null,
+    "imagem": "assets/images/noticias/tarifas-equatorial-para.png",
+    "imagemAlt": "Ilustração corporativa sobre a aprovação das tarifas da Equatorial Pará pela ANEEL",
+    "impacto": "Relevante",
+    "nivelImpacto": "Relevante",
+    "empresasImpactadas": [
+      "Equatorial Pará"
+    ],
+    "areaResponsavel": "Normas e Reporte",
+    "responsavel": "Marina Oliveira",
+    "palavrasChave": [
+      "ANEEL",
+      "tarifas",
+      "Equatorial Pará",
+      "reajuste tarifário",
+      "regulatório",
+      "energia elétrica"
+    ],
+    "indicadores": [
+      {
+        "label": "Tarifa residencial B1",
+        "valor": "+6,70%"
+      },
+      {
+        "label": "Efeito médio para o consumidor",
+        "valor": "+6,94%"
+      },
+      {
+        "label": "Unidades consumidoras atendidas",
+        "valor": "3,12 milhões"
+      }
+    ],
+    "destaque": true,
+    "demonstrativo": false,
+    "ativo": true,
+    "statusCuradoria": "Publicado",
+    "status": "Publicado",
+    "aprovadoPor": "Marina Oliveira",
+    "dataAprovacao": "2026-09-17",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Marina Oliveira",
+        "data": "2026-09-17"
+      }
+    ]
+  },
+  {
+    "id": "demo-cpc-ifrs-acompanhamento",
+    "categoria": "CPC / IFRS",
+    "titulo": "Atualizações técnicas e pronunciamentos em acompanhamento",
+    "resumo": "Espaço para destacar normas em análise e traduzir seus efeitos para as rotinas contábeis.",
+    "conteudoCompleto": "CONTEÚDO DEMONSTRATIVO — este card ilustra a hierarquia visual da Central de Conteúdo e não representa uma publicação técnica real.\nQuando notícias reais estiverem disponíveis, substitua este registro por um conteúdo revisado, com fonte primária e data de vigência confirmadas.",
+    "dataPublicacao": "2026-09-16",
+    "dataVigencia": null,
+    "dataCaptura": "2026-09-16",
+    "fonte": "Pauta demonstrativa — normas e reporte",
+    "urlFonte": null,
+    "link": null,
+    "documento": null,
+    "imagem": null,
+    "imagemAlt": null,
+    "impacto": "Moderado",
+    "nivelImpacto": "Moderado",
+    "empresasImpactadas": [
+      "Empresa A (exemplo)"
+    ],
+    "areaResponsavel": "Normas e Reporte",
+    "responsavel": "Marina Oliveira",
+    "palavrasChave": [
+      "CPC",
+      "IFRS",
+      "normas contábeis",
+      "pronunciamentos"
+    ],
+    "indicadores": [],
+    "destaque": false,
+    "demonstrativo": true,
+    "ativo": true,
+    "statusCuradoria": "Demonstrativo",
+    "status": "Publicado",
+    "aprovadoPor": "Marina Oliveira",
+    "dataAprovacao": "2026-09-16",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Marina Oliveira",
+        "data": "2026-09-16"
+      }
+    ]
+  },
+  {
+    "id": "demo-grupo-deliberacoes",
+    "categoria": "Grupo",
+    "titulo": "Deliberações corporativas que exigem acompanhamento",
+    "resumo": "Decisões do Grupo organizadas por vigência, empresas impactadas e área responsável.",
+    "conteudoCompleto": "CONTEÚDO DEMONSTRATIVO — este card ilustra a hierarquia visual da Central de Conteúdo e não representa uma deliberação real do Grupo.\nQuando deliberações reais estiverem disponíveis, substitua este registro por um conteúdo revisado e aprovado pela Gerência.",
+    "dataPublicacao": "2026-09-16",
+    "dataVigencia": null,
+    "dataCaptura": "2026-09-16",
+    "fonte": "Exemplo de deliberação corporativa",
+    "urlFonte": null,
+    "link": null,
+    "documento": null,
+    "imagem": null,
+    "imagemAlt": null,
+    "impacto": "Moderado",
+    "nivelImpacto": "Moderado",
+    "empresasImpactadas": [
+      "Empresa A (exemplo)",
+      "Empresa B (exemplo)"
+    ],
+    "areaResponsavel": "Gerência de Contabilidade",
+    "responsavel": "Marina Oliveira",
+    "palavrasChave": [
+      "grupo",
+      "deliberação",
+      "governança corporativa"
+    ],
+    "indicadores": [],
+    "destaque": false,
+    "demonstrativo": true,
+    "ativo": true,
+    "statusCuradoria": "Demonstrativo",
+    "status": "Publicado",
+    "aprovadoPor": "Marina Oliveira",
+    "dataAprovacao": "2026-09-16",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Marina Oliveira",
+        "data": "2026-09-16"
+      }
+    ]
+  },
+  {
+    "id": "demo-interno-comunicados",
+    "categoria": "Interno",
+    "titulo": "Comunicados operacionais para os times contábeis",
+    "resumo": "Orientações objetivas sobre fechamento, conciliações, prazos e procedimentos internos.",
+    "conteudoCompleto": "CONTEÚDO DEMONSTRATIVO — este card ilustra a hierarquia visual da Central de Conteúdo e não representa um comunicado interno real.\nQuando comunicados reais estiverem disponíveis, substitua este registro por um conteúdo revisado pela área responsável.",
+    "dataPublicacao": "2026-09-16",
+    "dataVigencia": null,
+    "dataCaptura": "2026-09-16",
+    "fonte": "Exemplo de comunicado interno",
+    "urlFonte": null,
+    "link": null,
+    "documento": null,
+    "imagem": null,
+    "imagemAlt": null,
+    "impacto": "Baixo",
+    "nivelImpacto": "Baixo",
+    "empresasImpactadas": [
+      "Empresa A (exemplo)"
+    ],
+    "areaResponsavel": "Gerência de Contabilidade",
+    "responsavel": "Jonathan Bruno",
+    "palavrasChave": [
+      "comunicado interno",
+      "fechamento",
+      "conciliações",
+      "procedimentos"
+    ],
+    "indicadores": [],
+    "destaque": false,
+    "demonstrativo": true,
+    "ativo": true,
+    "statusCuradoria": "Demonstrativo",
+    "status": "Publicado",
+    "aprovadoPor": "Jonathan Bruno",
+    "dataAprovacao": "2026-09-16",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Jonathan Bruno",
+        "data": "2026-09-16"
+      }
+    ]
   }
 ]

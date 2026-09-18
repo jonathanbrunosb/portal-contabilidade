@@ -128,6 +128,12 @@ export function renderNoticiasSecundarias(items) {
   if(!items.length)return '';
   return `<div class="noticias-secundarias">${items.map(renderNoticiaCard).join('')}</div>`;
 }
+// Hero grid shows at most 3 secondary cards, matching the destaque's own
+// height instead of letting a long, unfiltered list dwarf it and leave the
+// destaque column mostly blank underneath. A category/busca in effect means
+// the person is intentionally narrowing results, so completeness matters
+// more than the fixed-height hero layout — those views show every match.
+const NOTICIAS_SECUNDARIAS_LIMITE=3;
 // Orchestrator: applies category + search filters, promotes whichever match
 // is flagged destaque (or the most recent match otherwise) into the hero
 // slot, and renders the rest as secondary cards — never leaving the area
@@ -136,7 +142,8 @@ export function renderNoticias(items,categoria,query) {
   const filtered=filterNoticias(items,categoria,query);
   if(!filtered.length)return '<p class="empty-state">Nenhuma notícia corresponde aos filtros informados.</p>';
   const destaqueItem=filtered.find(item=>item.destaque)||filtered[0];
-  const secundarias=filtered.filter(item=>item!==destaqueItem);
+  let secundarias=filtered.filter(item=>item!==destaqueItem);
+  if(!categoria&&!query)secundarias=secundarias.slice(0,NOTICIAS_SECUNDARIAS_LIMITE);
   const secundariasHTML=renderNoticiasSecundarias(secundarias);
   return `<div class="noticias-grid${secundariasHTML?'':' no-secundarias'}">${renderNoticiaDestaque(destaqueItem)}${secundariasHTML}</div>`;
 }

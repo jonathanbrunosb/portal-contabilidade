@@ -1,11 +1,11 @@
-import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260920-34';
-import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js?v=20260920-34';
-import { initializeNavigation,markCurrentSection,bindTabs,selectTab } from './navigation.js?v=20260920-34';
-import { renderNewsletter,showArticle,loadNoticias,ultimaAtualizacaoLabel,noticiaCategorias,filterNoticias,renderNoticias } from './newsletter.js?v=20260920-34';
-import { renderTeamStructure } from './teams.js?v=20260920-34';
-import { initCarousel } from './carousel.js?v=20260920-34';
-import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,notify } from './ui.js?v=20260920-34';
-import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js';
+import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260920-36';
+import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js?v=20260920-36';
+import { initializeNavigation,markCurrentSection,bindTabs,selectTab } from './navigation.js?v=20260920-36';
+import { renderNewsletter,showArticle,loadNoticias,ultimaAtualizacaoLabel,noticiaCategorias,filterNoticias,renderNoticias } from './newsletter.js?v=20260920-36';
+import { renderTeamStructure } from './teams.js?v=20260920-36';
+import { initCarousel } from './carousel.js?v=20260920-36';
+import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,comVersao,notify } from './ui.js?v=20260920-36';
+import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js?v=20260920-36';
 let data,currentTab='newsletter',currentAdminTab='equipes',currentUser,currentMenu=[],navSections=[];
 const $=selector=>document.querySelector(selector);
 // Capability required to see each menu target / page section / searchable collection.
@@ -64,7 +64,7 @@ const podeAdministrar = () => hasAccess(currentUser, 'administracao');
 function cardPortal(o) {
   const url = safeURL(o.imagem) || (o.imagem && !/^https?:/i.test(o.imagem) ? o.imagem : null);
   const media = url
-    ? `<img class="pcard-img" src="${e(url)}" alt="" loading="lazy">`
+    ? `<img class="pcard-img" src="${e(comVersao(url))}" alt="" loading="lazy">`
     : `<span class="pcard-simbolo">${icon(o.icone || 'grid')}</span>`;
   const trocar = o.alvoImagem && podeAdministrar()
     ? `<button class="pcard-trocar" data-trocar-imagem="${e(o.alvoImagem)}">${icon('image')}<span>${url ? 'Trocar imagem' : 'Definir imagem'}</span></button>`
@@ -706,7 +706,7 @@ async function fileAsDataURL(file) {
   });
 }
 function renderResponsaveisEditor() {
-  $('#admin-responsaveis').innerHTML=adminEditState.responsaveis.map((p,i)=>`<fieldset class="admin-person-row" data-index="${i}"><legend>Colaborador ${i+1}</legend><img class="avatar" src="${e(safeURL(p.foto)||p.foto||'assets/users/default.svg')}" alt=""><label class="field">Nome completo<input type="text" class="admin-person-nome" value="${e(p.nome||'')}" required></label><label class="field">Cargo<input type="text" class="admin-person-cargo" value="${e(p.cargo||'')}" placeholder="Opcional"></label><label class="field">Foto ou caminho<input type="text" class="admin-person-foto-path" value="${e(p.foto||'')}" placeholder="assets/users/foto.png"></label><label class="admin-leader-choice"><input type="radio" name="admin-lider" value="${i}" ${p.id===adminEditState.liderId?'checked':''}> Liderança da equipe</label><label class="admin-file-label">Selecionar foto<input type="file" class="admin-person-foto" accept="image/*"></label><button type="button" class="danger-btn admin-remove-person" data-index="${i}">Excluir colaborador</button></fieldset>`).join('')||'<p class="empty-state compact">Nenhum colaborador cadastrado nesta equipe.</p>';
+  $('#admin-responsaveis').innerHTML=adminEditState.responsaveis.map((p,i)=>`<fieldset class="admin-person-row" data-index="${i}"><legend>Colaborador ${i+1}</legend><img class="avatar" src="${e(comVersao(safeURL(p.foto)||p.foto||'assets/users/default.svg'))}" alt=""><label class="field">Nome completo<input type="text" class="admin-person-nome" value="${e(p.nome||'')}" required></label><label class="field">Cargo<input type="text" class="admin-person-cargo" value="${e(p.cargo||'')}" placeholder="Opcional"></label><label class="field">Foto ou caminho<input type="text" class="admin-person-foto-path" value="${e(p.foto||'')}" placeholder="assets/users/foto.png"></label><label class="admin-leader-choice"><input type="radio" name="admin-lider" value="${i}" ${p.id===adminEditState.liderId?'checked':''}> Liderança da equipe</label><label class="admin-file-label">Selecionar foto<input type="file" class="admin-person-foto" accept="image/*"></label><button type="button" class="danger-btn admin-remove-person" data-index="${i}">Excluir colaborador</button></fieldset>`).join('')||'<p class="empty-state compact">Nenhum colaborador cadastrado nesta equipe.</p>';
   $('#admin-responsaveis').querySelectorAll('.admin-remove-person').forEach(btn=>btn.onclick=()=> {
     adminEditState.responsaveis.splice(Number(btn.dataset.index),1);
     renderResponsaveisEditor();
@@ -1206,7 +1206,7 @@ function openColaboradorPicker(areaId) {
   const team=data.equipes.find(t=>t.id===areaId);
   const rows=team.responsaveis.map(p=> {
     const matched=data.usuarios.find(u=>u.areaId===team.id&&normalize(u.nome)===normalize(p.nome));
-    return `<button class="identity-pick" data-user="${e(matched?matched.id:p.id)}"><img class="avatar" src="${e(safeURL(p.foto)||'assets/users/default.svg')}" alt=""><span><strong>${e(p.nome)}</strong><small>${e(p.cargo||team.nome)}</small></span></button>`;
+    return `<button class="identity-pick" data-user="${e(matched?matched.id:p.id)}"><img class="avatar" src="${e(comVersao(safeURL(p.foto)||'assets/users/default.svg'))}" alt=""><span><strong>${e(p.nome)}</strong><small>${e(p.cargo||team.nome)}</small></span></button>`;
   }
   ).join('')||'<p class="empty-state">Nenhum colaborador cadastrado nesta área.</p>';
   showDialog(team.nome,'Identificação',`<button class="text-btn" id="identity-back">← Voltar</button><div class="identity-list">${rows}</div>`);
@@ -1217,7 +1217,7 @@ function openColaboradorPicker(areaId) {
   }
   );
   document.querySelectorAll('.identity-pick .avatar').forEach(img=>img.addEventListener('error',()=> {
-    img.src='assets/users/default.svg';
+    img.src=comVersao('assets/users/default.svg');
   }
   , {
     once:true

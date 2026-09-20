@@ -19,6 +19,26 @@ export function hydrateIcons(root=document) {
 export const statusColor = status => /atenção|alto|alerta/i.test(status) ? 'yellow' : /pendente|crítico|recusado/i.test(status) ? 'red' : /andamento|moderado|revisão/i.test(status) ? 'purple' : /dia|prazo|concluído|ativo|baixo|publicado/i.test(status) ? 'green' : '';
 export const badge = (text,extraClass='') => `<span class="badge ${statusColor(text)}${extraClass?' '+extraClass:''}">${escapeHTML(text)}</span>`;
 // Only HTTP(S) and same-origin relative links are supported; reject script/data URLs.
+// Versao do portal, lida do proprio endereco deste modulo (`?v=` que o
+// index.html carimba). Nao ha um segundo numero para manter.
+export const VERSAO=new URL(import.meta.url).searchParams.get('v')||'';
+// Carimba a versao em arquivo servido por nos, para uma arte trocada chegar ao
+// usuario sem Ctrl+F5. O index.html expira em ~10 min no GitHub Pages; quando
+// ele renova, os endereços das imagens mudam junto e o navegador rebusca.
+// Endereço de terceiro, `data:` e `blob:` ficam intactos.
+export function comVersao(endereco) {
+  if(!endereco||!VERSAO)return endereco;
+  if(/^(data:|blob:)/i.test(endereco))return endereco;
+  try {
+    const url=new URL(endereco,location.href);
+    if(url.origin!==location.origin)return endereco;
+    url.searchParams.set('v',VERSAO);
+    return url.pathname+url.search+url.hash;
+  }
+  catch {
+    return endereco;
+  }
+}
 export function safeURL(value) {
   if(!value)return null;
   try {

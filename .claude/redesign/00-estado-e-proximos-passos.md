@@ -275,9 +275,6 @@ rodapé com mapa do portal.
   licenciamento de banco de imagens (iStock) que a Equatorial contratou para
   aquele site. O portal é publicado no GitHub Pages: vale confirmar com quem
   cuida do RI antes de publicar.
-- **As artes não têm cache-buster.** Os `?v=` só cobrem HTML/CSS/JS; se as
-  artes mudarem depois de publicadas, quem já visitou pode ficar com a versão
-  antiga até limpar o cache.
 - Conteúdo real para destaques e avisos (`data/destaques.json`,
   `data/avisos.json` estão com exemplos marcados).
 
@@ -298,10 +295,15 @@ rodapé com mapa do portal.
 - **Capturas do preview mentem** de vez em quando (faixa de menu ou listas em
   branco) quando a janela do app está atrás de outra. Antes de caçar um bug,
   meça o elemento com `getBoundingClientRect()`.
-- **Cache**: ao mexer em CSS/JS, subir o sufixo `?v=AAAAMMDD-N` em
-  `index.html` **e** nos imports dos módulos (hoje `20260920-31`). Todos os
-  imports de `ui.js` precisam da mesma versão, senão o navegador carrega duas
-  cópias do módulo.
+- **Cache**: depois de mexer em CSS, JS ou numa arte, rode
+  `python .claude/tools/versao.py --subir`. Ele sobe o `?v=AAAAMMDD-N` nas 19
+  ocorrências de uma vez — `index.html`, o CSS e todos os imports, que precisam
+  bater entre si, senão o navegador carrega duas cópias do mesmo módulo.
+  **As imagens não têm número próprio**: `comVersao()` em `js/ui.js` lê a versão
+  do endereço do próprio módulo e a carimba em tempo de renderização, então
+  subir a versão basta para uma arte nova chegar a quem já visitou — sem
+  Ctrl+F5. `python .claude/tools/versao.py` sem argumento mostra a versão atual
+  e avisa se duas estiverem convivendo.
 - **Quebras de linha**: o repositório tem CRLF e LF misturados. Depois de
   reescrever arquivos por script, rodar `.claude/tools/eol.py <arquivo>` para o
   diff mostrar só as mudanças reais. Sem isso, o diff "muda" o arquivo inteiro.

@@ -196,10 +196,20 @@ imagem não desenhou.
 
 ---
 
-## Duas coisas a lembrar antes de publicar
+## Depois de trocar uma arte, suba a versão
 
-- **As artes não têm cache-buster.** Os `?v=` cobrem HTML/CSS/JS; uma arte
-  trocada depois de publicada pode ficar velha no navegador de quem já visitou.
-- **Cuidado com foto licenciada.** A do banner da Central de Resultados é
-  iStock, contratada para o site de RI. Reaproveitar num site público é outra
-  coisa — confirme antes.
+```bash
+python .claude/tools/versao.py --subir
+```
+
+`comVersao()` em `js/ui.js` carimba o `?v=` do portal em toda imagem nossa na
+hora de renderizar, lendo a versão do endereço do próprio módulo. Então **subir
+a versão é o bastante** para a arte nova chegar a quem já visitou — sem
+Ctrl+F5 e sem número separado para lembrar. Sem isso, a arte troca no
+repositório e o navegador continua mostrando a antiga.
+
+## Uma coisa a lembrar antes de publicar
+
+**Cuidado com foto licenciada.** A do banner da Central de Resultados é iStock,
+contratada para o site de RI. Reaproveitar num site público é outra coisa —
+confirme antes.

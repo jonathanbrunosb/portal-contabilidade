@@ -1,9 +1,9 @@
-import { escapeHTML as e,icon,safeURL } from './ui.js?v=20260920-34';
+import { escapeHTML as e,icon,safeURL,comVersao } from './ui.js?v=20260920-36';
 
 const DEFAULT_AVATAR='assets/users/default.svg';
 
 function photo(value) {
-  return safeURL(value)||DEFAULT_AVATAR;
+  return comVersao(safeURL(value)||DEFAULT_AVATAR);
 }
 
 function leaderFor(area) {

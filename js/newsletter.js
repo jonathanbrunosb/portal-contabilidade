@@ -1,4 +1,4 @@
-import { escapeHTML as e,icon,badge,dateLabel,showDialog,detailGrid,safeURL,normalize } from './ui.js?v=20260920-34';
+import { escapeHTML as e,icon,badge,dateLabel,showDialog,detailGrid,safeURL,comVersao,normalize } from './ui.js?v=20260920-36';
 const colors= {
   'ANEEL':'','CPC / IFRS':'purple','DELIBERAÇÃO DO GRUPO':'teal','COMUNICADO INTERNO':'orange','Grupo':'teal','Interno':'orange'
 }
@@ -18,7 +18,7 @@ function itemMedia(item,wrapClass) {
   const src=item.imagem?safeURL(item.imagem):null;
   if(!src)return `<div class="${wrapClass} noticia-media-fallback">${icon('news')}</div>`;
   const overlay=item.statusSistema?`${badge(item.statusSistema,'system-media-badge')}${item.sistemaId?`<button class="primary-btn system-media-access" data-system="${e(item.sistemaId)}">Acessar sistema${icon('external').replace('class="icon"','class="icon ext"')}</button>`:''}`:'';
-  return `<div class="${wrapClass}"><img src="${e(src)}" alt="${e(item.imagemAlt||'')}" loading="lazy">${overlay}<span class="noticia-media-icon">${icon('news')}</span></div>`;
+  return `<div class="${wrapClass}"><img src="${e(comVersao(src))}" alt="${e(item.imagemAlt||'')}" loading="lazy">${overlay}<span class="noticia-media-icon">${icon('news')}</span></div>`;
 }
 // Featured/secondary hero layout, same as Notícias & Impactos: the most
 // recent publicação leads, full-width media and title, everything else

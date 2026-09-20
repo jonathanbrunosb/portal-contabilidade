@@ -1,4 +1,4 @@
-import { icon,escapeHTML as e,safeURL } from './ui.js?v=20260920-34';
+import { icon,escapeHTML as e,safeURL,comVersao } from './ui.js?v=20260920-36';
 // Carrossel de destaques da capa (16:9). Troca a cada 7 s; pausa com mouse ou
 // foco em cima, pelo botão de pausa (WCAG 2.2.2) e não gira sozinho quando o
 // sistema ou a preferência do portal pedem menos movimento.
@@ -8,7 +8,7 @@ export function initCarousel(root,items,onOpen) {
     root.hidden=true;
     return;
   }
-  root.innerHTML=`<div class="dq-frame" aria-live="off">${items.map((item,i)=>`<div class="dq-slide${i?'':' on'}" role="group" aria-roledescription="destaque" aria-label="${i+1} de ${items.length}"${i?' aria-hidden="true"':''}><button type="button" class="dq-open" data-index="${i}" tabindex="${i?'-1':'0'}"><img src="${e(safeURL(item.imagem)||'')}" alt="${e(item.alt||item.titulo)}"></button></div>`).join('')}</div>
+  root.innerHTML=`<div class="dq-frame" aria-live="off">${items.map((item,i)=>`<div class="dq-slide${i?'':' on'}" role="group" aria-roledescription="destaque" aria-label="${i+1} de ${items.length}"${i?' aria-hidden="true"':''}><button type="button" class="dq-open" data-index="${i}" tabindex="${i?'-1':'0'}"><img src="${e(comVersao(safeURL(item.imagem))||'')}" alt="${e(item.alt||item.titulo)}"></button></div>`).join('')}</div>
     <div class="dq-bar">
       <div class="dq-caption" aria-live="polite"></div>
       <div class="dq-controls">

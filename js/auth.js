@@ -1,4 +1,4 @@
-import { escapeHTML as e,safeURL } from './ui.js?v=20260920-34';
+import { escapeHTML as e,safeURL,comVersao } from './ui.js?v=20260920-36';
 // Presentation only: a browser-local choice is not authentication. hasAccess()
 // controls which sections/menu items/search results render for a profile — it
 // is a UX consistency layer, not a security boundary: the JSON sources remain
@@ -86,7 +86,7 @@ export function hasAccess(user,capability) {
 export function renderUser(user) {
   const visitor=isVisitorUser(user);
   const unidentified=!visitor&&user.id===undefined;
-  const photo=safeURL(user.foto)||'assets/users/default.svg';
+  const photo=comVersao(safeURL(user.foto)||'assets/users/default.svg');
   const avatarAlt=visitor?'Avatar corporativo do perfil de visitante':'';
   const firstName=visitor?'Visitante':unidentified?'':String(user.nome||'').split(' ')[0];
   const greeting=firstName?`Bem-vindo, <b>${e(firstName)}</b>`:'Identifique-se';

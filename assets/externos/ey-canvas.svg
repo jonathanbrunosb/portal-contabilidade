@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 400" width="440" height="400" role="img" aria-label="EY">
+
+<rect width="440" height="400" fill="#2e2e38"/>
+<image href="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNjguNjcgNjkuMzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgaGVpZ2h0PSI2OS4zMiIgd2lkdGg9IjY4LjY3Ij4KICA8cGF0aCBkPSJNMTEuMDkgNjEuNGgxNy4zN3Y3LjkySC42N1YzNC45aDE5LjdsNC42MSA3LjkySDExLjF2NS42OGgxMi41NnY3LjIySDExLjF6bTM1Ljg2LTI2LjVsLTUuOSAxMS4yMy01Ljg4LTExLjIzSDIzLjY1bDEyLjEzIDIwLjgydjEzLjZoMTAuNHYtMTMuNkw1OC4zMSAzNC45eiIgZmlsbD0iI2ZmZmZmZiIgZmlsbC1ydWxlPSJldmVub2RkIi8+CiAgPHBhdGggZmlsbD0iI2ZmZTYwMCIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNNjguNjcgMTIuODFWMEwwIDI0LjgzeiIvPgo8L3N2Zz4K" x="80" y="62" width="280" height="136" preserveAspectRatio="xMidYMid meet"/>
+<text x="220" y="274" text-anchor="middle" fill="#ffffff" fill-opacity="0.88" font-family="Segoe UI,Arial,Helvetica,sans-serif" font-size="30" font-weight="600" letter-spacing="0.6">Canvas · Client</text>
+<text x="220" y="310" text-anchor="middle" fill="#ffffff" fill-opacity="0.88" font-family="Segoe UI,Arial,Helvetica,sans-serif" font-size="30" font-weight="600" letter-spacing="0.6">Portal</text>
+</svg>

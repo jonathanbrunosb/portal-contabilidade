@@ -1,11 +1,11 @@
-import { escapeHTML as e,icon,badge,dateLabel,showDialog,detailGrid,safeURL,normalize } from './ui.js';
+import { escapeHTML as e,icon,badge,dateLabel,showDialog,detailGrid,safeURL,normalize } from './ui.js?v=20260920-34';
 const colors= {
   'ANEEL':'','CPC / IFRS':'purple','DELIBERAÇÃO DO GRUPO':'teal','COMUNICADO INTERNO':'orange','Grupo':'teal','Interno':'orange'
 }
 ;
 export function articleCard(item,collection) {
   const media=item.imagem?itemMedia(item,'noticia-media'):'';
-  return `<article class="content-card">${media}<div class="card-meta"><span class="tag ${colors[item.categoria]||''}">${e(item.categoria)}</span><time class="card-date" datetime="${e(item.dataPublicacao)}">${e(dateLabel(item.dataPublicacao))}</time></div><h3>${e(item.titulo)}</h3><p>${e(item.resumo)}</p><div class="card-bottom">${badge('Impacto '+item.nivelImpacto.toLowerCase())}<button class="text-btn" data-record="${e(collection)}:${e(item.id)}">Ler ${collection==='newsletter'?'orientação':'notícia'} →</button></div></article>`;
+  return `<article class="content-card">${media}<div class="card-meta"><span class="tag ${colors[item.categoria]||''}">${e(item.categoria)}</span><time class="card-date" datetime="${e(item.dataPublicacao)}">${e(dateLabel(item.dataPublicacao))}</time></div><h3>${e(item.titulo)}</h3><p>${e(item.resumo)}</p><div class="card-bottom">${badge('Impacto '+item.nivelImpacto.toLowerCase())}<button class="text-btn" data-record="${e(collection)}:${e(item.id)}">Ler ${collection==='newsletter'?'orientação':'notícia'}</button></div></article>`;
 }
 // Shared by Newsletter and Notícias cards: renders the image with a fallback
 // icon already in the markup (toggled by CSS on the img's error — see
@@ -17,7 +17,7 @@ export function articleCard(item,collection) {
 function itemMedia(item,wrapClass) {
   const src=item.imagem?safeURL(item.imagem):null;
   if(!src)return `<div class="${wrapClass} noticia-media-fallback">${icon('news')}</div>`;
-  const overlay=item.statusSistema?`${badge(item.statusSistema,'system-media-badge')}${item.sistemaId?`<button class="primary-btn system-media-access" data-system="${e(item.sistemaId)}">Acessar sistema ↗</button>`:''}`:'';
+  const overlay=item.statusSistema?`${badge(item.statusSistema,'system-media-badge')}${item.sistemaId?`<button class="primary-btn system-media-access" data-system="${e(item.sistemaId)}">Acessar sistema${icon('external').replace('class="icon"','class="icon ext"')}</button>`:''}`:'';
   return `<div class="${wrapClass}"><img src="${e(src)}" alt="${e(item.imagemAlt||'')}" loading="lazy">${overlay}<span class="noticia-media-icon">${icon('news')}</span></div>`;
 }
 // Featured/secondary hero layout, same as Notícias & Impactos: the most
@@ -27,20 +27,19 @@ function itemMedia(item,wrapClass) {
 // not specific to the noticias collection, so nothing new is added here.
 function newsletterDestaque(item) {
   const media=itemMedia(item,'noticia-destaque-media');
-  return `<article class="content-card noticia-destaque">${media}<div class="noticia-destaque-body"><div class="card-meta"><span class="tag ${colors[item.categoria]||''}">${e(item.categoria)}</span><time class="card-date" datetime="${e(item.dataPublicacao)}">${e(dateLabel(item.dataPublicacao))}</time></div><h2>${e(item.titulo)}</h2><p>${e(item.resumo)}</p><div class="noticia-destaque-footer">${badge('Impacto '+item.nivelImpacto.toLowerCase())}<button class="text-btn" data-record="newsletter:${e(item.id)}">Ler orientação completa →</button></div></div></article>`;
+  return `<article class="content-card noticia-destaque">${media}<div class="noticia-destaque-body"><div class="card-meta"><span class="tag ${colors[item.categoria]||''}">${e(item.categoria)}</span><time class="card-date" datetime="${e(item.dataPublicacao)}">${e(dateLabel(item.dataPublicacao))}</time></div><h2>${e(item.titulo)}</h2><p>${e(item.resumo)}</p><div class="noticia-destaque-footer">${badge('Impacto '+item.nivelImpacto.toLowerCase())}<button class="text-btn" data-record="newsletter:${e(item.id)}">Ler orientação completa</button></div></div></article>`;
 }
 export function renderNewsletter(items) {
   const news=items.filter(i=>i.status==='Publicado').sort((a,b)=>b.dataPublicacao.localeCompare(a.dataPublicacao));
-  const ticker=news.map(item=>`<span><b>${e(item.categoria)}:</b> ${e(item.titulo)}</span>`).join('');
   const [destaqueItem,...secundarias]=news;
   const secundariasHTML=secundarias.length?`<div class="noticias-secundarias">${secundarias.map(item=>articleCard(item,'newsletter')).join('')}</div>`:'';
   const grid=destaqueItem?`<div class="noticias-grid${secundariasHTML?'':' no-secundarias'}">${newsletterDestaque(destaqueItem)}${secundariasHTML}</div>`:'<p class="empty-state">Nenhuma orientação publicada.</p>';
-  return `<div class="radar"><span class="radar-label">${icon('radar')} RADAR</span><div class="radar-window"><div class="radar-track"><div style="display:flex">${ticker}</div><div style="display:flex" aria-hidden="true">${ticker}</div></div></div><button id="pause-radar" aria-label="Pausar radar" aria-pressed="false" title="Pausar radar">Ⅱ</button></div>${grid}<div class="content-footer"><span>Informações de exemplo para validação do portal</span><span>${news.length} publicações</span></div>`;
+  return grid;
 }
 export function showArticle(item) {
   const link=safeURL(item.link),doc=safeURL(item.documento);
   const governanca=item.aprovadoPor?detailGrid({'Aprovado por':item.aprovadoPor,'Publicado em':dateLabel(item.dataAprovacao)}):'';
-  showDialog(item.titulo,item.categoria,`${badge('Impacto '+item.nivelImpacto.toLowerCase())}<p>${e(item.resumo)}</p>${item.conteudoCompleto.split('\n').map(p=>`<p>${e(p)}</p>`).join('')}${detailGrid({'Publicação':dateLabel(item.dataPublicacao),'Vigência':dateLabel(item.dataVigencia),'Fonte':item.fonte,'Responsável':item.responsavel,'Área responsável':item.areaResponsavel,'Empresas impactadas':item.empresasImpactadas,'Status':item.status})}${governanca}${link?`<a class="primary-btn" href="${e(link)}" target="_blank" rel="noopener noreferrer">Consultar fonte ↗</a>`:''} ${doc?`<a class="primary-btn" href="${e(doc)}" download>Baixar documento</a>`:''}`);
+  showDialog(item.titulo,item.categoria,`${badge('Impacto '+item.nivelImpacto.toLowerCase())}<p>${e(item.resumo)}</p>${item.conteudoCompleto.split('\n').map(p=>`<p>${e(p)}</p>`).join('')}${detailGrid({'Publicação':dateLabel(item.dataPublicacao),'Vigência':dateLabel(item.dataVigencia),'Fonte':item.fonte,'Responsável':item.responsavel,'Área responsável':item.areaResponsavel,'Empresas impactadas':item.empresasImpactadas,'Status':item.status})}${governanca}${link?`<a class="primary-btn" href="${e(link)}" target="_blank" rel="noopener noreferrer">Consultar fonte${icon('external').replace('class="icon"','class="icon ext"')}</a>`:''} ${doc?`<a class="primary-btn" href="${e(doc)}" download>Baixar documento</a>`:''}`);
 }
 
 // ===== Notícias & Impactos =====
@@ -88,12 +87,8 @@ function formatUltimaAtualizacao(value) {
   if(Number.isNaN(data.getTime()))return dateLabel(value.slice(0,10));
   return `${data.toLocaleDateString('pt-BR')} às ${data.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`;
 }
-export function renderNoticiasHeader(items) {
-  return `<div class="noticias-header"><div><span class="section-kicker">CENTRAL DE CONTEÚDO</span><h2>Notícias &amp; Impactos</h2><p>Atualizações regulatórias, contábeis e corporativas com leitura rápida do possível impacto para a Gerência de Contabilidade.</p></div><div class="noticias-atualizacao">Última atualização<strong>${e(formatUltimaAtualizacao(ultimaAtualizacaoNoticias(items)))}</strong></div></div>`;
-}
-export function renderNoticiaFiltros(items) {
-  const chips=['Todos',...noticiaCategorias(items)].map((categoria,index)=>`<button type="button" class="noticia-chip" data-categoria="${categoria==='Todos'?'':e(categoria)}" aria-selected="${index===0}">${e(categoria)}</button>`).join('');
-  return `<div class="noticia-filtros" role="group" aria-label="Filtrar notícias por categoria">${chips}</div>`;
+export function ultimaAtualizacaoLabel(items) {
+  return formatUltimaAtualizacao(ultimaAtualizacaoNoticias(items));
 }
 // Search covers every field the spec lists — título, resumo, categoria, fonte,
 // palavras-chave, empresas impactadas, área responsável e classificação do
@@ -117,12 +112,12 @@ export function renderNoticiaDestaque(item) {
   if(!item)return '<p class="empty-state">Nenhuma notícia corresponde aos filtros informados.</p>';
   const impacto=noticiaImpacto(item);
   const fonteURL=safeURL(item.urlFonte||item.link);
-  return `<article class="content-card noticia-destaque" data-noticia-id="${e(item.id)}">${itemMedia(item,'noticia-destaque-media')}<div class="noticia-destaque-body"><div class="card-meta"><span class="tag ${colors[item.categoria]||''}">${e(item.categoria)}</span><time class="card-date" datetime="${e(item.dataPublicacao)}">${e(formatNewsDate(item.dataPublicacao))}</time></div><h2>${e(item.titulo)}</h2><p>${e(item.resumo)}</p><span class="badge ${getImpactClass(impacto)}">Impacto potencial: ${e(impacto)}</span>${renderIndicadoresNoticia(item)}<div class="noticia-destaque-footer"><span class="noticia-fonte">Fonte: ${e(item.fonte||'Não informada')}</span>${fonteURL?`<a class="primary-btn noticia-fonte-link" href="${e(fonteURL)}" target="_blank" rel="noopener noreferrer">Ler na fonte oficial ↗</a>`:''}</div></div></article>`;
+  return `<article class="content-card noticia-destaque" data-noticia-id="${e(item.id)}">${itemMedia(item,'noticia-destaque-media')}<div class="noticia-destaque-body"><div class="card-meta"><span class="tag ${colors[item.categoria]||''}">${e(item.categoria)}</span><time class="card-date" datetime="${e(item.dataPublicacao)}">${e(formatNewsDate(item.dataPublicacao))}</time></div><h2>${e(item.titulo)}</h2><p>${e(item.resumo)}</p><span class="badge ${getImpactClass(impacto)}">Impacto potencial: ${e(impacto)}</span>${renderIndicadoresNoticia(item)}<div class="noticia-destaque-footer"><span class="noticia-fonte">Fonte: ${e(item.fonte||'Não informada')}</span>${fonteURL?`<a class="primary-btn noticia-fonte-link" href="${e(fonteURL)}" target="_blank" rel="noopener noreferrer">Ler na fonte oficial${icon('external').replace('class="icon"','class="icon ext"')}</a>`:''}</div></div></article>`;
 }
 function renderNoticiaCard(item) {
   const impacto=noticiaImpacto(item);
   const demonstrativo=item.demonstrativo?'<span class="noticia-demo-flag">Conteúdo demonstrativo</span>':'';
-  return `<article class="content-card noticia-card" data-noticia-id="${e(item.id)}">${itemMedia(item,'noticia-media')}<div class="card-meta"><span class="tag ${colors[item.categoria]||''}">${e(item.categoria)}</span><time class="card-date" datetime="${e(item.dataPublicacao)}">${e(formatNewsDate(item.dataPublicacao))}</time></div><h3>${e(item.titulo)}</h3><p>${e(item.resumo)}</p>${demonstrativo}<div class="card-bottom"><span class="badge ${getImpactClass(impacto)}">${e('Impacto '+impacto.toLowerCase())}</span><button class="text-btn" data-noticia-detalhe="${e(item.id)}">Ler notícia →</button></div></article>`;
+  return `<article class="content-card noticia-card" data-noticia-id="${e(item.id)}">${itemMedia(item,'noticia-media')}<div class="card-meta"><span class="tag ${colors[item.categoria]||''}">${e(item.categoria)}</span><time class="card-date" datetime="${e(item.dataPublicacao)}">${e(formatNewsDate(item.dataPublicacao))}</time></div><h3>${e(item.titulo)}</h3><p>${e(item.resumo)}</p>${demonstrativo}<div class="card-bottom"><span class="badge ${getImpactClass(impacto)}">${e('Impacto '+impacto.toLowerCase())}</span><button class="text-btn" data-noticia-detalhe="${e(item.id)}">Ler notícia</button></div></article>`;
 }
 export function renderNoticiasSecundarias(items) {
   if(!items.length)return '';

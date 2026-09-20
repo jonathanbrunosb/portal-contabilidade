@@ -44,8 +44,9 @@ portal-contabilidade/
 │   ├── analytics.js           # Registro local de uso (abas, buscas, acessos, downloads)
 │   ├── auth.js                # Identificação por seleção de nome e perfis demonstrativos
 │   ├── data-service.js        # Carregamento das bases, futuro adaptador de API
-│   ├── navigation.js          # Menu, foco e tabs por teclado
-│   ├── newsletter.js          # Radar, cards e leitura das publicações
+│   ├── carousel.js            # Carrossel de destaques da capa
+│   ├── navigation.js          # Menu do cabeçalho, submenus, menu do usuário e tabs por teclado
+│   ├── newsletter.js          # Cards e leitura das publicações
 │   ├── teams.js               # Janela do organograma e expansão das equipes
 │   └── ui.js                  # Ícones, escape de texto, URLs e diálogos
 ├── server/
@@ -60,7 +61,9 @@ portal-contabilidade/
 │   ├── sistemas.json
 │   ├── documentos.json
 │   ├── agenda.json
-│   └── entregas.json
+│   ├── entregas.json
+│   ├── destaques.json         # Carrossel da capa
+│   └── avisos.json            # Avisos da capa (Extra, Prazo, Info)
 └── assets/
     ├── logos/portal.svg
     ├── users/                 # Avatar padrão e avatar de iniciais
@@ -82,7 +85,9 @@ Edite os JSONs em UTF-8, mantenha a sintaxe válida e atualize o navegador. Os a
 | Resumo do banner e indicadores | `data/config.json`, propriedades `resumo` e `kpis` |
 | Processos, prazos e status | `data/processos.json` |
 | Agenda e entregas | `data/agenda.json` e `data/entregas.json` |
-| Documentos e categorias | `data/documentos.json` e arquivos em `assets/documents/` |
+| Documentos & Normas (referências oficiais) | `data/documentos.json`; grupos em `config.json › navegacao` |
+| Destaques do carrossel da capa | `data/destaques.json` |
+| Avisos da capa (Extra, Prazo, Info) | `data/avisos.json` |
 
 Datas editoriais da home e competência são parametrizadas por `data/config.json`. Agenda e entregas representam o calendário da base, sem atualização por serviço externo.
 
@@ -109,7 +114,7 @@ Duplique um objeto e preencha: `id`, `categoria`, `titulo`, `resumo`, `conteudoC
 - Impactos: `Alto`, `Moderado`, `Baixo`.
 - Categorias sugeridas estão em `config.json`: ANEEL, CPC, IFRS, Deliberação do Grupo, Comunicado Interno, Regulatório, Auditoria, Tecnologia, IA e Processos.
 - `link` recebe a fonte primária e `documento` um arquivo local opcional.
-- O radar reúne as publicações, movimenta-se automaticamente e pausa por hover, foco, botão ou preferência de movimento reduzido.
+- O movimento automático ficou restrito ao carrossel de destaques da capa, que pausa por hover, foco, botão ou preferência de movimento reduzido.
 
 As notícias usam o mesmo esquema. Todo o acervo inicial é demonstrativo: não representa novas normas nem orientações legais verificadas.
 
@@ -129,23 +134,40 @@ Responsabilidades e empresas atendidas aparecem na janela somente quando `dadosA
 
 ### Documentos
 
-Troque os documentos demonstrativos por arquivos aprovados, como PDF, HTML ou DOCX, atualizando `arquivo`, `formato`, `versao`, `data` e `responsavel`. O navegador determina se o formato abre diretamente ou é baixado. Categoria e busca textual podem ser combinadas. Os 13 modelos locais abrem e podem ser baixados sem depender de links externos.
+Documentos & Normas lista **somente referências reais**, com link oficial verificado: cada item tem `grupo`, `titulo`, `descricao`, `fonte`, `link` (abre em nova aba) e `verificadoEm` (AAAA-MM-DD da última conferência do link). Um documento interno aprovado pode entrar com `arquivo` (caminho em `assets/documents/`), que habilita o botão "Baixar", e com `imagem`, que substitui o ícone do grupo no cartão. Os grupos e a ordem deles ficam em `config.json › navegacao` (`gruposDocumentos`); o menu abre direto a grade e a faixa de subpáginas mostra "Todos" e cada grupo. Não cadastre item sem link ou arquivo real.
+
+### Destaques e avisos da capa
+
+A capa abre com o **carrossel de destaques** (16:9, metade esquerda) e, ao lado, **Avisos** e **Acesso rápido**.
+
+- `data/destaques.json`: cada destaque tem `titulo`, `resumo`, `imagem` (de preferência 16:9, ex.: 1280×720), `alt` (descrição da imagem para leitor de tela), `categoria`, `ordem`, `inicio` e `fim` (AAAA-MM-DD) e **uma** ação ao clicar: `registro` (`"newsletter:<id>"` ou `"noticias:<id>"` abre a publicação), `sistema` (id de `data/sistemas.json`, abre o sistema) ou `rota` (ex.: `"#central/documentos"`). Fora do período `inicio`–`fim`, o destaque sai do carrossel sozinho. O carrossel troca a cada 7 s, pausa com mouse/foco em cima, tem botão de pausa e não gira com "Reduzir movimento".
+- `data/avisos.json`: cada aviso tem `tipo` (`extra`, `prazo` ou `info`, no molde do "Extra!" da Comunicação), `titulo`, `texto`, `janela` (quando: horário ou prazo), `area` responsável, `inicio` e `fim`. A capa mostra até 3 vigentes, Extra primeiro. `demonstrativo: true` marca exemplo.
+- **Acesso rápido** é montado sozinho: links de `config.json > links` com endereço e sistemas `Ativo` de `data/sistemas.json` (até 8).
 
 ### Adicionar menu
 
-Inclua um objeto em `config.json > menu`: `label`, `icon`, `target` e, opcionalmente, `tab` ou `view`. `tab` seleciona uma aba da Central de Conteúdo; `view` identifica uma janela principal, como `equipes`. Para uma nova janela, adicione sua seção ao HTML e um renderizador modular. Os ícones disponíveis estão em `ui.js`. Se a nova seção só deve aparecer para certos perfis, registre seu `target` em `TARGET_ACCESS` (`js/app.js`) com a capacidade exigida.
+O menu exibido fica em `config.json > navegacao`: cada seção tem `label` e `icon` e, ou um `target` direto (como `Início`), ou uma lista `itens` que vira o submenu. Cada item de submenu aponta para um destino do portal: `target` e, opcionalmente, `tab` (aba da Central de Conteúdo), `view` (janela principal, como `equipes`) ou `adminTab` (aba da Administração). Duas chaves especiais montam a seção a partir dos dados: `acessosCorporativos` acrescenta os links de `config.json > links` (abrem em nova aba) e `gruposDocumentos` lista os grupos de Documentos & Normas na faixa de páginas, sem submenu. `config.json > menu` continua sendo a tabela de rotas (`target` → seção). Para uma nova janela, adicione sua seção ao HTML e um renderizador modular. Os ícones disponíveis estão em `ui.js`. Se o destino só deve aparecer para certos perfis, registre seu `target` em `TARGET_ACCESS` (`js/app.js`); seções sem itens visíveis somem do menu.
 
 ## Decisões técnicas e experiência
 
 - Módulos ES nativos, dados separados e sem dependências externas.
-- Layout com sidebar fixa, topbar sticky, Central de Conteúdo e janela exclusiva para as equipes.
-- Menu móvel com fechamento após seleção, Escape e controle de foco.
+- Cabeçalho institucional com a imagem da gerência, título, busca, "Bem-vindo" (menu do usuário: trocar identificação, preferências e, para a gerência, alertas) e o menu principal com ícones embutido na base da faixa. **O menu não abre submenu suspenso**: cada seção é um link direto para a sua primeira página, e as demais aparecem na faixa de subpáginas logo abaixo, em abas.
+- Rotas em hash: `#inicio`, `#central/<aba>`, `#administracao/<aba>` e `#<seção>`; o botão Voltar do navegador funciona entre elas.
+- No celular, o botão "Menu" abre as mesmas seções dentro da faixa e fecha após a seleção.
+- Faixa de subpáginas no padrão do CFC, logo abaixo do menu, com as páginas da seção aberta. Vale para qualquer seção (inclusive Gestão, cujas páginas são painéis da capa) e fica escondida quando a seção tem uma página só (Pessoas) ou quando é uma janela com abas próprias (Administração); uma linha azul de 3 px fica sobre a página atual e desliza até o item sob o mouse ou foco (0,25 s; sem animação com "Reduzir movimento"). Seções: Comunicação (Newsletter, Notícias), **Portais e Links** (Contabilidade = sistemas da área; Equatorial = 20 portais do Grupo; Externos = 6 sites de terceiros), **Sistemas e automações** (Contabilidade = automações; Equatorial = atalhos de `config.json › links`, como SAP e Snowflake; Externos = ferramentas de terceiros que automatizam tarefa) e Documentos & Normas (por categoria). A capa mostra "Comunicação recente" (as 5 últimas publicações).
+- **Grade de cartões padrão** (`.pcard`) em todas as telas de lista — Portais e Links → Contabilidade, Sistemas e automações → Contabilidade e → Equatorial, e Documentos & Normas: cada item é uma **faixa horizontal** (~176 px de altura) com a imagem numa coluna fixa à esquerda, em altura cheia, e rótulo, título, descrição e ações no restante do espaço. **Dois por faixa** em telas largas, um abaixo de 1100 px, e continua faixa no celular. As ações são o status, o botão **"i"** (ficha do item) e **Acessar**/**Baixar** — o clique no cartão não abre nada. Sem imagem cadastrada, o cartão mostra o ícone da categoria no mesmo espaço. Estilo de borda e sombra tirado de microsoft.com/pt-br.
+- **Arte dos cartões**: todo cartão tem um SVG em `assets/{atalhos,sistemas,automacoes,documentos,portais,externos}/`, gerado por `.claude/tools/arte-marcas.py` (61 artes). Quando o destino tem **tela de entrada própria**, a arte reproduz essa tela — o fundo, a logo e o título dela (ProjectHub, Cronograma de Fechamento, Portal de Auditoria, IFRS 16/CPC 06, Gestor de Horas, Central de Resultados, e o Brasão da República nas leis do Planalto). Quando não tem, entra a **marca oficial do titular** sobre o fundo da própria marca (ChatGPT em preto, EY no carvão `#2E2E38`, WeTransfer no azul `#409FFF`), **sem desenho decorativo**, com **rótulo abaixo** quando a mesma marca serve a vários cartões — a transação (`ME23N`, `FB03`), a norma (`SPED · ECD`) ou o sistema. Marcas em `assets/marcas/` (origem em `FONTES.md`); os insumos das telas em `projeto/marcas-telas/`, fora do site. **Uso referencial**: o cartão leva ao site da própria instituição. O passo a passo para criar a arte de um item novo está em `.claude/redesign/04-arte-dos-cartoes.md`.
+- Quem tem o perfil de administração troca a arte de um cartão clicando sobre a própria imagem (campo `imagem` em `data/sistemas.json` e `data/automacoes.json`; os atalhos de `config.json › links` são somente leitura na API e precisam ser editados no arquivo). Uploads vão para `assets/sistemas/`, `assets/automacoes/`, `assets/portais/`, `assets/externos/` ou `assets/users/`.
+- Em Documentos & Normas o cartão traz o grupo como rótulo, a fonte oficial na faixa de ações e a data de conferência do link na ficha do "i". Sem tabela: a única que sobrou no portal é a de processos críticos, no painel da gerência.
+- Rodapé institucional em todas as telas, com o **mapa do portal** (as mesmas seções e páginas do menu, filtradas pelo perfil), a área responsável (vinda de `data/equipes.json`, equipe `tipo: gerencia`) e a data de atualização da base.
 - Tabs acessíveis por setas, Home e End; diálogos nativos com Escape e retorno de foco.
 - Busca sem diferenciação de acentos, abrangendo conteúdos, equipes, colaboradores, agenda e entregas.
+- **Faixa de busca e filtros padrão** em todas as telas de conteúdo (a capa não tem, porque lá a busca é a do cabeçalho): busca à esquerda, filtros no meio e "Limpar filtros" no fim, com a contagem do resultado no rodapé da tela. Newsletter e Notícias filtram por categoria, Portais e Links por equipe responsável, Automações por tecnologia e status, Documentos por grupo.
 - Indicadores executivos demonstrativos independentes do subconjunto de registros detalhados: 24 processos e 07 sistemas não são contagens automáticas dos cinco processos e quatro sistemas exibidos.
 - Preferências locais de tamanho de texto e movimento, com tolerância a armazenamento bloqueado.
 - Tratamento de erro no carregamento e nova tentativa; nenhuma autenticação real, com ou sem o backend opcional (ver "Backend opcional").
-- Identidade visual em azul marinho, azul corporativo e teal; logo vetorial, ícones inline e fontes do sistema, sem requisições a CDNs.
+- Identidade visual em azul marinho e azul corporativo; logo vetorial, ícones inline e a fonte do sistema (`"Segoe UI", Arial`), sem requisições a CDNs.
+- **Sistema visual em tokens** no `:root` de `css/styles.css`: escala de 8 tamanhos (11 a 30 px), 3 pesos, 5 raios, 3 sombras e a paleta completa. Nenhuma cor literal fora do `:root`. Todo texto da interface atende ao contraste AA (4,5:1); ao mexer em cor, mantenha essa margem.
 
 ## Uso e métricas locais
 
@@ -222,7 +244,7 @@ No portal estático e no GitHub Pages, as alterações são salvas em `localStor
 
 ## Painel editorial (Fase 4 — governança de conteúdo)
 
-O risco que esta fase fecha: publicar newsletter e notícias hoje significa editar `data/newsletter.json` ou `data/noticias.json` na mão, sem revisão nem trilha de quem aprovou o quê — arriscado para conteúdo com peso regulatório (ANEEL, CPC/IFRS, deliberações). O "Painel editorial", no menu lateral (visível para perfis com a capacidade `gerencial` — ver "Usuários e identificação"), dá um fluxo com um mínimo de controle:
+O risco que esta fase fecha: publicar newsletter e notícias hoje significa editar `data/newsletter.json` ou `data/noticias.json` na mão, sem revisão nem trilha de quem aprovou o quê — arriscado para conteúdo com peso regulatório (ANEEL, CPC/IFRS, deliberações). O "Painel editorial", no menu Gestão (visível para perfis com a capacidade `gerencial` — ver "Usuários e identificação"), dá um fluxo com um mínimo de controle:
 
 - **Fluxo de status**: `Rascunho` → `Em revisão` → `Publicado`, com desvio para `Recusado` (que pode reabrir como `Rascunho`). Cada item guarda um `historicoStatus` com quem moveu o quê e quando.
 - **A única regra que o backend impõe de verdade**: não existe transição para `Publicado` sem um `aprovadoPor` informado no corpo da requisição — o servidor recusa (`400`) qualquer tentativa de publicar, ou de "reafirmar" a publicação de algo já publicado, sem essa informação. É deliberadamente a única regra rígida: o resto do fluxo (enviar para revisão, recusar, reabrir) é permissivo, porque o ponto de risco identificado era especificamente "publicar sem aprovação registrada", não uma máquina de estados completa.

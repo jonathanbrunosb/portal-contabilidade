@@ -1,0 +1,62 @@
+[
+  {
+    "id": "d1-projecthub",
+    "titulo": "ProjectHub: nova solução integra a gestão de projetos da Contabilidade",
+    "resumo": "Planejamento, prazos, riscos e indicadores dos projetos da área em uma única visão.",
+    "imagem": "assets/images/comunicados/projecthub-lancamento.webp",
+    "alt": "Tela de apresentação do ProjectHub com painéis de projetos, tarefas e indicadores",
+    "categoria": "Comunicado interno",
+    "registro": "newsletter:n6-projecthub-lancamento",
+    "inicio": "2026-09-01",
+    "fim": "2026-12-31",
+    "ordem": 1
+  },
+  {
+    "id": "d2-tarifas-para",
+    "titulo": "Aprovadas as novas tarifas da Equatorial Pará",
+    "resumo": "Reajuste tarifário anual aprovado pela ANEEL; veja os impactos para a Contabilidade.",
+    "imagem": "assets/images/noticias/tarifas-equatorial-para.png",
+    "alt": "Ilustração sobre o reajuste tarifário da Equatorial Pará",
+    "categoria": "Notícias & Impactos",
+    "registro": "noticias:aneel-tarifas-equatorial-para-2026",
+    "inicio": "2026-09-01",
+    "fim": "2026-12-31",
+    "ordem": 2
+  },
+  {
+    "id": "d3-cronograma",
+    "titulo": "Acompanhe as atividades do fechamento no Cronograma",
+    "resumo": "Prazos, responsáveis e status de cada etapa do fechamento contábil.",
+    "imagem": "assets/sistemas/cronograma-de-fechamento.webp",
+    "alt": "Ilustração do sistema Cronograma de Fechamento",
+    "categoria": "Sistemas da área",
+    "sistema": "s5",
+    "inicio": "2026-09-01",
+    "fim": "2026-12-31",
+    "ordem": 3
+  },
+  {
+    "id": "d4-ifrs16",
+    "titulo": "IFRS 16 / CPC 06: contratos de arrendamento em um só lugar",
+    "resumo": "Gestão de contratos, passivos, ativo de direito de uso e relatórios.",
+    "imagem": "assets/sistemas/ifrs16-cpc06.webp",
+    "alt": "Ilustração do sistema IFRS 16 / CPC 06",
+    "categoria": "Sistemas da área",
+    "sistema": "s1",
+    "inicio": "2026-09-01",
+    "fim": "2026-12-31",
+    "ordem": 4
+  },
+  {
+    "id": "d5-auditoria",
+    "titulo": "Portal de Auditoria: solicitações e etapas do ciclo anual",
+    "resumo": "Acompanhe as solicitações e o relatório de desempenho por área.",
+    "imagem": "assets/sistemas/portal-de-auditoria.webp",
+    "alt": "Ilustração do Portal de Auditoria",
+    "categoria": "Sistemas da área",
+    "sistema": "s6",
+    "inicio": "2026-09-01",
+    "fim": "2026-12-31",
+    "ordem": 5
+  }
+]

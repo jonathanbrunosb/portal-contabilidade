@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protótipo de navegação</title>
+<link rel="stylesheet" href="../../projeto/brand/tokens-marca.css">
+<style>
+  :root {
+    --container: 1760px;
+    --menu-texto: #1B3F72;
+    --ativo: var(--marca-azul-comunic);
+    --linha: #E2E6EE;
+  }
+  * { box-sizing: border-box }
+  html { scroll-behavior: smooth }
+  body { margin: 0; font-family: var(--fonte); font-size: 15px; line-height: 1.5; color: #2B3445; background: #fff }
+  a { color: inherit }
+  svg.i { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0 }
+  .wrap { max-width: var(--container); margin: 0 auto; padding: 0 32px }
+  :focus-visible { outline: 3px solid #4A90E2; outline-offset: 2px }
+
+  /* Barra do protótipo (fora do design) */
+  .proto { background: #FFF7D6; border-bottom: 1px solid #E8D48A; font-size: 13px }
+  .proto .wrap { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; padding-top: 8px; padding-bottom: 8px }
+  .proto b { color: #5B4A00 }
+  .proto button { font: inherit; border: 1px solid #C9B45A; background: #fff; padding: 4px 10px; cursor: pointer }
+  .proto button[aria-pressed="true"] { background: #5B4A00; color: #fff; border-color: #5B4A00 }
+
+  /* Cabeçalho institucional: faixa de impacto com a imagem do modelo antigo */
+  .header { color: #fff; background: linear-gradient(100deg,#071f49f2 0%,#071f49d9 38%,#0b376aa6 62%,#075c8070 85%,#075c8047 100%), url("../../assets/images/banner/portal-gerencia-contabilidade.webp") right 0 top 30% / auto 420px no-repeat; background-color: #01163a; position: relative; z-index: 20 }
+  .head-row { display: flex; align-items: center; gap: 32px; min-height: 96px }
+  .brand { display: flex; align-items: center; gap: 22px; text-decoration: none; margin-right: auto; color: #fff }
+  .brand img { height: 34px; width: auto }
+  .brand h1 { margin: 0; border-left: 1px solid rgba(255,255,255,.35); padding-left: 22px; font-weight: 400; line-height: 1.05; display: grid; gap: 2px }
+  .brand h1 .l1 { font-size: 1.125rem; font-weight: 300; color: rgba(255,255,255,.9) }
+  .brand h1 .l2 { font-size: 1.875rem; font-weight: 700; letter-spacing: -.01em; color: #fff }
+  .search { display: flex; align-items: center; height: 46px; width: min(520px, 36vw); background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.30); transition: background .2s, border-color .2s }
+  .search:focus-within { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.7) }
+  .search svg { margin: 0 12px; color: rgba(255,255,255,.8) }
+  .search input { border: 0; font: inherit; font-size: 1rem; padding-right: 14px; flex: 1; height: 100%; outline: none; min-width: 0; background: transparent; color: #fff }
+  .search input::placeholder { color: rgba(255,255,255,.72) }
+  .user { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; line-height: 1.3; padding: 6px 8px; border: 1px solid transparent }
+  .user:hover { border-color: rgba(255,255,255,.3) }
+  .user img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,.5) }
+  .user span { font-size: .875rem; color: rgba(255,255,255,.85); text-shadow: 0 1px 2px rgba(0,0,0,.55) }
+  .user span b { font-weight: 600; color: #fff }
+  .user small { display: block; font-size: .75rem; color: rgba(255,255,255,.7) }
+  .menu-btn { display: none; align-items: center; gap: 6px; height: 40px; padding: 0 12px; border: 1px solid rgba(255,255,255,.45); background: transparent; color: #fff; font: 700 14px var(--fonte); cursor: pointer }
+
+  /* Menu embutido na base da faixa: tarja escura translúcida sobre a mesma imagem */
+  .nav { background: rgba(1,14,40,.55); border-top: 1px solid rgba(255,255,255,.14) }
+  .nav ul { list-style: none; margin: 0; padding: 0 }
+  .nav > .wrap > ul { display: flex; justify-content: center; gap: 4px }
+  .nav li { position: relative }
+  .nav .top { display: flex; align-items: center; gap: 8px; height: 52px; padding: 0 18px; text-decoration: none; color: rgba(255,255,255,.82); font: 600 15px var(--fonte); border: 0; background: none; cursor: pointer; white-space: nowrap; position: relative; transition: background .18s, color .18s }
+  .nav .top svg { opacity: .85 }
+  .nav .top .car { width: 14px; height: 14px; margin-left: -2px; transition: transform .2s }
+  .nav .top:hover, .nav li.open > .top { background: rgba(255,255,255,.08); color: #fff }
+  .nav .top[aria-current="page"] { color: #fff }
+  .nav .top[aria-current="page"] svg { opacity: 1 }
+  .nav .top[aria-current="page"]::after { content: ""; position: absolute; left: 18px; right: 18px; bottom: 0; height: 3px; background: var(--acento-laranja) }
+  .nav li.open > .top .car { transform: rotate(180deg) }
+  .drop { position: absolute; top: 100%; left: 0; min-width: 260px; background: #fff; border: 1px solid rgba(0,0,0,.15); border-top: 3px solid var(--acento-laranja); border-radius: 0 0 4px 4px; box-shadow: 0 8px 18px rgba(1,14,40,.22); padding: 6px 0; display: none }
+  .nav li.open > .drop { display: block }
+  .drop a { display: flex; gap: 10px; align-items: center; padding: 9px 16px; text-decoration: none; color: #3B4A60; font-size: 14px }
+  .drop a:hover, .drop a:focus-visible { background: #F1F4F9; color: var(--ativo) }
+  .drop a svg { width: 16px; height: 16px; color: #7A879A }
+
+  /* Faixa superior: carrossel 16:9 + avisos/acesso */
+  .top-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 24px auto 32px }
+  .carousel { min-width: 0 }
+  .slides { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: #0B2E5C }
+  .slide { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity .6s, visibility .6s }
+  .slide.on { opacity: 1; visibility: visible }
+  .slide a { display: block; height: 100% }
+  .slide img { width: 100%; height: 100%; object-fit: cover; display: block }
+  .ctrl { display: flex; align-items: center; gap: 12px; padding: 10px 0 0 }
+  .ctrl .cap { flex: 1; min-width: 0 }
+  .ctrl .cap b { display: block; font-size: 15px; color: #1F2A3C; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+  .ctrl .cap small { color: #5F6B7E; font-size: 13px }
+  .dots { display: flex; gap: 6px }
+  .dots button { width: 11px; height: 11px; border-radius: 50%; border: 0; padding: 0; background: #C5CCD8; cursor: pointer }
+  .dots button[aria-current="true"] { background: var(--marca-azul) }
+  .cbtn { width: 32px; height: 32px; border: 1px solid #D5DAE3; background: #fff; display: grid; place-items: center; cursor: pointer; color: #3B4A60 }
+  .cbtn svg { width: 16px; height: 16px }
+
+  .side h2, .sec h2 { font-size: 20px; margin: 0 0 12px; color: #1F2A3C; display: flex; align-items: center; gap: 8px }
+  .side h2 a, .sec h2 a { margin-left: auto; font-size: 13px; font-weight: 700; color: var(--link) }
+  .avisos { list-style: none; margin: 0 0 24px; padding: 0; border-top: 1px solid var(--linha) }
+  .avisos li { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; padding: 12px 0; border-bottom: 1px solid var(--linha) }
+  .tag { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #fff; padding: 3px 8px; align-self: start; margin-top: 2px }
+  .tag.extra { background: var(--aviso-extra) } .tag.prazo { background: var(--acento-laranja) } .tag.info { background: var(--marca-azul-comunic) }
+  .avisos a { font-weight: 700; color: #1F2A3C; text-decoration: none } .avisos a:hover { text-decoration: underline }
+  .avisos small { grid-column: 2; color: #5F6B7E; font-size: 13px }
+  .acesso { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--linha) }
+  .acesso a { display: flex; align-items: center; gap: 10px; padding: 11px 8px; text-decoration: none; color: #1F2A3C; font-weight: 700; font-size: 14px; border-bottom: 1px solid var(--linha) }
+  .acesso a:hover { background: #F1F4F9; color: var(--ativo) }
+  .acesso svg { color: var(--marca-azul) }
+  .acesso .ext { width: 14px; height: 14px; margin-left: auto; color: #8A96A8 }
+
+  /* Conteúdo abaixo */
+  .below { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; margin-bottom: 48px }
+  .sec { border-top: 3px solid var(--marca-azul-comunic); padding-top: 14px }
+  .news { list-style: none; margin: 0; padding: 0 }
+  .news li { padding: 14px 0; border-bottom: 1px solid var(--linha) }
+  .news .meta { font-size: 13px; color: #5F6B7E; display: flex; gap: 10px }
+  .news .meta b { color: var(--marca-azul-comunic) }
+  .news a { display: block; font-size: 17px; font-weight: 700; color: #1F2A3C; text-decoration: none; margin: 2px 0 4px }
+  .news a:hover { color: var(--ativo); text-decoration: underline }
+  .news p { margin: 0; color: var(--texto); max-width: 65ch }
+  .aside { display: grid; gap: 32px; align-content: start }
+  .agenda, .docs { list-style: none; margin: 0; padding: 0 }
+  .agenda li { display: grid; grid-template-columns: 52px 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--linha) }
+  .agenda .d { text-align: center; border: 1px solid var(--linha); line-height: 1.1; padding: 6px 0 }
+  .agenda .d b { display: block; font-size: 20px; color: var(--marca-azul) } .agenda .d small { font-size: 11px; text-transform: uppercase; color: #5F6B7E }
+  .agenda strong { display: block; font-size: 14px; color: #1F2A3C } .agenda span { font-size: 13px; color: #5F6B7E }
+  .docs li { padding: 9px 0; border-bottom: 1px solid var(--linha); display: flex; gap: 10px; align-items: flex-start }
+  .docs svg { color: #7A879A; margin-top: 2px } .docs a { color: #1F2A3C; font-weight: 700; font-size: 14px; text-decoration: none } .docs a:hover { text-decoration: underline }
+  .docs small { display: block; font-size: 12px; color: #5F6B7E }
+
+  /* Rodapé com mapa do portal */
+  footer { background: var(--marca-marinho); color: #DCE4F5; font-size: 14px }
+  footer .map { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 24px; padding: 32px 16px 24px }
+  footer h3 { font-size: 14px; color: #fff; margin: 0 0 8px; display: flex; gap: 8px; align-items: center }
+  footer h3 svg { width: 16px; height: 16px }
+  footer ul { list-style: none; margin: 0; padding: 0 } footer li { margin: 4px 0 } footer a { color: #DCE4F5; text-decoration: none } footer a:hover { color: #fff; text-decoration: underline }
+  footer .base { border-top: 1px solid rgba(255,255,255,.15); display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; align-items: center; padding: 16px; font-size: 13px }
+  footer .base img { height: 26px }
+
+  /* Notas do protótipo */
+  .note { position: relative }
+  .pin { position: absolute; z-index: 30; width: 22px; height: 22px; border-radius: 50%; background: #5B4A00; color: #fff; font: 700 12px/22px var(--fonte); text-align: center; pointer-events: none }
+  body.no-pins .pin { display: none }
+
+  [hidden] { display: none !important }
+  @media (max-width: 900px) {
+    .head-row { flex-wrap: wrap; gap: 12px 16px; min-height: 0; padding-top: 16px; padding-bottom: 16px }
+    .brand { gap: 12px; min-width: 0 }
+    .brand img { height: 26px }
+    .brand h1 { padding-left: 12px; gap: 2px }
+    .brand h1 .l1 { font-size: .875rem }
+    .brand h1 .l2 { font-size: 1.375rem }
+    .user { display: none }
+    .search { order: 3; width: 100% }
+    .ctrl { flex-wrap: wrap }
+    .ctrl .cap { flex-basis: 100%; order: -1 }
+    .ctrl .cap b { white-space: normal }
+    .nav .wrap { padding: 0 }
+    .menu-btn { display: flex }
+    .nav { display: none; background: rgba(1,14,40,.88) } .nav.m-open { display: block }
+    .nav > .wrap > ul { flex-direction: column; gap: 0 }
+    .nav .top { height: 48px; width: 100%; padding: 0 16px; border-bottom: 1px solid rgba(255,255,255,.1) }
+    .nav .top[aria-current="page"]::after { left: 0; right: auto; top: 0; bottom: 0; width: 3px; height: auto }
+    .drop { position: static; box-shadow: none; border: 0; border-radius: 0; background: transparent; padding: 0 0 6px 28px }
+    .drop a { color: rgba(255,255,255,.8) }
+    .drop a:hover, .drop a:focus-visible { background: rgba(255,255,255,.08); color: #fff }
+    .drop a svg { color: rgba(255,255,255,.6) }
+    .top-row, .below { grid-template-columns: 1fr }
+  }
+  @media (prefers-reduced-motion: reduce) { .slide { transition: none } }
+</style>
+</head>
+<body>
+<div class="proto" role="region" aria-label="Controles do protótipo">
+  <div class="wrap">
+    <b>Protótipo de navegação · proposta 19/09/2026</b>
+    <span>Ver como:</span>
+    <span id="perfis"></span>
+    <label><input type="checkbox" id="pins" checked> Mostrar marcações</label>
+  </div>
+</div>
+
+<header class="header note">
+  <span class="pin" style="left:4px;bottom:40px">1</span>
+  <div class="wrap head-row">
+    <a class="brand" href="#/inicio"><img src="../../projeto/brand/logos/grupo-equatorial-branco-480.png" alt="Grupo Equatorial"><h1><span class="l1">Portal da Gerência de</span><span class="l2">Contabilidade</span></h1></a>
+    <form class="search" role="search" onsubmit="return false"><svg class="i" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><input type="search" aria-label="Buscar no portal" placeholder="Buscar sistema, norma, documento ou pessoa"></form>
+    <a class="user" href="#/perfil" title="Trocar identificação"><img id="avatar" src="../../assets/users/default.svg" alt=""><span>Bem-vindo, <b id="uname">Eduardo</b><small id="ucargo">Analista · Contabilidade IV</small></span></a>
+    <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="nav"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Menu</button>
+  </div>
+  <nav class="nav" id="nav" aria-label="Menu principal">
+    <div class="wrap"><ul id="menu"></ul></div>
+  </nav>
+</header>
+
+<main class="wrap">
+  <div class="top-row">
+    <section class="carousel note" aria-roledescription="carrossel" aria-label="Destaques">
+      <span class="pin" style="left:-11px;top:-11px">2</span>
+      <div class="slides" id="slides" aria-live="off"></div>
+      <div class="ctrl">
+        <div class="cap" id="cap"></div>
+        <button class="cbtn" id="prev" aria-label="Destaque anterior"><svg class="i" viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></button>
+        <div class="dots" id="dots" role="group" aria-label="Escolher destaque"></div>
+        <button class="cbtn" id="next" aria-label="Próximo destaque"><svg class="i" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button>
+        <button class="cbtn" id="pause" aria-label="Pausar destaques"><svg class="i" viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></svg></button>
+      </div>
+    </section>
+    <div class="side note">
+      <span class="pin" style="left:-11px;top:-11px">3</span>
+      <h2>Avisos <a href="#/comunicacao/avisos">Ver todos</a></h2>
+      <ul class="avisos" id="avisos"></ul>
+      <h2>Acesso rápido <a href="#/sistemas">Todos os sistemas</a></h2>
+      <ul class="acesso" id="acesso"></ul>
+    </div>
+  </div>
+
+  <div class="below">
+    <section class="sec note">
+      <span class="pin" style="left:-11px;top:-11px">4</span>
+      <h2>Comunicação recente <a href="#/comunicacao">Ver todas</a></h2>
+      <ul class="news" id="news"></ul>
+    </section>
+    <div class="aside">
+      <section class="sec"><h2>Agenda da semana <a href="#/gestao/agenda">Agenda</a></h2><ul class="agenda" id="agenda"></ul></section>
+      <section class="sec"><h2>Documentos recentes <a href="#/documentos">Documentos & Normas</a></h2><ul class="docs" id="docs"></ul></section>
+    </div>
+  </div>
+</main>
+
+<footer class="note">
+  <span class="pin" style="left:4px;top:-11px">5</span>
+  <div class="wrap"><div class="map" id="map"></div></div>
+  <div class="wrap base"><span>Gerência de Contabilidade · Mapa do portal conforme o seu perfil · Base atualizada em 18/09/2026</span><img src="../../projeto/brand/logos/grupo-equatorial-branco-480.png" alt="Grupo Equatorial"></div>
+</footer>
+
+<script>
+const P = {
+  home:'<path d="M3 11 12 4l9 7M5 10v10h5v-6h4v6h5V10"/>',
+  news:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h4v4H7zM14 8h3M14 12h3M7 16h10"/>',
+  grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  file:'<path d="M14 2H5v20h14V7zM14 2v6h5M8 12h8M8 16h8"/>',
+  users:'<circle cx="9" cy="8" r="3"/><path d="M3 20v-3c0-5 12-5 12 0v3M16 5a3 3 0 0 1 0 6M18 14c3 0 3 3 3 6"/>',
+  chart:'<path d="M3 3v18h18M7 16v-5M12 16V7M17 16V4"/>',
+  settings:'<path d="m9 3 6 0 1 3 3 1 2 5-2 5-3 1-1 3H9l-1-3-3-1-2-5 2-5 3-1z"/><circle cx="12" cy="12" r="3"/>',
+  calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6M17 2v6M3 10h18"/>',
+  briefcase:'<rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V3h8v4M3 12h18"/>',
+  shield:'<path d="m12 2 8 3v7c0 5-8 10-8 10S4 17 4 12V5zM8 12l3 3 5-6"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/>',
+  link:'<path d="m9 15 6-6M8 17l-2 2a4 4 0 0 1-5-5l5-5a4 4 0 0 1 5 0M16 7l2-2a4 4 0 0 1 5 5l-5 5a4 4 0 0 1-5 0"/>',
+  flow:'<circle cx="6" cy="6" r="2"/><circle cx="18" cy="18" r="2"/><path d="M8 6h6a4 4 0 0 1 0 8h-4a4 4 0 0 0 0 8"/>',
+  bolt:'<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
+  chev:'<path d="m6 9 6 6 6-6"/>',
+  ext:'<path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/>'
+};
+const ic = (n, cls='i') => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${P[n]||P.file}</svg>`;
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const PERMS = { Visitante:['conteudo'], Colaborador:['conteudo','time'], Gerência:['conteudo','time','gerencial'], Administrador:['conteudo','time','gerencial','administracao'] };
+const MENU = [
+  { label:'Início', icon:'home', href:'#/inicio', perm:'conteudo' },
+  { label:'Comunicação', icon:'news', href:'#/comunicacao', perm:'conteudo', kids:[
+    ['Newsletter Contábil','news','#/comunicacao/newsletter'], ['Notícias & Impactos','globe','#/comunicacao/noticias'], ['Avisos','bolt','#/comunicacao/avisos'] ] },
+  { label:'Sistemas', icon:'grid', href:'#/sistemas', perm:'conteudo', kids:[
+    ['Sistemas da área','grid','#/sistemas'], ['Acessos corporativos','link','#/sistemas/acessos'], ['Automações','flow','#/sistemas/automacoes'] ] },
+  { label:'Documentos & Normas', icon:'file', href:'#/documentos', perm:'conteudo', kids:[
+    ['Normas CPC e IFRS','file','#/documentos?categoria=normas'], ['Fechamento','calendar','#/documentos?categoria=Fechamento'], ['ECD e ECF','file','#/documentos?categoria=ECD'], ['Manuais','briefcase','#/documentos?categoria=Manuais'] ] },
+  { label:'Pessoas', icon:'users', href:'#/pessoas', perm:'time', kids:[
+    ['Estrutura das Equipes','users','#/pessoas/equipes'] ] },
+  { label:'Gestão', icon:'chart', href:'#/gestao', perm:'gerencial', kids:[
+    ['Painel da Gerência','chart','#/gestao/painel'], ['Processos críticos','flow','#/gestao/processos'], ['Agenda & Entregas','calendar','#/gestao/agenda'], ['Painel Editorial','news','#/gestao/editorial'] ] },
+  { label:'Administração', icon:'settings', href:'#/administracao', perm:'administracao', kids:[
+    ['Equipes','users','#/administracao/equipes'], ['Automações','flow','#/administracao/automacoes'] ] }
+];
+let perfil = 'Colaborador';
+
+function renderMenu() {
+  const can = PERMS[perfil];
+  const items = MENU.filter(m => can.includes(m.perm));
+  document.getElementById('menu').innerHTML = items.map((m, i) => m.kids ? `
+    <li><button class="top" aria-expanded="false" aria-haspopup="true" data-i="${i}">${ic(m.icon)}${esc(m.label)}${ic('chev','i car')}</button>
+      <ul class="drop">${m.kids.map(k => `<li><a href="${k[2]}">${ic(k[1])}${esc(k[0])}</a></li>`).join('')}</ul></li>`
+    : `<li><a class="top" href="${m.href}" ${i===0?'aria-current="page"':''}>${ic(m.icon)}${esc(m.label)}</a></li>`).join('');
+  document.getElementById('map').innerHTML = items.filter(m => m.kids).map(m => `<div><h3>${ic(m.icon)}${esc(m.label)}</h3><ul>${m.kids.map(k => `<li><a href="${k[2]}">${esc(k[0])}</a></li>`).join('')}</ul></div>`).join('');
+  const cargo = { Visitante:'Acesso de visitante', Colaborador:'Analista · Contabilidade IV', Gerência:'Gerência de Contabilidade', Administrador:'Administração do portal' }[perfil];
+  document.getElementById('uname').textContent = perfil === 'Visitante' ? 'Visitante' : 'Eduardo';
+  document.getElementById('ucargo').textContent = cargo;
+}
+const closeAll = except => document.querySelectorAll('.nav li.open').forEach(li => { if (li !== except) { li.classList.remove('open'); li.querySelector('.top').setAttribute('aria-expanded','false'); } });
+const menuEl = document.getElementById('menu');
+menuEl.addEventListener('click', e => {
+  const b = e.target.closest('button.top'); if (!b) return;
+  const li = b.parentElement, open = !li.classList.contains('open');
+  closeAll(li); li.classList.toggle('open', open); b.setAttribute('aria-expanded', open);
+  if (open && e.detail === 0) li.querySelector('.drop a')?.focus();
+});
+menuEl.addEventListener('mouseover', e => { if (matchMedia('(max-width: 900px)').matches) return; const li = e.target.closest('#menu > li'); if (li && li.querySelector('.drop')) { closeAll(li); li.classList.add('open'); li.querySelector('.top').setAttribute('aria-expanded','true'); } });
+menuEl.addEventListener('mouseleave', () => { if (!matchMedia('(max-width: 900px)').matches) closeAll(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { const li = document.querySelector('.nav li.open'); closeAll(); li?.querySelector('.top').focus(); }
+  const drop = e.target.closest('.drop');
+  if (drop && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) { e.preventDefault(); const as = [...drop.querySelectorAll('a')]; const i = as.indexOf(e.target); as[(i + (e.key === 'ArrowDown' ? 1 : -1) + as.length) % as.length].focus(); }
+  if (e.key === '/' && !/input|textarea/i.test(e.target.tagName)) { e.preventDefault(); document.querySelector('.search input').focus(); }
+});
+document.addEventListener('click', e => { if (!e.target.closest('.nav')) closeAll(); });
+document.getElementById('menu-btn').addEventListener('click', e => { const nav = document.getElementById('nav'); const o = nav.classList.toggle('m-open'); e.currentTarget.setAttribute('aria-expanded', o); });
+
+document.getElementById('perfis').innerHTML = Object.keys(PERMS).map(p => `<button type="button" data-p="${p}" aria-pressed="${p===perfil}">${p}</button>`).join(' ');
+document.getElementById('perfis').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; perfil = b.dataset.p; document.querySelectorAll('#perfis button').forEach(x => x.setAttribute('aria-pressed', x === b)); renderMenu(); });
+document.getElementById('pins').addEventListener('change', e => document.body.classList.toggle('no-pins', !e.target.checked));
+renderMenu();
+
+/* Carrossel 16:9 */
+const E = '../../projeto/brand/referencias/emails/';
+const SLIDES = [
+  { img:'../../assets/images/comunicados/projecthub-lancamento.webp', t:'ProjectHub: nova solução integra a gestão de projetos', s:'Comunicado interno · Sistemas' },
+  { img:E+'fique-por-dentro-24-08-2026/03.png', t:'Escola de Eletricistas inicia nova jornada em Goiás', s:'Fique por dentro · 24/08' },
+  { img:E+'fique-por-dentro-24-08-2026/14.png', t:'Código de Ética: você sabe o que é tratamento de dados pessoais?', s:'Compliance' },
+  { img:E+'fique-por-dentro-14-09-2026/10.png', t:'Eleições: sua opinião é pessoal, os dados que você acessa não', s:'Compliance' },
+  { img:E+'fique-por-dentro-24-08-2026/04.png', t:'Movimente-se reúne colaboradores e familiares', s:'Viver+ · Saúde' }
+];
+let cur = 0, timer = null, paused = false, hold = false;
+const slidesEl = document.getElementById('slides'), dotsEl = document.getElementById('dots');
+slidesEl.innerHTML = SLIDES.map((s, i) => `<div class="slide${i?'':' on'}" role="group" aria-roledescription="destaque" aria-label="${i+1} de ${SLIDES.length}"><a href="#/comunicacao"><img src="${s.img}" alt="${esc(s.t)}"></a></div>`).join('');
+dotsEl.innerHTML = SLIDES.map((s, i) => `<button type="button" aria-label="Destaque ${i+1}: ${esc(s.t)}" ${i?'':'aria-current="true"'}></button>`).join('');
+function go(n) {
+  cur = (n + SLIDES.length) % SLIDES.length;
+  slidesEl.querySelectorAll('.slide').forEach((el, i) => el.classList.toggle('on', i === cur));
+  dotsEl.querySelectorAll('button').forEach((el, i) => i === cur ? el.setAttribute('aria-current','true') : el.removeAttribute('aria-current'));
+  document.getElementById('cap').innerHTML = `<b>${esc(SLIDES[cur].t)}</b><small>${esc(SLIDES[cur].s)} · ${cur+1} de ${SLIDES.length}</small>`;
+}
+function tick() { clearInterval(timer); if (!paused && !hold && !matchMedia('(prefers-reduced-motion: reduce)').matches) timer = setInterval(() => go(cur + 1), 7000); }
+dotsEl.addEventListener('click', e => { const b = e.target.closest('button'); if (b) { go([...dotsEl.children].indexOf(b)); tick(); } });
+document.getElementById('prev').onclick = () => { go(cur - 1); tick(); };
+document.getElementById('next').onclick = () => { go(cur + 1); tick(); };
+document.getElementById('pause').onclick = e => { paused = !paused; e.currentTarget.setAttribute('aria-label', paused ? 'Retomar destaques' : 'Pausar destaques'); e.currentTarget.innerHTML = paused ? ic('play') : '<svg class="i" viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></svg>'; tick(); };
+P.play = '<path d="M7 4v16l13-8z"/>';
+const car = document.querySelector('.carousel');
+['mouseenter','focusin'].forEach(ev => car.addEventListener(ev, () => { hold = true; tick(); }));
+['mouseleave','focusout'].forEach(ev => car.addEventListener(ev, () => { hold = false; tick(); }));
+go(0); tick();
+
+/* Dados reais do portal */
+const avisos = [
+  { tipo:'extra', r:'Extra', t:'Manutenção programada do SAP ECC PRD', s:'Indisponível das 22h de 10/07 às 6h de 11/07 · Gerência Corp. de Sistemas Corporativos' },
+  { tipo:'prazo', r:'Prazo', t:'Descontinuação do ambiente legado de Data Services', s:'Serviços dependentes param em 30/09/2026 · Gerência Corp. de Sistemas Corporativos' },
+  { tipo:'info', r:'Info', t:'Cronograma de cadastro de CAPEX não elegível 2027', s:'Exemplo de aviso (comunicado de 25/05/2026, prazo não extraído)' }
+];
+document.getElementById('avisos').innerHTML = avisos.map(a => `<li><span class="tag ${a.tipo}">${a.r}</span><a href="#/comunicacao/avisos">${esc(a.t)}</a><small>${esc(a.s)}</small></li>`).join('');
+const J = f => fetch('../../data/' + f + '.json').then(r => r.json()).catch(() => []);
+Promise.all([J('config'), J('sistemas'), J('newsletter'), J('noticias'), J('agenda'), J('documentos')]).then(([cfg, sis, nl, nt, ag, docs]) => {
+  const links = (cfg.links || []).filter(l => l.link).map(l => ({ n:l.nome, i:l.icon, ext:true }));
+  const seen = new Set();
+  const acc = [...links, ...sis.filter(s => s.status === 'Ativo').map(s => ({ n:s.nome.split(' — ')[0], i:'grid', ext:true }))].filter(a => !seen.has(a.n) && seen.add(a.n)).slice(0, 8);
+  document.getElementById('acesso').innerHTML = acc.map(a => `<li><a href="#/sistemas">${ic(a.i)}${esc(a.n)}${a.ext ? ic('ext','i ext') : ''}</a></li>`).join('');
+  const pubs = [...nl, ...nt].filter(p => p.status === 'Publicado').sort((a, b) => (b.dataPublicacao||'').localeCompare(a.dataPublicacao||'')).slice(0, 5);
+  const d = v => v ? new Date(v + 'T12:00:00').toLocaleDateString('pt-BR', { day:'2-digit', month:'short' }).replace('.', '') : '';
+  document.getElementById('news').innerHTML = pubs.map(p => `<li><div class="meta"><b>${esc(p.categoria)}</b><span>${d(p.dataPublicacao)}</span></div><a href="#/comunicacao/${esc(p.id)}">${esc(p.titulo)}</a><p>${esc(p.resumo)}</p></li>`).join('');
+  document.getElementById('agenda').innerHTML = ag.slice(0, 4).map(a => { const dt = new Date(a.data + 'T12:00:00'); return `<li><div class="d"><b>${dt.getDate()}</b><small>${dt.toLocaleDateString('pt-BR',{month:'short'}).replace('.','')}</small></div><div><strong>${esc(a.nome)}</strong><span>${esc(a.horario||'')} · ${esc(a.tipo||'')}</span></div></li>`; }).join('');
+  document.getElementById('docs').innerHTML = docs.slice().sort((a, b) => (b.data||'').localeCompare(a.data||'')).slice(0, 4).map(x => `<li>${ic('file')}<div><a href="#/documentos">${esc(x.titulo)}</a><small>${esc(x.categoria)} · ${esc(x.formato||'')} · ${esc(x.versao||'')}</small></div></li>`).join('');
+});
+</script>
+</body>
+</html>

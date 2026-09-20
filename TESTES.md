@@ -20,7 +20,7 @@ A diferença de 15 px corresponde à barra de rolagem vertical. No celular, a ta
 - Matrícula `999999`: colaborador não identificado e avatar padrão.
 - URL sem matrícula: colaborador não identificado e matrícula não informada.
 - Quatro tabs da central: newsletter, notícias, sistemas e documentos.
-- Newsletter: quatro publicações, abertura do conteúdo completo e pausa do radar por botão.
+- Newsletter: publicações, abertura do conteúdo completo. Carrossel da capa: troca a cada 7 s, pausa por botão, hover e foco.
 - Organograma: Gerência e quatro equipes com líderes e contagens.
 - Busca por `conciliações`: cinco resultados; termo inexistente retorna estado vazio; limpeza funciona.
 - Documentos: filtro textual por conciliações e filtro de categoria IFRS; detalhes exibidos; destino de download válido.
@@ -37,6 +37,54 @@ A diferença de 15 px corresponde à barra de rolagem vertical. No celular, a ta
 - Destinos do menu correspondem às seções reais.
 - Referências das soluções de equipes correspondem aos sistemas cadastrados.
 - Sem instalação de dependências, sem requisições a CDN, sem publicação em nuvem.
+
+## Validação do redesign — 20/09/2026
+
+Telas internas (fatia 5) e sistema visual (fatia 6), no navegador integrado,
+servidor estático local.
+
+| Viewport | Resultado |
+| --- | --- |
+| 1440 × 900 | Todas as seções renderizadas, sem overflow horizontal |
+| 1024 × 800 | Cabeçalho, menu e capa em duas colunas; sem overflow |
+| 375 × 812 | Cabeçalho empilhado (190 px), tabelas em blocos com rótulo; sem overflow |
+
+- **Navegação completa**: as 11 páginas do menu abertas em sequência (Início,
+  Newsletter, Notícias, Portais e Links × 3, Sistemas e automações × 3,
+  Documentos & Normas, Estrutura das Equipes) — nenhuma falhou.
+- **Perfis**: Colaborador (Eduardo) e Gerência (Alexandra). Com Gerência,
+  também Painel da Gerência, Processos críticos, Agenda & Entregas, Painel
+  Editorial e Alertas da gerência. A identificação original foi restaurada ao
+  fim do teste.
+- **Contraste (WCAG AA)**: `.claude/tools/contraste.js` executado em todas as
+  telas acima, nos dois perfis, em 1440 e 375 px — **nenhum texto abaixo de
+  4,5:1**. Varredura estática das regras do CSS (pares cor/fundo na mesma
+  regra): nenhuma abaixo do mínimo.
+- **Foco visível**: contorno de 3 px em `--foco` (5,4:1 sobre branco) no corpo
+  da página e **branco** dentro da faixa escura do cabeçalho, conferido com Tab
+  e Shift+Tab.
+- **Diálogo de detalhes**: abre, fecha e mantém o link oficial.
+- **Console**: nenhum erro em nenhuma das telas.
+
+Limite: o perfil Administrador (janela de Administração) não foi reaberto
+nesta rodada — ele usa os mesmos componentes e tokens das demais telas, mas
+convém conferi-lo antes da homologação.
+
+### Acabamento (fatia 7)
+
+- **Alvos de toque**: varredura de todo elemento clicável visível em 1440 e
+  375 px, nas 11 páginas do menu e no painel de menu do celular — **nenhum
+  abaixo de 24 × 24 px**.
+- **Tamanho de texto**: **nenhum texto abaixo de 12 px** em nenhuma tela.
+- **Conteúdo restrito**: com perfil Colaborador, `#painel` e `#editorial`
+  chegam ocultos do HTML e continuam ocultos; com perfil Gerência, aparecem
+  com os quatro indicadores.
+- **Diálogos medidos ao vivo** (aviso, publicação, preferências,
+  identificação, alertas, detalhe de documento) em 1440 e 375 px: nenhum campo
+  cortado, nenhum estouro horizontal. Achado registrado sem aplicar: a
+  publicação rola ~490 px em 1440 px com a caixa em 640 px de largura.
+- Diálogos de edição (Novo rascunho, Administração) não foram medidos: exigem
+  o backend opcional.
 
 ## Limites e checklist para homologação corporativa
 

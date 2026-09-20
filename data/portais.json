@@ -1,0 +1,185 @@
+[
+  {
+    "id": "portal-servicos-home",
+    "nome": "Portal de Serviços",
+    "descricao": "Página inicial do atendimento interno do Grupo (ServiceNow): abertura de chamado, catálogo de serviços e base de conhecimento.",
+    "icon": "grid",
+    "grupo": "Portal de Serviços",
+    "link": "https://portaldeservicos.equatorialenergia.com.br/equatorial?id=home",
+    "imagem": "assets/portais/portal-servicos-home.svg"
+  },
+  {
+    "id": "portal-servicos-ocorrencias",
+    "nome": "Minhas ocorrências",
+    "descricao": "Acompanhamento dos chamados e requisições abertos por você ou em seu nome, com o status e o prazo de cada um.",
+    "icon": "check",
+    "grupo": "Portal de Serviços",
+    "link": "https://portaldeservicos.equatorialenergia.com.br/equatorial?id=ocl_list&table=task",
+    "imagem": "assets/portais/portal-servicos-ocorrencias.svg"
+  },
+  {
+    "id": "portal-servicos-acesso",
+    "nome": "Solicitar acesso a sistemas",
+    "descricao": "Formulário do catálogo para pedir acesso a um sistema corporativo. Informe o sistema, o perfil desejado e o gestor aprovador.",
+    "icon": "shield",
+    "grupo": "Portal de Serviços",
+    "link": "https://portaldeservicos.equatorialenergia.com.br/equatorial?id=ocl_sc_cat_item&sys_id=64ee05561bda7510b1d9eb9fe54bcbae",
+    "imagem": "assets/portais/portal-servicos-acesso.svg"
+  },
+  {
+    "id": "portal-servicos-sap",
+    "nome": "SAP — solicitações",
+    "descricao": "Item do catálogo dedicado a demandas de SAP: perfil de acesso, liberação de transação, correção de cadastro e abertura de período.",
+    "icon": "flow",
+    "grupo": "Portal de Serviços",
+    "link": "https://portaldeservicos.equatorialenergia.com.br/equatorial?id=ocl_sc_cat_item&sys_id=358e51af1b194c50d827535f1b4bcb10",
+    "imagem": "assets/portais/portal-servicos-sap.svg"
+  },
+  {
+    "id": "portal-servicos-incidentes",
+    "nome": "Sistemas — problemas gerais",
+    "descricao": "Registro de incidente em sistemas corporativos: erro, indisponibilidade ou comportamento inesperado. É o mesmo item do catálogo Cibernix.",
+    "icon": "radar",
+    "grupo": "Portal de Serviços",
+    "link": "https://portaldeservicos.equatorialenergia.com.br/equatorial?id=ocl_sc_cat_item&sys_id=578f714d1be435102e12dca0f54bcb7f",
+    "imagem": "assets/portais/portal-servicos-incidentes.svg"
+  },
+  {
+    "id": "portal-servicos-office365",
+    "nome": "Acesso Office 365",
+    "descricao": "Solicitação de licença e acesso ao Microsoft 365: Teams, Outlook, SharePoint e OneDrive corporativos.",
+    "icon": "link",
+    "grupo": "Portal de Serviços",
+    "link": "https://portaldeservicos.equatorialenergia.com.br/equatorial?id=ocl_sc_cat_item&sys_id=4943cd2a1b89a850b1d9eb9fe54bcbc5",
+    "imagem": "assets/portais/portal-servicos-office365.svg"
+  },
+  {
+    "id": "portal-servicos-powerbi",
+    "nome": "Power BI — publicação em nuvem",
+    "descricao": "Pedido de publicação de relatório do Power BI no ambiente em nuvem, com a área responsável e o público que vai consumir o painel.",
+    "icon": "chart",
+    "grupo": "Portal de Serviços",
+    "link": "https://portaldeservicos.equatorialenergia.com.br/equatorial?id=ocl_sc_cat_item&sys_id=500926371bae28542e12dca0f54bcb8c",
+    "imagem": "assets/portais/portal-servicos-powerbi.svg"
+  },
+  {
+    "id": "portal-servicos-senha",
+    "nome": "Redefinição de senha",
+    "descricao": "Troca da senha de rede usada para entrar no computador e nos sistemas corporativos. Resolve na hora, sem abrir chamado.",
+    "icon": "shield",
+    "grupo": "Portal de Serviços",
+    "link": "https://portaldeservicos.equatorialenergia.com.br/pwd",
+    "imagem": "assets/portais/portal-servicos-senha.svg"
+  },
+  {
+    "id": "portal-servicos-jornada",
+    "nome": "Minha Jornada de Trabalho",
+    "descricao": "Item do catálogo para tratar registro de ponto, banco de horas e ajuste de jornada.",
+    "icon": "clock",
+    "grupo": "Portal de Serviços",
+    "link": "https://equatorialenergia.service-now.com/equatorial?id=ocl_sc_cat_item&sys_id=e2dddc1a979e6650cb0bb9b6f053af3d",
+    "imagem": "assets/portais/portal-servicos-jornada.svg",
+    "observacao": "Este item fica no domínio service-now.com, e não em portaldeservicos.equatorialenergia.com.br como os demais."
+  },
+  {
+    "id": "workplace",
+    "nome": "Rede Colaborativa Workplace",
+    "descricao": "Rede social corporativa do Grupo: comunicados oficiais, grupos por área e transmissões da liderança.",
+    "icon": "news",
+    "grupo": "Comunicação e aprendizagem",
+    "link": "https://equatorialenergia.workplace.com/",
+    "imagem": "assets/portais/workplace.svg"
+  },
+  {
+    "id": "learning-rocks",
+    "nome": "Learning.rocks",
+    "descricao": "Plataforma de treinamentos do Grupo. Reúne as trilhas obrigatórias, os cursos por competência e o histórico de conclusão.",
+    "icon": "file",
+    "grupo": "Comunicação e aprendizagem",
+    "link": "https://equatorialenergia.learning.rocks/",
+    "imagem": "assets/portais/learning-rocks.svg"
+  },
+  {
+    "id": "sharepoint-eqtl-go",
+    "nome": "Equipe EQTL GO",
+    "descricao": "Site da equipe de Goiás no SharePoint: documentos compartilhados, listas de controle e comunicados da operação local.",
+    "icon": "briefcase",
+    "grupo": "SharePoint",
+    "link": "https://grupoequatorialenergia.sharepoint.com/sites/EquipeEQTLGO",
+    "imagem": "assets/portais/sharepoint-eqtl-go.svg"
+  },
+  {
+    "id": "bi-gastos-gerenciaveis",
+    "nome": "BI - Gastos Gerenciáveis",
+    "descricao": "Painel de acompanhamento dos gastos gerenciáveis: realizado contra orçado, por centro de custo e natureza. Base da análise mensal da Controladoria.",
+    "icon": "chart",
+    "grupo": "Power BI",
+    "link": "https://app.powerbi.com/groups/me/reports/d40ffa50-7b26-46f8-82aa-f5a6697d8c99/ReportSection220af0e2d27055a56a5f",
+    "imagem": "assets/portais/bi-gastos-gerenciaveis.svg",
+    "observacao": "O endereço aponta para \"Meu workspace\" (groups/me). Para abrir, o relatório precisa estar compartilhado com a sua conta do Power BI."
+  },
+  {
+    "id": "central-funcionario",
+    "nome": "Central do Funcionário",
+    "descricao": "Autoatendimento de RH: contracheque, férias, benefícios e solicitações de pessoal.",
+    "icon": "users",
+    "grupo": "Pessoas e RH",
+    "link": "https://portaldeservicos.equatorialenergia.com.br/esc",
+    "imagem": "assets/portais/central-funcionario.svg"
+  },
+  {
+    "id": "actio",
+    "nome": "Actio",
+    "descricao": "Gestão de metas e desempenho. Acompanhe o painel de indicadores individuais e da equipe ao longo do ciclo.",
+    "icon": "chart",
+    "grupo": "Pessoas e RH",
+    "link": "https://equatorialenergia.actiosoftware.app/",
+    "imagem": "assets/portais/actio.svg"
+  },
+  {
+    "id": "portal-colaborador",
+    "nome": "Portal do Colaborador",
+    "descricao": "Intranet de RH com cartão de ponto, informações cadastrais e documentos pessoais.",
+    "icon": "users",
+    "grupo": "Pessoas e RH",
+    "link": "http://portaldocolaborador.equatorial.corp/",
+    "imagem": "assets/portais/portal-colaborador.svg",
+    "observacao": "Endereço da rede interna (.corp). Só abre no computador corporativo ou por VPN."
+  },
+  {
+    "id": "eqtl-previ",
+    "nome": "EQTL Previ",
+    "descricao": "Área do participante do plano de previdência complementar: saldo acumulado, contribuições e simulações de benefício.",
+    "icon": "shield",
+    "grupo": "Pessoas e RH",
+    "link": "https://restrito.eletra.org.br/webparticipante/",
+    "imagem": "assets/portais/eqtl-previ.svg"
+  },
+  {
+    "id": "qulture-rocks",
+    "nome": "Qulture.Rocks",
+    "descricao": "Avaliação de desempenho e feedback: ciclos de avaliação, registros de 1:1 e plano de desenvolvimento individual.",
+    "icon": "users",
+    "grupo": "Pessoas e RH",
+    "link": "https://app.qulture.rocks/",
+    "imagem": "assets/portais/qulture-rocks.svg"
+  },
+  {
+    "id": "argo-pontes",
+    "nome": "ARGO — Pontes Tur",
+    "descricao": "Reserva de viagens corporativas: passagem, hospedagem e fluxo de aprovação do gestor.",
+    "icon": "globe",
+    "grupo": "Viagens",
+    "link": "https://www.argoit.com.br/pontestur/default.aspx?cliente=equatorialcelg",
+    "imagem": "assets/portais/argo-pontes.svg"
+  },
+  {
+    "id": "paytrack",
+    "nome": "Paytrack",
+    "descricao": "Prestação de contas de despesas de viagem: adiantamento, anexo de comprovantes e pedido de reembolso.",
+    "icon": "briefcase",
+    "grupo": "Viagens",
+    "link": "https://app.paytrack.com.br/",
+    "imagem": "assets/portais/paytrack.svg"
+  }
+]

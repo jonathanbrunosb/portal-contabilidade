@@ -146,23 +146,57 @@ painéis de Gestão.
 **O cartão é uma faixa horizontal**, não um bloco alto: a imagem ocupa uma
 coluna fixa à esquerda, em altura cheia, e as informações ficam no restante.
 Dois por faixa em telas largas, um abaixo de 1100 px — e **continua faixa no
-celular**, com a coluna da imagem encolhendo para 104 px em vez de a arte subir
-para cima do texto.
+celular**, com a coluna da imagem encolhendo em vez de a arte subir para cima
+do texto.
 
 | | Medida |
 |---|---|
-| Cartão | 650 × 176 px em 1440; raio `--raio-xl` (16), borda 1 px `--borda` |
+| Cartão | 650 × **156** px em 1440 (173–177 com título de duas linhas); raio `--raio-xl` (16), borda 1 px `--borda` |
 | Sombra | `--sombra-sutil` — duas camadas rasas, receita medida em microsoft.com/pt-br |
-| Coluna da imagem | `clamp(150px, 32%, 220px)`, altura cheia, raio `--raio-md`, 8 px de respiro |
-| Ajuste da arte | `object-fit:contain` — as ilustrações são 16:9 num espaço quase quadrado; cortar deixava metade de fora |
+| Coluna da imagem | `clamp(150px, 32%, 220px)`, altura cheia, raio `--raio-md`, 8 px de respiro. Abaixo de 560 px: `clamp(112px, 32%, 160px)` com `aspect-ratio: 5/4` centralizada |
+| Ajuste da arte | `object-fit:cover` — a arte tem fundo da própria marca e área segura nas bordas, então preenche o quadro sem tarja |
 | Conteúdo | rótulo (`.meta-label`), título `--fs-md`/600 em até 2 linhas, descrição `--fs-sm` em até 2 linhas |
-| Ações | faixa no rodapé: status à esquerda, "i" e Acessar/Baixar à direita |
+| Ações | faixa no rodapé (56 px): status à esquerda, "i" (32 px) e Acessar/Baixar à direita |
 
 Regras da grade:
 
-- **O clique no cartão não abre nada.** A ficha sai pelo botão **"i"**; o
-  destino, pelo botão **Acessar** (link externo) ou **Baixar** (arquivo).
-  Quando não há endereço, o lugar da ação diz "Acesso em configuração".
+- **O clique em qualquer parte do cartão leva ao destino.** A ação principal
+  — **Acessar** (link externo) ou **Baixar** (arquivo) — estica um `::after`
+  sobre o cartão inteiro:
+
+  ```css
+  .pcard { position:relative }
+  .pcard-principal { position:static }          /* senão o ::after cai dentro do botão */
+  .pcard-principal::after { content:""; position:absolute; inset:0; z-index:1 }
+  .pcard-info, .pcard-trocar,
+  .pcard-acessar:not(.pcard-principal) { position:relative; z-index:2 }
+  ```
+
+  Não dá para embrulhar o cartão num `<a>`: dentro dele já há um link e um
+  botão, e link dentro de link é HTML inválido — quebra teclado e leitor de
+  tela. Com o `::after`, a tabulação continua com duas paradas por cartão e o
+  nome acessível sai do link real. O `:focus-within` marca o cartão todo.
+  A ficha continua saindo pelo **"i"**, que fica por cima do esticado.
+- Quando não há endereço, o lugar da ação diz "Acesso em configuração" e **o
+  cartão não clica** — não há para onde ir. Hoje é o caso das 12 automações.
+- **O texto continua selecionável.** O corpo do cartão sobe para cima do
+  esticado (`z-index:2`), senão o mouse nunca chega ao texto. Em troca, o
+  clique no corpo é tratado em `ligarCliqueDoCorpo()` (`js/app.js`), que só
+  navega quando `getSelection()` está vazia — quem arrasta para selecionar não
+  é levado embora.
+- **Altura (20/09, segunda medição).** O cartão tinha 199 px em 1440 e 210 em
+  1024, com 36 px de folga vazia no corpo. Ficou em **156 px** (173 a 177 com
+  título de duas linhas): `min-height` 176→156, faixa de ações 60→56 px
+  (botões 36→32, ainda acima dos 24 da WCAG 2.5.8), rótulo do cartão em
+  `--fs-xs` e recuos internos um ponto menores.
+- **A moldura da imagem.** Medida no portal, ela vai de **1,25 a 1,44** de
+  proporção conforme a largura da tela e o tamanho do título. O quadro da arte
+  é 500×400 (1,25), então o corte chega a 7% por borda, só em altura — daí a
+  margem segura de 46 px em cima e embaixo e apenas 40 px nas laterais.
+  No celular a moldura ficava **retrato (0,57)** por causa de uma coluna fixa
+  de 104 px, e o `cover` comia 24% de cada lado da marca; agora ela usa
+  `aspect-ratio: 5/4` centralizada e **não corta nada**. Era a causa principal
+  das assinaturas largas (ServiceNow, Microsoft, CPC) parecerem pequenas.
 - **Sem arte, o cartão mostra o ícone da categoria** no mesmo espaço — a
   altura não muda e a grade continua alinhada.
 - Título e descrição são cortados em 2 linhas (`-webkit-line-clamp`) e a faixa

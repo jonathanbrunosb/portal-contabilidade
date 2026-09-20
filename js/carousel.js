@@ -1,4 +1,4 @@
-import { icon,escapeHTML as e,safeURL,comVersao } from './ui.js?v=20260920-36';
+import { icon,escapeHTML as e,safeURL,comVersao } from './ui.js?v=20260920-40';
 // Carrossel de destaques da capa (16:9). Troca a cada 7 s; pausa com mouse ou
 // foco em cima, pelo botão de pausa (WCAG 2.2.2) e não gira sozinho quando o
 // sistema ou a preferência do portal pedem menos movimento.

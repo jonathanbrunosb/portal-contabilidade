@@ -29,13 +29,14 @@ from PIL import Image
 MARCAS = 'assets/marcas'
 TELAS = 'projeto/marcas-telas'   # insumo do gerador; nao vai para o site
 LOGOS = 'assets/logos'
-L, A = 440, 400                  # quadro: 1,1 de proporcao, perto do cartao
+L, A = 500, 400                  # quadro 1,25: a media das molduras do cartao
 
-# Area segura: com object-fit:cover o cartao corta ate 10% de cada lado e 8%
-# em cima e embaixo, conforme a largura da coluna da imagem.
-# Com object-fit:cover o cartao pode cortar ate 10% de cada lado; a margem
-# precisa ficar alem disso, senao a logo encosta na borda do corte.
-MARGEM_X, MARGEM_Y = 60, 44
+# Area segura. Medido no portal: a moldura da imagem varia de 1,14 a 1,57 de
+# proporcao conforme a largura da tela e o tamanho do titulo do cartao. Contra
+# o quadro de 1,25 isso corta pouco na largura e ate 10% em cima e embaixo —
+# o oposto do que eu supunha antes, quando a margem lateral de 60 px so
+# espremia a marca a toa.
+MARGEM_X, MARGEM_Y = 40, 46
 SANS = 'Segoe UI,Arial,Helvetica,sans-serif'
 SERIF = 'Georgia,Times New Roman,serif'
 INK_CLARO, INK_ESCURO = '#3b4a60', '#ffffff'
@@ -242,10 +243,13 @@ def compor(spec):
         rotulo = spec.get('rotulo')
         linhas = quebra(rotulo, 20) if rotulo else []
         if spec.get('logo'):
+            # A caixa da marca vai ate perto da area segura: e o que da
+            # presenca as assinaturas largas (ServiceNow, Microsoft, CPC),
+            # que sao limitadas pela largura e sobravam curtas.
             if linhas:
-                caixa = (80, 74, L - 160, 150) if len(linhas) == 1 else (80, 62, L - 160, 136)
+                caixa = (52, 62, L - 104, 174) if len(linhas) == 1 else (52, 54, L - 104, 156)
             else:
-                caixa = (72, 104, L - 144, 192)
+                caixa = (46, 78, L - 92, 244)
             corpo.append('<image href="%s" x="%d" y="%d" width="%d" height="%d" '
                          'preserveAspectRatio="xMidYMid meet"/>'
                          % (uri(spec['logo'], spec.get('trocas'), 640), *caixa))
@@ -255,8 +259,8 @@ def compor(spec):
             corpo.append(texto(L / 2, 186 if linhas else 212, assinatura, tinta, tam,
                                700, fonte, 'middle', espaco=0.5))
         if linhas:
-            base = 296 if len(linhas) == 1 else 274
-            tam = min(30, int(30 * 19.0 / max(len(max(linhas, key=len)), 10)))
+            base = 300 if len(linhas) == 1 else 278
+            tam = min(31, int(31 * 21.0 / max(len(max(linhas, key=len)), 11)))
             for i, linha in enumerate(linhas):
                 corpo.append(texto(L / 2, base + i * 36, linha, tinta, tam, 600,
                                    SANS, 'middle', 0.88))

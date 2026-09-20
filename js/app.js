@@ -1,11 +1,11 @@
-import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260920-36';
-import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js?v=20260920-36';
-import { initializeNavigation,markCurrentSection,bindTabs,selectTab } from './navigation.js?v=20260920-36';
-import { renderNewsletter,showArticle,loadNoticias,ultimaAtualizacaoLabel,noticiaCategorias,filterNoticias,renderNoticias } from './newsletter.js?v=20260920-36';
-import { renderTeamStructure } from './teams.js?v=20260920-36';
-import { initCarousel } from './carousel.js?v=20260920-36';
-import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,comVersao,notify } from './ui.js?v=20260920-36';
-import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js?v=20260920-36';
+import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260920-40';
+import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js?v=20260920-40';
+import { initializeNavigation,markCurrentSection,bindTabs,selectTab } from './navigation.js?v=20260920-40';
+import { renderNewsletter,showArticle,loadNoticias,ultimaAtualizacaoLabel,noticiaCategorias,filterNoticias,renderNoticias } from './newsletter.js?v=20260920-40';
+import { renderTeamStructure } from './teams.js?v=20260920-40';
+import { initCarousel } from './carousel.js?v=20260920-40';
+import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,comVersao,notify } from './ui.js?v=20260920-40';
+import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js?v=20260920-40';
 let data,currentTab='newsletter',currentAdminTab='equipes',currentUser,currentMenu=[],navSections=[];
 const $=selector=>document.querySelector(selector);
 // Capability required to see each menu target / page section / searchable collection.
@@ -57,9 +57,10 @@ function openAccess(item,{opened=false}={}) {
   showDialog(item.nome,'Acesso corporativo',`<p>${e(item.descricao||'Acesso utilizado pela Gerência de Contabilidade.')}</p><p>O endereço deste acesso ainda não foi cadastrado. Solicite o link ao responsável da área.</p>${detailGrid({'Status':'Aguardando configuração','Responsável':item.responsavel||'Administração do portal'})}`);
 }
 // Cartao padrao das grades de Portais e Links, atalhos e automacoes. Medido em
-// microsoft.com/pt-br: imagem numa area fixa 16:9 no topo, conteudo abaixo e
-// uma faixa de acoes no rodape. O clique no cartao nao abre nada — a ficha sai
-// pelo "i" e o destino pelo botao Acessar/Baixar.
+// microsoft.com/pt-br: imagem numa coluna fixa a esquerda, conteudo ao lado e
+// uma faixa de acoes no rodape. **O cartao inteiro leva ao destino**: a acao
+// principal recebe `pcard-principal` e o CSS estica um `::after` dela por cima
+// do cartao. A ficha continua saindo pelo "i", que fica por cima do esticado.
 const podeAdministrar = () => hasAccess(currentUser, 'administracao');
 function cardPortal(o) {
   const url = safeURL(o.imagem) || (o.imagem && !/^https?:/i.test(o.imagem) ? o.imagem : null);
@@ -72,7 +73,23 @@ function cardPortal(o) {
   const info = o.registro
     ? `<button class="pcard-info" data-record="${e(o.registro)}" aria-label="Informações sobre ${e(o.titulo)}">${icon('info')}</button>`
     : '';
-  return `<article class="pcard"><div class="pcard-media${url ? '' : ' sem-imagem'}">${media}${trocar}</div><div class="pcard-corpo">${o.rotulo ? `<p class="meta-label">${e(o.rotulo)}</p>` : ''}<h3>${e(o.titulo)}</h3><p class="pcard-texto">${e(o.descricao || '')}</p></div><div class="pcard-acoes">${o.statusHTML || '<span></span>'}<span class="pcard-botoes">${info}${o.acao || ''}</span></div></article>`;
+  // A primeira acao do cartao e a principal: e ela que cobre o cartao. Sem
+  // acao ("Acesso em configuracao"), nada e esticado e o cartao nao clica.
+  const acao = (o.acao || '').replace('class="primary-btn pcard-acessar"',
+    'class="primary-btn pcard-acessar pcard-principal"');
+  return `<article class="pcard"><div class="pcard-media${url ? '' : ' sem-imagem'}">${media}${trocar}</div><div class="pcard-corpo">${o.rotulo ? `<p class="meta-label">${e(o.rotulo)}</p>` : ''}<h3>${e(o.titulo)}</h3><p class="pcard-texto">${e(o.descricao || '')}</p></div><div class="pcard-acoes">${o.statusHTML || '<span></span>'}<span class="pcard-botoes">${info}${acao}</span></div></article>`;
+}
+// O corpo do cartao fica acima do link esticado, para o texto poder ser
+// selecionado. Em troca, o clique nele chega aqui: navega so quando o usuario
+// nao estava selecionando texto, e nunca por cima de um link ou botao.
+function ligarCliqueDoCorpo() {
+  document.addEventListener('click', event => {
+    const corpo = event.target.closest('.pcard-corpo');
+    if(!corpo || event.target.closest('a,button')) return;
+    if(String(getSelection() || '').trim()) return;
+    corpo.closest('.pcard')?.querySelector('.pcard-principal')?.click();
+  }
+  );
 }
 const acaoAcessar = (url, nome, marca = 'data-quick') => `<a class="primary-btn pcard-acessar" href="${e(url)}" target="_blank" rel="noopener noreferrer" ${marca}="${e(nome)}">Acessar${icon('external').replace('class="icon"','class="icon ext"')}</a>`;
 const acaoBaixar = (url, nome) => `<a class="primary-btn pcard-acessar" href="${e(url)}" download data-doc-title="${e(nome)}">${icon('download')}Baixar</a>`;
@@ -1301,6 +1318,7 @@ async function init() {
       showDialog('Central de notificações','Alertas da gerência',`<p>${alerts.length} pontos de atenção na base demonstrativa.</p>${alerts.map(({item,collection})=>`<article class="content-card"><h3>${e(item.nome)}</h3><p>${e(item.responsavel)}</p><div class="card-bottom">${badge(item.status)}<button class="text-btn" data-record="${collection}:${e(item.id)}">Ver detalhes</button></div></article>`).join('')||'<p>Nenhum alerta.</p>'}`);
     }
     ;
+    ligarCliqueDoCorpo();
     document.addEventListener('click',event=> {
       const record=event.target.closest('[data-record]');
       if(record) {

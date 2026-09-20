@@ -1,4 +1,4 @@
-import { escapeHTML as e,icon,safeURL,comVersao } from './ui.js?v=20260920-36';
+import { escapeHTML as e,icon,safeURL,comVersao } from './ui.js?v=20260920-40';
 
 const DEFAULT_AVATAR='assets/users/default.svg';
 

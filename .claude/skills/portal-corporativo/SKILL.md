@@ -182,8 +182,12 @@ no menu ou na capa.
 - **Grade de cartões (`.pcard`), padrão único:** o cartão é uma **faixa
   horizontal** (~176 px de altura), com a imagem numa coluna fixa à esquerda em
   altura cheia e as informações no restante; **dois por faixa**, e continua
-  faixa no celular. Clique no cartão não abre nada: ficha pelo "i", destino
-  por Acessar/Baixar. Sem arte, entra o ícone da categoria no mesmo espaço.
+  faixa no celular. Clique em **qualquer parte do cartão** leva ao destino (decisão de
+  20/09/2026, substitui a anterior): a ação principal estica um `::after` sobre
+  o cartão, sem embrulhar tudo num `<a>` — link dentro de link é inválido e
+  quebra teclado e leitor de tela. O "i" e o segundo botão ficam por cima e
+  continuam clicáveis. Sem destino cadastrado, o cartão não clica. A ficha sai pelo "i".
+  Sem arte, entra o ícone da categoria no mesmo espaço.
   Quem administra troca a arte clicando na própria imagem.
 
 ## Restrições da stack (não negociáveis)

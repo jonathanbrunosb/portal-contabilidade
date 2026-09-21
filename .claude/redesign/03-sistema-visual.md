@@ -636,6 +636,12 @@ data, assunto e quem assina). Duas marcas a mais no texto:
   banner "Carreira Equatorial" do e-mail (960×540, sem texto na imagem; quem é
   quem fica no `alt`). Com o recorte pelo centro, a Alexandra sumia no
   celular.
+- `imagemMiniatura`: versão 8:7 (a proporção de `.coluna-miniatura`) usada só
+  pela miniatura da capa e de "Mais comunicados" (`midia(...,{miniatura:true})`);
+  com ela, o `imagemFoco` não se aplica, porque nada é recortado. Na
+  Movimentação (pedido do usuário, 21/09): a mesma composição, com as fotos
+  perdendo as laterais — Alexandra estreita (0,5) e os quatro quadros em
+  retrato — para as cinco pessoas caberem inteiras no quadro de 128×112.
 
 **Realce dos comunicados e das abas (21/09/2026, noite, pedido do usuário).**
 Um vocabulário só para "este item está sob o mouse ou o foco", com os tokens

@@ -327,6 +327,9 @@ Contabilidade (a Movimentação por decisão do usuário):
   larga mostram a composição inteira; com `imagemFoco: "esquerda"`, a
   miniatura da capa (128×112) mostra a Alexandra e a 1ª coluna de quadros, e
   a faixa do celular (104×176), a Alexandra inteira. Console limpo.
+- **Miniatura 8:7 da Movimentação** (`imagemMiniatura`, 480×420): na capa e em
+  "Mais comunicados" (página do IFRS 16), em 1366 e 375, as cinco pessoas
+  aparecem inteiras no quadro de 128×112; o `imagemFoco` não entra ali.
 
 ## Limites e checklist para homologação corporativa
 

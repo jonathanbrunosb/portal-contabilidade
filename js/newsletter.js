@@ -1,4 +1,4 @@
-import { escapeHTML as e,icon,dateLabel,detailGrid,safeURL,comVersao,normalize,ORIGENS,seloOrigem } from './ui.js?v=20260921-49';
+import { escapeHTML as e,icon,dateLabel,detailGrid,safeURL,comVersao,normalize,ORIGENS,seloOrigem } from './ui.js?v=20260921-50';
 // Comunicação (decisão do usuário em 21/09/2026): a Newsletter Contábil e
 // Notícias & Impactos viraram uma lista só de comunicados, repartida por origem
 // nas abas da seção (Todos, Contabilidade, Equatorial, Externo). Cada
@@ -48,10 +48,15 @@ export function filtrarComunicados(lista,{categoria='',query=''}={}) {
 // `imagemFoco` ("esquerda" | "direita"): o lado que o recorte guarda quando a
 // moldura é mais estreita que a imagem — ex.: a capa da Movimentação, com a
 // Gerente à esquerda e os executivos em quadros ao lado.
+// `imagemMiniatura`: versão 8:7 da imagem, montada para a miniatura da capa e
+// de "Mais comunicados" — composição que não cabe inteira no quadro pequeno
+// (pedido do usuário em 21/09/2026).
 const FOCOS=['esquerda','direita'];
-function midia(item,classe) {
-  const src=safeURL(item.imagemCapa||item.imagem);
-  const foco=FOCOS.includes(item.imagemFoco)?` class="foco-${item.imagemFoco}"`:'';
+function midia(item,classe,{miniatura=false}={}) {
+  const propria=miniatura&&safeURL(item.imagemMiniatura);
+  const src=propria||safeURL(item.imagemCapa||item.imagem);
+  // A versão da miniatura já cabe inteira: o foco só vale para os recortes.
+  const foco=!propria&&FOCOS.includes(item.imagemFoco)?` class="foco-${item.imagemFoco}"`:'';
   if(src)return `<span class="${classe}"><img src="${e(comVersao(src))}" alt="" loading="lazy"${foco}></span>`;
   return `<span class="${classe} sem-imagem ${e(item.origem||'')}">${icon('news')}</span>`;
 }
@@ -186,7 +191,7 @@ export function itemDaColuna({item,colecao}) {
   const destino=hashComunicado(colecao,item.id);
   // O subtítulo abaixo do título ocupa a altura da miniatura, que sobrava vazia
   // (pedido do usuário em 21/09/2026).
-  return `<li data-origem="${e(item.origem||'')}"><a class="coluna-item" href="${e(destino)}" data-route="${e(destino)}">${midia(item,'midia-comunicado coluna-miniatura')}<span class="coluna-item-texto"><span class="coluna-item-titulo">${e(item.titulo)}</span>${item.resumo?`<span class="coluna-item-resumo">${e(item.resumo)}</span>`:''}</span></a></li>`;
+  return `<li data-origem="${e(item.origem||'')}"><a class="coluna-item" href="${e(destino)}" data-route="${e(destino)}">${midia(item,'midia-comunicado coluna-miniatura',{miniatura:true})}<span class="coluna-item-texto"><span class="coluna-item-titulo">${e(item.titulo)}</span>${item.resumo?`<span class="coluna-item-resumo">${e(item.resumo)}</span>`:''}</span></a></li>`;
 }
 export function colunasOrigem(lista) {
   return Object.entries(ORIGENS).map(([origem,rotulo])=> {

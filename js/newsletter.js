@@ -1,4 +1,4 @@
-import { escapeHTML as e,icon,dateLabel,detailGrid,safeURL,comVersao,normalize,ORIGENS,seloOrigem } from './ui.js?v=20260921-47';
+import { escapeHTML as e,icon,dateLabel,detailGrid,safeURL,comVersao,normalize,ORIGENS,seloOrigem } from './ui.js?v=20260921-49';
 // Comunicação (decisão do usuário em 21/09/2026): a Newsletter Contábil e
 // Notícias & Impactos viraram uma lista só de comunicados, repartida por origem
 // nas abas da seção (Todos, Contabilidade, Equatorial, Externo). Cada
@@ -45,9 +45,14 @@ export function filtrarComunicados(lista,{categoria='',query=''}={}) {
 // `alt` fica vazio; na página do comunicado entra a descrição cadastrada.
 // Peça vertical (cartaz de e-mail) tem `imagemCapa`, um recorte horizontal do
 // topo, para a faixa e a capa; a página mostra a peça inteira (`imagem`).
+// `imagemFoco` ("esquerda" | "direita"): o lado que o recorte guarda quando a
+// moldura é mais estreita que a imagem — ex.: a capa da Movimentação, com a
+// Gerente à esquerda e os executivos em quadros ao lado.
+const FOCOS=['esquerda','direita'];
 function midia(item,classe) {
   const src=safeURL(item.imagemCapa||item.imagem);
-  if(src)return `<span class="${classe}"><img src="${e(comVersao(src))}" alt="" loading="lazy"></span>`;
+  const foco=FOCOS.includes(item.imagemFoco)?` class="foco-${item.imagemFoco}"`:'';
+  if(src)return `<span class="${classe}"><img src="${e(comVersao(src))}" alt="" loading="lazy"${foco}></span>`;
   return `<span class="${classe} sem-imagem ${e(item.origem||'')}">${icon('news')}</span>`;
 }
 // Imagem que falha ao carregar vira o mesmo quadro de quem não tem imagem; na

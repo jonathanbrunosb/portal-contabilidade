@@ -1,4 +1,4 @@
-import { icon,escapeHTML as e } from './ui.js?v=20260921-47';
+import { icon,escapeHTML as e } from './ui.js?v=20260921-49';
 // Menu embutido na base da faixa do cabeçalho: uma seção por item, com ícone
 // e **sem submenu suspenso**. Clicar leva direto à primeira página da seção; as
 // demais aparecem na faixa de subpáginas, em abas — o mesmo caminho que

@@ -322,6 +322,11 @@ Contabilidade (a Movimentação por decisão do usuário):
   Pela data, entra no fim da lista.
 - Playwright em 1366, 1024 e 375: nenhuma marca `**` à mostra, nenhuma imagem
   quebrada, sem rolagem lateral, console limpo.
+- **Capa da Movimentação** (pedido do usuário): Alexandra à esquerda e os 4
+  executivos da Contabilidade em quadros 2×2. Página (613×346 em 1366) e faixa
+  larga mostram a composição inteira; com `imagemFoco: "esquerda"`, a
+  miniatura da capa (128×112) mostra a Alexandra e a 1ª coluna de quadros, e
+  a faixa do celular (104×176), a Alexandra inteira. Console limpo.
 
 ## Limites e checklist para homologação corporativa
 

@@ -627,6 +627,15 @@ data, assunto e quem assina). Duas marcas a mais no texto:
   bloco `flow-root`. Cada perfil começa com a sua foto e o próximo parágrafo
   não sobe para o lado dela, como no e-mail de movimentação do Grupo. A foto
   não abre em outra aba (não há o que ampliar).
+- `imagemFoco` (`"esquerda"` | `"direita"`) diz que lado da imagem os
+  recortes guardam — miniatura 8:7 da capa, faixa estreita do celular — em vez
+  do centro (`object-position` e a origem do zoom do hover no mesmo lado).
+  Criado para a capa da Movimentação (pedido do usuário, 21/09): a Alexandra
+  Furtado, Gerente de Contabilidade, num quadro grande à esquerda e os quatro
+  executivos da Contabilidade em quadros 2×2 ao lado, sobre o degradê do
+  banner "Carreira Equatorial" do e-mail (960×540, sem texto na imagem; quem é
+  quem fica no `alt`). Com o recorte pelo centro, a Alexandra sumia no
+  celular.
 
 **Realce dos comunicados e das abas (21/09/2026, noite, pedido do usuário).**
 Um vocabulário só para "este item está sob o mouse ou o foco", com os tokens

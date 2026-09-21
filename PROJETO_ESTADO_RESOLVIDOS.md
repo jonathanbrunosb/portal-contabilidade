@@ -8,6 +8,12 @@
 
 > O trabalho deste dia foi commitado **por assunto** na branch `ajustes-frontend-dudu` (`59832ff`..`8e7b0ef` + o commit do checkpoint), sem push.
 
+### Capa da Movimentação com a Gerente e os executivos
+- **Era:** a capa da Movimentação era o banner "Carreira Equatorial"; o usuário pediu a Alexandra Furtado como capa, no canto esquerdo, e os 4 executivos da Contabilidade em quadros ao lado.
+- **Solução:** composição 960×540: Alexandra num quadro grande à esquerda, Jonathan e Marcia em cima, Ana Laura e Luana embaixo (ordem do e-mail), molduras brancas com sombra leve, sobre o degradê medido no banner do e-mail. Sem texto na imagem; o `alt` diz quem é quem. Campo novo `imagemFoco: "esquerda"` para os recortes pequenos guardarem a Alexandra.
+- **Detalhes técnicos:** script `capa_movimentacao.py` (scratchpad): fotos das fatias PNG originais, recorte na proporção do quadro com o rosto no alto, ampliação LANCZOS + `UnsharpMask`; grava `assets/images/comunicados/movimentacao-controladoria-2026.webp` (mesmo nome da imagem antiga). O recorte do banner (`-capa.webp`) e o campo `imagemCapa` saíram. `midia()` em `js/newsletter.js` põe `class="foco-<lado>"`; CSS `.midia-comunicado img.foco-esquerda|foco-direita` (`object-position` + `transform-origin`).
+- **Verificação:** TESTES.md, "Comunicados tirados dos e-mails" (último item).
+
 ### Comunicados tirados dos e-mails: IFRS 16 e Movimentação da Controladoria
 - **Era:** dois e-mails em `projeto/comunicados-emails/` para virar comunicado, "buscando preservar sempre a fonte original": as melhorias do Sistema de Arrendamentos (Jonathan Bruno, 21/09, com a peça anexa) e o Comunicado de Movimentação da Diretoria de Controladoria e Estratégia (Comunicação do Grupo, 14/05, todo em imagens no servidor da Comunicação). O usuário pediu os dois com origem Contabilidade.
 - **Solução:** texto transcrito do e-mail (erros de digitação do original mantidos, só as saudações saem), negritos do original, peça e fotos do próprio e-mail, e a `fonte` com remetente, data, assunto e signatário. Duas marcas novas no `conteudoCompleto`: `**negrito**` e figura `"tipo":"retrato"` (foto pequena à esquerda, presa ao parágrafo seguinte). A imagem do topo da página passou a abrir inteira em outra aba.

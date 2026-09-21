@@ -1,4 +1,4 @@
-import { escapeHTML as e,safeURL,comVersao } from './ui.js?v=20260921-47';
+import { escapeHTML as e,safeURL,comVersao } from './ui.js?v=20260921-49';
 // Presentation only: a browser-local choice is not authentication. hasAccess()
 // controls which sections/menu items/search results render for a profile — it
 // is a UX consistency layer, not a security boundary: the JSON sources remain

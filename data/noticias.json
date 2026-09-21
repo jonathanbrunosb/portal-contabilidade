@@ -433,8 +433,8 @@
     "link": null,
     "documento": null,
     "imagem": "assets/images/comunicados/movimentacao-controladoria-2026.webp",
-    "imagemCapa": "assets/images/comunicados/movimentacao-controladoria-2026-capa.webp",
-    "imagemAlt": "Banner \"Carreira Equatorial\": letreiro branco sobre degradê de verde-água a verde, com o símbolo do Grupo em traço claro à esquerda.",
+    "imagemAlt": "Alexandra Furtado, nova Gerente de Contabilidade, num quadro grande à esquerda; à direita, em quatro quadros, os executivos da Contabilidade: Jonathan Bruno (Conciliação e Auditorias) e Marcia Fernanda (Contas a Receber) em cima, Ana Laura do Carmo (Regulatório e Projetos) e Luana Maria (Contabilidade Geral) embaixo, sobre o degradê verde do Carreira Equatorial.",
+    "imagemFoco": "esquerda",
     "figuras": [
       {
         "tipo": "retrato",

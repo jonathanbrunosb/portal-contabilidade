@@ -1,4 +1,4 @@
-import { icon,escapeHTML as e,safeURL,comVersao,seloOrigem } from './ui.js?v=20260921-47';
+import { icon,escapeHTML as e,safeURL,comVersao,seloOrigem } from './ui.js?v=20260921-49';
 // Carrossel de destaques da capa.
 //
 // Molde do slide (21/09/2026): o do usuário, desenhado no Figma em 2000×519

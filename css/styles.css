@@ -579,6 +579,17 @@ main {
   height:100%;
   object-fit:cover}
 
+/* `imagemFoco` do comunicado: o recorte (miniatura 8:7, faixa estreita no
+   celular) guarda esse lado da imagem em vez do centro. O zoom do hover
+   parte do mesmo lado, para o foco não escapar do quadro. */
+.midia-comunicado img.foco-esquerda {
+  object-position:left center;
+  transform-origin:left center}
+
+.midia-comunicado img.foco-direita {
+  object-position:right center;
+  transform-origin:right center}
+
 .midia-comunicado.sem-imagem {
   display:flex;
   align-items:center;
@@ -2533,7 +2544,7 @@ th,td {
   background:
     linear-gradient(100deg,#071f49f2 0%,#071f49d9 38%,#0b376aa6 62%,#075c8070 85%,#075c8047 100%),
     linear-gradient(90deg,var(--marinho-escuro) 0 2px,color-mix(in srgb,var(--marinho-escuro) 55%,transparent) 18%,transparent 45%) right 0 top 0/var(--ph-foto-largura) 100% no-repeat,
-    url("../assets/images/banner/portal-gerencia-contabilidade.webp?v=20260921-47") right 0 top 30%/auto 420px no-repeat;
+    url("../assets/images/banner/portal-gerencia-contabilidade.webp?v=20260921-49") right 0 top 30%/auto 420px no-repeat;
   background-color:var(--marinho-escuro)}
 
 .ph-row {

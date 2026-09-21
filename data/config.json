@@ -56,7 +56,7 @@
       "label": "Central de Conteúdo",
       "icon": "news",
       "target": "central",
-      "tab": "newsletter"
+      "tab": "comunicacao"
     },
     {
       "label": "Estrutura das Equipes",
@@ -166,16 +166,28 @@
       "icon": "news",
       "itens": [
         {
-          "label": "Newsletter Contábil",
+          "label": "Todos",
           "icon": "news",
           "target": "central",
-          "tab": "newsletter"
+          "tab": "comunicacao"
         },
         {
-          "label": "Notícias & Impactos",
+          "label": "Contabilidade",
+          "icon": "grid",
+          "target": "central",
+          "tab": "comunicacao-contabilidade"
+        },
+        {
+          "label": "Equatorial",
+          "icon": "briefcase",
+          "target": "central",
+          "tab": "comunicacao-equatorial"
+        },
+        {
+          "label": "Externo",
           "icon": "globe",
           "target": "central",
-          "tab": "noticias"
+          "tab": "comunicacao-externo"
         }
       ]
     },

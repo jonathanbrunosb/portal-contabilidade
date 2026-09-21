@@ -1,19 +1,21 @@
 import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260921-46';
 import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js?v=20260921-46';
 import { initializeNavigation,markCurrentSection,bindTabs,selectTab } from './navigation.js?v=20260921-46';
-import { renderNewsletter,showArticle,loadNoticias,ultimaAtualizacaoLabel,noticiaCategorias,filterNoticias,renderNoticias } from './newsletter.js?v=20260921-13';
+import { comunicados,filtrarComunicados,faixaComunicado,paginaComunicado,colunasOrigem,itemDaColuna,hashComunicado,ligarMidias,ultimaAtualizacaoLabel } from './newsletter.js?v=20260921-46';
 import { renderTeamStructure } from './teams.js?v=20260921-46';
 import { initCarousel } from './carousel.js?v=20260921-13';
 import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,comVersao,notify,ORIGENS,seloOrigem,opcoesOrigem } from './ui.js?v=20260921-46';
 import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js?v=20260921-46';
-let data,currentTab='newsletter',currentAdminTab='equipes',currentUser,currentMenu=[],navSections=[];
+let data,currentTab='comunicacao',currentAdminTab='equipes',currentUser,currentMenu=[],navSections=[];
 const $=selector=>document.querySelector(selector);
+const TITULO_PADRAO=document.title;
 // Capability required to see each menu target / page section / searchable collection.
 const TARGET_ACCESS= {
   central:'conteudo',equipes:'time',processos:'gerencial',painel:'gerencial',agenda:'gerencial',editorial:'gerencial',administracao:'administracao'
 }
 ;
-const CENTRAL_TABS=['newsletter','noticias','sistemas','portais-equatorial','portais-servicos','portais-gente','portais-externos','documentos','automacoes','atalhos-equatorial','automacoes-externos'];
+// Comunicação: uma aba por origem (+ "Todos") e a página de cada comunicado.
+const CENTRAL_TABS=['comunicacao','comunicacao-contabilidade','comunicacao-equatorial','comunicacao-externo','comunicado','sistemas','portais-equatorial','portais-servicos','portais-gente','portais-externos','documentos','automacoes','atalhos-equatorial','automacoes-externos'];
 // Páginas ainda sem conteúdo definido (o usuário vai desenhar).
 const PAGINAS_EM_DEFINICAO=[];
 const SECTION_ACCESS= {
@@ -204,46 +206,66 @@ function documentResults() {
   $('#document-results').innerHTML=records.map(documentCard).join('')||'<p class="empty-state">Nenhum documento encontrado. Tente outro grupo ou termo.</p>';
   $('#doc-count').textContent=`${records.length} ${records.length===1?'referência oficial':'referências oficiais'}`;
 }
-// Images render with a static fallback icon already in the markup (see
-// itemMedia() in newsletter.js); an onerror listener just toggles which
-// one is visible, keeping error handling out of inline HTML attributes.
-function wireNoticiaImages(root) {
-  root.querySelectorAll('.noticia-media img,.noticia-destaque-media img').forEach(img=>img.addEventListener('error',()=> {
-    img.closest('.noticia-media,.noticia-destaque-media')?.classList.add('noticia-media-fallback');
-  }
-  , {
-    once:true
-  }
-  ));
+// ===== Comunicação =====
+// Lista de comunicados de uma aba ('' = Todos) e a página de cada um. Como em
+// Documentos, a aba é gravada por navigate(): a origem é a aba, então não vira
+// filtro (regra "filtro não repete aba").
+let comunicadoAtual=null;
+function comunicadoAberto() {
+  const alvo=comunicadoAtual;
+  const item=alvo&&(data[alvo.colecao]||[]).find(registro=>registro.id===alvo.id);
+  return item&&item.status==='Publicado'?{item,colecao:alvo.colecao}:null;
 }
-function renderNoticiasResults() {
-  const query=$('#noticia-search')?.value||'';
-  const categoria=$('#noticia-categoria')?.value||'';
-  const ativos=loadNoticias(data.noticias);
-  const resultados=$('#noticias-resultados');
-  resultados.innerHTML=renderNoticias(ativos,categoria,query);
-  const contador=$('#noticia-count');
-  if(contador)contador.textContent=contagem(filterNoticias(ativos,categoria,query).length,'notícia','notícias');
-  wireNoticiaImages(resultados);
-}
-// Global search results link into the tab via showRecord('noticias', id):
-// instead of opening the read-more modal (data-noticia-detalhe does that),
-// this opens/keeps the Notícias & Impactos tab, scrolls to the matching
-// card and applies a temporary highlight, per spec section 16.
-function focusNoticia(id) {
-  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  navigate({...(currentMenu.find(item=>item.target==='central')||{target:'central'}),tab:'noticias'});
-  setTimeout(()=> {
-    const card=document.querySelector(`[data-noticia-id="${CSS.escape(id)}"]`);
-    if(!card)return;
-    card.scrollIntoView( {
-      behavior:reduced?'auto':'smooth',block:'center'
-    }
-    );
-    card.classList.add('noticia-highlight');
-    setTimeout(()=>card.classList.remove('noticia-highlight'),2200);
+function renderListaComunicacao(origem) {
+  const todos=comunicados(data);
+  const lista=origem?todos.filter(({item})=>item.origem===origem):todos;
+  const categorias=valoresDe(lista.map(({item})=>item),'categoria');
+  const filtros=categorias.length>1?[{id:'com-categoria',rotulo:'Categoria',todos:'Todas as categorias',opcoes:categorias}]:[];
+  const busca={id:'com-busca',rotulo:origem?`Pesquisar comunicados de ${ORIGENS[origem]}`:'Pesquisar comunicados',placeholder:'Título, texto, categoria ou fonte…'};
+  $('#content-view').innerHTML=`${barraFiltro({busca,filtros})}<div class="comunicados-lista" id="com-lista"></div><div class="content-footer"><span id="com-count" role="status" aria-live="polite"></span><span>Última atualização: ${e(ultimaAtualizacaoLabel(lista.map(({item})=>item)))}</span></div>`;
+  ligarBarraFiltro({busca,filtros,aoMudar:()=> {
+    const visiveis=filtrarComunicados(lista,{categoria:$('#com-categoria')?.value||'',query:$('#com-busca').value});
+    const vazio=lista.length?'Nenhum comunicado corresponde à busca.':`Nenhum comunicado de ${ORIGENS[origem]} publicado ainda.`;
+    $('#com-lista').innerHTML=visiveis.map(faixaComunicado).join('')||`<p class="empty-state">${e(vazio)}</p>`;
+    $('#com-count').textContent=contagem(visiveis.length,'comunicado','comunicados');
+    ligarMidias($('#com-lista'));
   }
-  ,320);
+  }
+  );
+}
+function renderPaginaComunicado() {
+  const aberto=comunicadoAberto();
+  if(!aberto) {
+    $('#content-view').innerHTML='<p class="empty-state">Este comunicado não foi encontrado ou não está publicado. <a href="#central/comunicacao" data-route="#central/comunicacao">Ver todos os comunicados</a>.</p>';
+    return;
+  }
+  const sistema=aberto.item.sistemaId?data.sistemas.find(s=>s.id===aberto.item.sistemaId):null;
+  $('#content-view').innerHTML=paginaComunicado(aberto,{sistema});
+  // "Mais comunicados" ao lado da ficha: primeiro os da mesma origem, depois os
+  // demais, do mais recente ao mais antigo.
+  const outros=comunicados(data).filter(c=>!(c.colecao===aberto.colecao&&c.item.id===aberto.item.id));
+  const relacionados=[...outros.filter(c=>c.item.origem===aberto.item.origem),...outros.filter(c=>c.item.origem!==aberto.item.origem)].slice(0,4);
+  if(relacionados.length)$('.comunicado-rodape-grade').insertAdjacentHTML('beforeend',`<section class="comunicado-relacionados" aria-labelledby="comunicado-relacionados-titulo"><h3 class="comunicado-ficha-titulo" id="comunicado-relacionados-titulo">Mais comunicados</h3><ul class="coluna-lista">${relacionados.map(itemDaColuna).join('')}</ul></section>`);
+  // Espaço de quem administra: a situação do comunicado no carrossel da capa e
+  // o atalho para destacá-lo (pedido do usuário em 21/09/2026).
+  if(podeAdministrar()) {
+    const ref=`${aberto.colecao}:${aberto.item.id}`;
+    const destaque=destaqueDoAlvo(data,'comunicado',ref);
+    const situacao=destaque?`<span class="badge ${COR_SITUACAO[situacaoDestaque(destaque)]}">${e(SITUACOES[situacaoDestaque(destaque)])}</span> ${e(periodoDestaque(destaque))} · posição ${e(destaque.ordem??'—')}`:'Este comunicado não está no carrossel.';
+    $('.comunicado-ficha').insertAdjacentHTML('beforeend',`<section class="comunicado-admin" aria-labelledby="comunicado-admin-titulo"><h3 class="comunicado-ficha-titulo" id="comunicado-admin-titulo">Carrossel da capa</h3><p>${situacao}</p>${botaoDestacar('comunicado',ref)}</section>`);
+  }
+  ligarMidias($('#content-view'));
+  track('record_view',{collection:aberto.colecao,label:aberto.item.titulo});
+}
+// Aba da Comunicação que corresponde a uma página: a do comunicado aberto é a
+// aba da origem dele.
+function abaDaComunicacao(tab) {
+  if(tab!=='comunicado')return tab;
+  const origem=comunicadoAberto()?.item.origem;
+  return ORIGENS[origem]?`comunicacao-${origem}`:'comunicacao';
+}
+function abrirComunicado(colecao,id) {
+  navigate(routeItem(hashComunicado(colecao,id)));
 }
 const AUTOMATION_STATUSES=['Produção','Produção e Melhorias','Desenvolvimento e Testes'];
 const AUTOMATION_FAMILIAS= {
@@ -321,29 +343,9 @@ const valoresDe=(lista,campo)=>[...new Set(lista.map(item=>item[campo]).filter(B
 function renderContent(tab) {
   currentTab=tab;
   track('tab_view',{tab});
-  if(CENTRAL_TABS.includes(tab))activateMenu({target:'central',tab});
-  if(tab==='newsletter') {
-    const publicadas=data.newsletter.filter(item=>item.status==='Publicado');
-    const filtros=[{id:'news-categoria',rotulo:'Categoria',todos:'Todas as categorias',opcoes:valoresDe(publicadas,'categoria')}];
-    const busca={id:'news-busca',rotulo:'Pesquisar na Newsletter Contábil',placeholder:'Título, resumo, categoria ou fonte…'};
-    $('#content-view').innerHTML=`${barraFiltro({busca,filtros})}<div id="news-resultados"></div><div class="content-footer"><span id="news-count" role="status" aria-live="polite"></span><span>Informações de exemplo para validação do portal</span></div>`;
-    ligarBarraFiltro({busca,filtros,aoMudar:()=> {
-      const alvo=$('#news-resultados');
-      const visiveis=filterNoticias(publicadas,$('#news-categoria').value,$('#news-busca').value);
-      alvo.innerHTML=renderNewsletter(visiveis);
-      $('#news-count').textContent=contagem(visiveis.length,'publicação','publicações');
-      wireNoticiaImages(alvo);
-    }
-    }
-    );
-  }
-  if(tab==='noticias') {
-    const ativos=loadNoticias(data.noticias);
-    const filtros=[{id:'noticia-categoria',rotulo:'Categoria',todos:'Todas as categorias',opcoes:noticiaCategorias(ativos)}];
-    const busca={id:'noticia-search',rotulo:'Pesquisar em Notícias & Impactos',placeholder:'Título, resumo, categoria, fonte ou empresa…'};
-    $('#content-view').innerHTML=`${barraFiltro({busca,filtros})}<div id="noticias-resultados"></div><div class="content-footer"><span id="noticia-count" role="status" aria-live="polite"></span><span>Última atualização: ${e(ultimaAtualizacaoLabel(ativos))}</span></div>`;
-    ligarBarraFiltro({busca,filtros,aoMudar:renderNoticiasResults});
-  }
+  if(CENTRAL_TABS.includes(tab))activateMenu({target:'central',tab:abaDaComunicacao(tab)});
+  if(tab==='comunicacao'||tab.startsWith('comunicacao-'))renderListaComunicacao(tab.slice('comunicacao-'.length));
+  if(tab==='comunicado')renderPaginaComunicado();
   if(PAGINAS_EM_DEFINICAO.includes(tab))$('#content-view').innerHTML='<p class="empty-state">Conteúdo em definição. Esta página será preenchida em breve.</p>';
   if(tab==='atalhos-equatorial') {
     const busca={id:'atalho-busca',rotulo:'Pesquisar atalho corporativo',placeholder:'Nome ou descrição do atalho…'};
@@ -437,6 +439,9 @@ const paginasDe=s=>s.paginas||s.itens||[];
 const mesmaPagina=(a,b)=>Boolean(a&&b)&&a.target===b.target&&(a.tab||'')===(b.tab||'')&&(a.grupo??'')===(b.grupo??'')&&(a.adminTab||'')===(b.adminTab||'');
 let subnavTargets=[];
 function renderSubnav(item) {
+  // Na página de um comunicado, a faixa é a da Comunicação, com a aba da origem
+  // dele marcada.
+  if(item.tab==='comunicado')item={...item,tab:abaDaComunicacao('comunicado')};
   const section=navSections.find(s=>paginasDe(s).some(child=>child.target===item.target&&(child.tab||'')===(item.tab||'')));
   const paginas=section?paginasDe(section):[];
   const atual=paginas.find(child=>mesmaPagina(child,item));
@@ -480,17 +485,22 @@ function ligarLinha() {
   faixa.addEventListener('focusout',event=>{if(!faixa.contains(event.relatedTarget))moverLinha(atual());});
   window.addEventListener('resize',()=>moverLinha(atual()));
 }
-// Rotas: #inicio, #<target>, #central/<aba>, #administracao/<aba>.
+// Rotas: #inicio, #<target>, #central/<aba>, #administracao/<aba> e a página de
+// um comunicado, #central/comunicado/<coleção>/<id>.
 function routeItem(hash) {
-  const [target,sub]=String(hash||'').replace(/^#/,'').split('/');
+  const [target,sub,colecao,id]=String(hash||'').replace(/^#/,'').split('/');
   if(target==='inicio'||!target)return {target:'inicio'};
   const base=currentMenu.find(item=>item.target===target);
   if(!base)return null;
+  if(target==='central'&&sub==='comunicado'&&colecao&&id)return {...base,tab:'comunicado',comunicado:{colecao,id:decodeURIComponent(id)}};
+  // Endereços de antes da Comunicação unificada (21/09/2026).
+  if(target==='central'&&(sub==='newsletter'||sub==='noticias'))return {...base,tab:'comunicacao'};
   if(sub&&target==='central'&&CENTRAL_TABS.includes(sub))return {...base,tab:sub};
   if(sub&&target==='administracao')return {...base,adminTab:sub};
   return base;
 }
 function routeHash(item) {
+  if(item.target==='central'&&item.tab==='comunicado'&&item.comunicado)return hashComunicado(item.comunicado.colecao,item.comunicado.id);
   if(item.target==='central'&&item.tab)return `#central/${item.tab}`;
   if(item.target==='administracao'&&item.adminTab)return `#administracao/${item.adminTab}`;
   return `#${item.target}`;
@@ -508,6 +518,7 @@ function navigate(item,updateHistory=true) {
     $('#equipes').hidden=true;
     $('#administracao').hidden=true;
     activateMenu(item);
+    document.title=TITULO_PADRAO;
     if(updateHistory)history.pushState(null,'','#inicio');
     window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
     $('#main').focus({preventScroll:true});
@@ -531,10 +542,14 @@ function navigate(item,updateHistory=true) {
   }
   else if(item.tab) {
     if(item.tab==='documentos')docGrupo=item.grupo??'';
+    if(item.tab==='comunicado')comunicadoAtual=item.comunicado||null;
     renderContent(item.tab);
   }
   else activateMenu(item);
   renderSubnav(item);
+  // A página de um comunicado leva o título dele na aba do navegador.
+  const aberto=item.tab==='comunicado'?comunicadoAberto():null;
+  document.title=aberto?`${aberto.item.titulo} | Portal Contabilidade`:TITULO_PADRAO;
   if(updateHistory)history.pushState(null,'',routeHash(item));
   requestAnimationFrame(()=> {
     if(pagina) {
@@ -603,9 +618,13 @@ function renderHome() {
   const atalhos=[...data.config.links.filter(l=>!l.target).map(l=>({nome:l.nome,icon:l.icon,url:safeURL(l.link)})),...data.sistemas.filter(s=>s.status==='Ativo').map(s=>({nome:s.nome.split(' — ')[0],icon:s.icon||'grid',url:safeURL(s.link)}))]
     .filter(a=>a.url&&!vistos.has(a.nome)&&vistos.add(a.nome)).slice(0,8);
   $('#acesso-list').innerHTML=atalhos.map(a=>`<li><a href="${e(a.url)}" target="_blank" rel="noopener noreferrer" data-quick="${e(a.nome)}">${icon(a.icon||'link')}<span>${e(a.nome)}</span>${icon('external').replace('class="icon"','class="icon ext"')}</a></li>`).join('');
-  const publicadas=[...data.newsletter.map(item=>({item,collection:'newsletter'})),...data.noticias.map(item=>({item,collection:'noticias'}))]
-    .filter(({item})=>item.status==='Publicado').sort((a,b)=>(b.item.dataPublicacao||'').localeCompare(a.item.dataPublicacao||'')).slice(0,5);
-  $('#news-list').innerHTML=publicadas.map(({item,collection})=>`<li><div class="news-meta"><span>${e(item.categoria)}</span><time datetime="${e(item.dataPublicacao)}">${e(dateLabel(item.dataPublicacao))}</time></div><button type="button" class="news-title" data-record="${collection}:${e(item.id)}">${e(item.titulo)}</button><p>${e(item.resumo)}</p></li>`).join('')||'<li class="empty-state">Nenhuma publicação.</li>';
+  renderColunasComunicacao();
+}
+// Capa: uma coluna de comunicados por origem (Contabilidade, Equatorial,
+// Externo), no formato de portal de notícias. Pedido do usuário em 21/09/2026.
+function renderColunasComunicacao() {
+  $('#news-list').innerHTML=colunasOrigem(comunicados(data));
+  ligarMidias($('#news-list'));
 }
 // Rodapé: mapa do portal com as mesmas seções do menu (já filtradas pelo
 // perfil) e a área responsável pela gerência.
@@ -684,7 +703,9 @@ async function handleEditorialAction(collection,id,action) {
     );
     data[collection][data[collection].findIndex(i=>i.id===id)]=updated;
     renderEditorial();
-    if(currentTab===collection)renderContent(collection);
+    // Publicar, recusar ou reabrir muda a Comunicação e as colunas da capa.
+    if(/^comunica/.test(currentTab)&&!$('#page-view').hidden)renderContent(currentTab);
+    renderColunasComunicacao();
     notify('Conteúdo editorial atualizado.');
   }
   catch(error) {
@@ -1070,15 +1091,12 @@ function renderAdmin() {
 function showRecord(collection,id) {
   const item=data[collection]?.find(i=>i.id===id);
   if(!item)return;
+  // Comunicado abre a página própria dele, que registra a visita.
+  if(collection==='newsletter'||collection==='noticias') {
+    abrirComunicado(collection,id);
+    return;
+  }
   track('record_view',{collection,label:item.titulo||item.nome});
-  if(collection==='newsletter') {
-    showArticle(item);
-    return;
-  }
-  if(collection==='noticias') {
-    focusNoticia(id);
-    return;
-  }
   if(collection==='equipes') {
     navigate(currentMenu.find(item=>item.view==='equipes'));
     return;
@@ -1393,11 +1411,6 @@ async function init() {
       if(trocarImagem)openTrocarImagem(trocarImagem.dataset.trocarImagem);
       const system=event.target.closest('[data-system]');
       if(system)openAccess(data.sistemas.find(i=>i.id===system.dataset.system));
-      const noticiaDetalhe=event.target.closest('[data-noticia-detalhe]');
-      if(noticiaDetalhe) {
-        const item=data.noticias.find(i=>i.id===noticiaDetalhe.dataset.noticiaDetalhe);
-        if(item)showArticle(item);
-      }
       const editorial=event.target.closest('[data-editorial]');
       if(editorial) {
         const [collection,id,action]=editorial.dataset.editorial.split(':');

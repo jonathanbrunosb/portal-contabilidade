@@ -51,6 +51,8 @@
   --origem-contabilidade-fundo:var(--verde-agua-fundo);
   --origem-equatorial-fundo:var(--azul-suave);
   --origem-externo-fundo:var(--roxo-fundo);
+  /* Véu na base de uma foto, para o título branco ler bem sobre ela. */
+  --veu-imagem:rgba(1,14,40,.82);
   --ph-laranja:var(--acento-laranja);
   --ph-tarja:rgba(1,14,40,.55);
   /* Escala tipográfica curta: 12 / 13 / 14 / 16 / 18 / 22 / 30 px. Nada de
@@ -490,80 +492,290 @@ main {
   background:var(--ambar-fundo);
   color:var(--laranja)}
 
-/* Notícias & Impactos: destaque + cards secundários reaproveitam .content-card,
-   .tag, .badge, .primary-btn e .text-btn — apenas a mídia, a grade e os chips
-   de categoria são específicos desta tab. */
-
-.noticias-grid {
+/* ===== Comunicação: lista em faixas e página do comunicado (21/09/2026) =====
+   Uma faixa por comunicado, com a imagem à esquerda e, à direita, origem,
+   categoria e data, título, subtítulo e o texto até onde couber. A faixa
+   inteira leva à página própria do comunicado. */
+.comunicados-lista {
   display:grid;
-  grid-template-columns:64fr 36fr;
-  gap:18px;
-  align-items:start}
+  gap:16px}
 
-.noticias-grid.no-secundarias {
-  grid-template-columns:1fr}
+.comunicado-faixa {
+  position:relative;
+  display:grid;
+  grid-template-columns:clamp(180px,30%,340px) minmax(0,1fr);
+  background:#fff;
+  border:1px solid var(--borda);
+  border-radius:var(--raio-xl);
+  box-shadow:var(--sombra-sutil);
+  overflow:hidden;
+  cursor:pointer;
+  transition:border-color .2s,box-shadow .2s}
 
-.noticias-secundarias {
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-  min-width:0}
+.comunicado-faixa:hover {
+  border-color:var(--borda-ativa);
+  box-shadow:var(--sombra-media)}
 
-.noticia-destaque {
-  padding:0;
+.comunicado-faixa:focus-within {
+  border-color:var(--azul);
+  box-shadow:var(--sombra-media)}
+
+/* Imagem ou quadro na cor da origem. Serve à faixa, à capa e às miniaturas. */
+.midia-comunicado {
+  position:relative;
+  display:block;
   overflow:hidden}
 
-.noticia-destaque-media {
-  position:relative;
-  aspect-ratio:16/9;
-  overflow:hidden;
-  background:var(--azul-suave)}
-
-.noticia-destaque-media img {
+.midia-comunicado img {
+  position:absolute;
+  inset:0;
+  display:block;
   width:100%;
   height:100%;
-  object-fit:cover;
-  display:block;
-  transition:transform .3s}
+  object-fit:cover}
 
-.noticia-destaque:hover .noticia-destaque-media img {
-  transform:scale(1.03)}
-
-.noticia-destaque-media:after {
-  content:"";
-  position:absolute;
-  inset:auto 0 0 0;
-  height:64px;
-  background:linear-gradient(to top,#071f4966,transparent);
-  pointer-events:none}
-
-.noticia-destaque-body {
-  padding:20px 22px 22px}
-
-.noticia-destaque-body h2 {
-  font-size:var(--fs-xl);
-  line-height:1.32;
-  color:var(--marinho);
-  margin:2px 0 10px;
-  letter-spacing:-.3px}
-
-.noticia-destaque-body p {
-  font-size:var(--fs-sm);
-  color:var(--texto-apoio);
-  line-height:1.65;
-  margin:0 0 13px}
-
-.noticia-destaque-footer {
+.midia-comunicado.sem-imagem {
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-  margin-top:15px}
+  justify-content:center;
+  background:var(--cor-origem-fundo,var(--superficie-2));
+  color:var(--cor-origem,var(--texto-apoio))}
 
-.noticia-fonte {
-  font-size:var(--fs-xs);
-  color:var(--texto-apoio)}
+.midia-comunicado.sem-imagem .icon {
+  width:34px;
+  height:34px}
+
+/* A imagem acompanha a altura do texto (o item de grade estica). Sem
+   `aspect-ratio`: com ela, a altura esticada empurrava a largura para além da
+   coluna. */
+.comunicado-faixa-midia {
+  min-height:160px}
+
+/* O corpo fica abaixo do link esticado, como no .pcard: a faixa é um alvo só. */
+.comunicado-faixa-corpo {
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  min-width:0;
+  padding:16px 20px;
+  -webkit-user-select:none;
+  user-select:none}
+
+.comunicado-meta {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:4px 10px;
+  margin:0;
+  color:var(--texto-apoio);
+  font-size:var(--fs-sm)}
+
+.comunicado-faixa h3 {
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  overflow:hidden;
+  margin:0;
+  font-size:var(--fs-lg);
+  font-weight:var(--peso-forte);
+  line-height:1.3}
+
+.comunicado-faixa-link {
+  color:var(--texto);
+  text-decoration:none}
+
+.comunicado-faixa-link::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:1}
+
+.comunicado-faixa:hover .comunicado-faixa-link {
+  color:var(--azul);
+  text-decoration:underline}
+
+.comunicado-faixa-subtitulo {
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  overflow:hidden;
+  margin:0;
+  color:var(--texto-2);
+  font-size:var(--fs-md);
+  line-height:1.45}
+
+.comunicado-faixa-texto {
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:3;
+  overflow:hidden;
+  margin:0;
+  color:var(--texto-apoio);
+  font-size:var(--fs-base);
+  line-height:1.55}
+
+.comunicado-faixa-mais {
+  margin-top:auto;
+  padding-top:4px;
+  color:var(--azul);
+  font-size:var(--fs-base);
+  font-weight:var(--peso-medio)}
+
+/* Página do comunicado — matéria de jornal (pedido do usuário em 21/09/2026,
+   3ª versão). O texto ocupa a largura toda, justificado e com hifenização, e
+   as imagens flutuam dentro dele (`float`), com o texto contornando: a capa à
+   direita, as figuras alternando esquerda e direita. Abaixo, as ações e, lado
+   a lado, a ficha e "Mais comunicados". Antes: uma coluna de 800 px (1ª) e
+   texto e imagens em colunas separadas (2ª) — as duas deixavam tela vazia. */
+.comunicado-pagina {
+  padding:4px 6px 8px}
+
+.comunicado-pagina header {
+  max-width:980px;
+  margin-bottom:22px}
+
+.comunicado-voltar {
+  display:inline-block;
+  margin-bottom:12px;
+  font-size:var(--fs-base);
+  font-weight:var(--peso-medio)}
+
+.comunicado-pagina h2 {
+  margin:10px 0;
+  color:var(--texto);
+  font-size:var(--fs-2xl);
+  font-weight:var(--peso-forte);
+  line-height:1.25}
+
+.comunicado-lead {
+  margin:0;
+  color:var(--texto-2);
+  font-size:var(--fs-lg);
+  line-height:1.55}
+
+/* A matéria contém as imagens flutuantes (flow-root). */
+.comunicado-materia {
+  display:flow-root}
+
+.comunicado-figura {
+  margin:0 0 18px}
+
+/* Cartaz vertical não vira uma coluna de 1.300 px: a peça cabe na altura da
+   tela e a figura encolhe junto (a largura acompanha a imagem). */
+.comunicado-figura img {
+  display:block;
+  width:auto;
+  max-width:100%;
+  height:auto;
+  max-height:calc(100vh - 32px);
+  border:1px solid var(--borda);
+  border-radius:var(--raio-lg)}
+
+.comunicado-texto p {
+  margin:0 0 14px;
+  color:var(--texto);
+  font-size:var(--fs-md);
+  line-height:1.7;
+  text-align:justify;
+  -webkit-hyphens:auto;
+  hyphens:auto}
+
+/* Intertítulo ("## " no texto). */
+.comunicado-intertitulo {
+  margin:24px 0 8px;
+  color:var(--texto);
+  font-size:var(--fs-lg);
+  font-weight:var(--peso-forte);
+  line-height:1.35}
+
+.comunicado-texto > .comunicado-intertitulo:first-child {
+  margin-top:0}
+
+/* Figura do texto ("[figura N]"): abre a imagem inteira ao clicar. */
+.comunicado-figura-texto {
+  margin:6px 0 18px}
+
+.comunicado-figura-texto a {
+  display:block}
+
+.comunicado-figura-texto img {
+  display:block;
+  width:100%;
+  height:auto;
+  border:1px solid var(--borda);
+  border-radius:var(--raio-md)}
+
+.comunicado-figura-texto a:hover img {
+  border-color:var(--azul)}
+
+.comunicado-figura-texto figcaption {
+  margin-top:6px;
+  color:var(--texto-apoio);
+  font-size:var(--fs-sm);
+  line-height:1.5}
+
+/* A partir de 761 px as imagens flutuam. A capa fica com até 49% da largura
+   (menos, se for um cartaz vertical); as figuras, com 49% — infográfico
+   estreito demais não se lê. Com 46% uma imagem à direita e a seguinte à
+   esquerda deixavam uma fresta de 70 px, e a linha que cruzava a passagem
+   ficava com uma palavra; com 49% + a margem de 32 px as duas não cabem lado a
+   lado e essa linha desce inteira. Cada figura começa abaixo da anterior
+   (clear: both). Na tela larga o corpo do texto sobe para
+   --fs-lg: a linha ao lado da imagem passa de 800 px. */
+@media(min-width:761px) {
+  .comunicado-figura {
+    float:right;
+    max-width:49%;
+    margin:4px 0 16px 32px}
+  .comunicado-figura-texto {
+    width:49%}
+  .comunicado-figura-texto.flutua-esquerda {
+    float:left;
+    clear:both;
+    margin:6px 32px 16px 0}
+  .comunicado-figura-texto.flutua-direita {
+    float:right;
+    clear:both;
+    margin:6px 0 16px 32px}
+}
+
+@media(min-width:1301px) {
+  .comunicado-texto p {
+    font-size:var(--fs-lg)}
+}
+
+@media(max-width:760px) {
+  .comunicado-figura img {
+    max-height:70vh}
+}
+
+/* Abaixo da matéria: ações e, lado a lado, a ficha e "Mais comunicados". */
+.comunicado-rodape {
+  clear:both;
+  margin-top:10px}
+
+.comunicado-acoes {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:20px 0 8px}
+
+.comunicado-rodape-grade {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));
+  gap:0 48px;
+  align-items:start}
+
+.comunicado-ficha-titulo {
+  margin:24px 0 10px;
+  padding-top:18px;
+  border-top:1px solid var(--borda);
+  color:var(--texto);
+  font-size:var(--fs-md);
+  font-weight:var(--peso-forte)}
+
+.comunicado-relacionados .coluna-lista {
+  border-top:0}
 
 .noticia-indicadores {
   display:grid;
@@ -588,84 +800,24 @@ main {
   font-size:var(--fs-xs);
   color:var(--texto-apoio)}
 
-.noticia-media {
-  position:relative;
-  margin-bottom:12px;
-  border-radius:var(--raio-md);
-  overflow:hidden;
-  aspect-ratio:16/9;
-  background:var(--azul-suave)}
-
-.noticia-media img {
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block}
-
-.noticia-media-icon {
-  display:none}
-
-.noticia-destaque-media .noticia-media-icon,
-.noticia-media .noticia-media-icon {
-  align-items:center;
-  justify-content:center;
-  color:var(--azul)}
-
-.noticia-destaque-media.noticia-media-fallback,
-.noticia-media.noticia-media-fallback {
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:var(--azul)}
-
-.noticia-media-fallback img {
-  display:none}
-
-.noticia-media-fallback .noticia-media-icon {
-  display:flex}
-
-.noticia-destaque-media .icon {
-  width:44px;
-  height:44px}
-
-.noticia-media .icon {
-  width:30px;
-  height:30px}
-
-.noticia-demo-flag {
-  display:inline-block;
-  font-size:var(--fs-xs);
-  font-weight:var(--peso-forte);
-  letter-spacing:.3px;
-  color:var(--laranja);
-  background:var(--ambar-fundo);
-  border-radius:var(--raio-xs);
-  padding:2px 6px;
-  margin-bottom:8px}
-
-.noticia-highlight {
-  outline:3px solid var(--foco);
-  outline-offset:2px}
-
-@media(max-width:1100px) {
-  .noticias-grid {
-    grid-template-columns:1fr}
-  .noticias-secundarias {
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-
 @media(max-width:640px) {
-  .noticias-secundarias {
-    grid-template-columns:1fr}
   .noticia-indicadores {
     grid-template-columns:1fr}
-  .noticia-destaque-footer {
-    flex-direction:column;
-    align-items:stretch}
-  .noticia-destaque-footer .primary-btn {
-    justify-content:center;
-    width:100%}
+}
+
+/* Celular: a faixa continua faixa, com a imagem mais estreita; o texto longo
+   sai e o título ganha uma linha. */
+@media(max-width:560px) {
+  .comunicado-faixa {
+    grid-template-columns:clamp(104px,32%,140px) minmax(0,1fr)}
+  .comunicado-faixa-corpo {
+    padding:12px 14px}
+  .comunicado-faixa h3 {
+    font-size:var(--fs-md);
+    -webkit-line-clamp:3}
+  .comunicado-faixa-texto,
+  .comunicado-faixa-mais {
+    display:none}
 }
 
 .text-btn {
@@ -1697,9 +1849,6 @@ th,td {
   animation:none!important;
   scroll-behavior:auto!important;
   transition:none!important}
-
-.noticia-destaque:hover .noticia-destaque-media img {
-  transform:none}
 
 }
 
@@ -3155,52 +3304,207 @@ svg.ext {
 #page-view #content-view {
   padding:18px}
 
-/* Capa: comunicação recente */
-.home-news .section-heading a {
+/* ===== Capa: Comunicação em três colunas, uma por origem (21/09/2026) =====
+   Formato de portal de notícias, na referência que o usuário enviou (capa da
+   CNN Brasil): título da coluna na cor da origem, um destaque com o título
+   sobre a imagem e, abaixo, a lista com miniatura à esquerda. */
+.home-comunicacao {
+  margin-top:8px}
+
+.home-comunicacao-topo {
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:16px;
+  padding-bottom:10px;
+  border-bottom:1px solid var(--borda)}
+
+.home-comunicacao-topo h2 {
+  margin:0;
+  color:var(--texto)}
+
+.home-comunicacao-topo .text-btn {
   font-size:var(--fs-base);
   font-weight:var(--peso-medio)}
 
-.news-list {
+.colunas-origem {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:28px;
+  align-items:start}
+
+.coluna-origem {
+  min-width:0}
+
+.coluna-titulo {
+  display:flex;
+  align-items:baseline;
+  gap:4px;
+  margin:0 0 12px;
+  color:var(--cor-origem);
+  font-size:var(--fs-xl);
+  font-weight:var(--peso-forte);
+  line-height:1.2}
+
+/* O quadradinho depois do nome, como na referência. */
+.coluna-titulo::after {
+  content:"";
+  flex:0 0 auto;
+  width:7px;
+  height:7px;
+  background:var(--cor-origem)}
+
+.coluna-destaque {
+  position:relative;
+  display:block;
+  aspect-ratio:16 / 10;
+  border-radius:var(--raio-md);
+  overflow:hidden;
+  /* A cor da origem fica por baixo da foto: enquanto ela carrega (ou se
+     falhar), o título branco continua legível. */
+  background:var(--cor-origem);
+  color:#fff;
+  text-decoration:none}
+
+.coluna-destaque-midia {
+  position:absolute;
+  inset:0}
+
+.coluna-destaque-midia:not(.sem-imagem)::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to bottom,transparent 35%,var(--veu-imagem))}
+
+/* Sem imagem, o destaque é a própria cor da origem, com o título em branco. */
+.coluna-destaque-midia.sem-imagem {
+  align-items:flex-start;
+  padding-top:14%;
+  background:var(--cor-origem);
+  color:#fff}
+
+.coluna-destaque-midia.sem-imagem .icon {
+  width:52px;
+  height:52px;
+  opacity:.45}
+
+.coluna-destaque-titulo {
+  position:absolute;
+  right:0;
+  bottom:0;
+  left:0;
+  z-index:1;
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:3;
+  overflow:hidden;
+  padding:0 16px 14px;
+  font-size:var(--fs-lg);
+  font-weight:var(--peso-forte);
+  line-height:1.35}
+
+.coluna-destaque:hover .coluna-destaque-titulo {
+  text-decoration:underline}
+
+.coluna-lista {
   list-style:none;
   margin:0;
-  padding:0 20px 8px}
+  padding:0}
 
-.news-list li {
+.coluna-lista li {
+  border-bottom:1px solid var(--borda)}
+
+.coluna-item {
+  display:grid;
+  grid-template-columns:128px minmax(0,1fr);
+  gap:14px;
+  align-items:start;
   padding:14px 0;
-  border-top:1px solid var(--borda)}
-
-.news-list li:first-child {
-  border-top:0}
-
-.news-meta {
-  display:flex;
-  gap:12px;
-  font-size:var(--fs-sm);
-  color:var(--texto-apoio)}
-
-.news-meta span {
-  color:var(--azul-marca);
-  font-weight:var(--peso-medio)}
-
-.news-title {
-  display:block;
-  margin:2px 0 3px;
-  padding:2px 0;
-  border:0;
-  background:none;
   color:var(--texto);
+  text-decoration:none}
+
+.coluna-miniatura {
+  aspect-ratio:8 / 7;
+  border-radius:var(--raio-md)}
+
+/* Marca da origem no canto da miniatura, como na referência. */
+.coluna-miniatura::before {
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  z-index:1;
+  width:24px;
+  height:7px;
+  background:var(--cor-origem);
+  border-bottom-right-radius:var(--raio-xs)}
+
+.coluna-item-texto {
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  min-width:0}
+
+.coluna-item-titulo {
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:3;
+  overflow:hidden;
   font-size:var(--fs-md);
   font-weight:var(--peso-forte);
-  text-align:left}
+  line-height:1.35}
 
-.news-title:hover {
+/* Subtítulo abaixo do título (21/09/2026): ocupa a altura da miniatura, que
+   ficava vazia; até 3 linhas. */
+.coluna-item-resumo {
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:3;
+  overflow:hidden;
+  color:var(--texto-apoio);
+  font-size:var(--fs-sm);
+  line-height:1.45}
+
+.coluna-item:hover .coluna-item-titulo {
   color:var(--azul);
   text-decoration:underline}
 
-.news-list p {
-  max-width:75ch;
-  color:var(--texto-2);
+.coluna-mais {
+  display:inline-block;
+  margin-top:12px;
+  padding:2px 0;
+  color:var(--texto-apoio);
+  font-size:var(--fs-base);
+  font-weight:var(--peso-medio);
+  text-decoration:none}
+
+.coluna-mais:hover {
+  color:var(--azul);
+  text-decoration:underline}
+
+.coluna-vazia {
+  margin:0;
+  padding:18px 0;
+  border-top:1px solid var(--borda);
+  color:var(--texto-apoio);
   font-size:var(--fs-base)}
+
+@media(max-width:1100px) {
+  .colunas-origem {
+    gap:20px}
+  .coluna-item {
+    grid-template-columns:96px minmax(0,1fr)}
+}
+
+/* Abaixo disso as três colunas empilham, cada uma com a largura toda. */
+@media(max-width:860px) {
+  .colunas-origem {
+    grid-template-columns:1fr;
+    gap:32px}
+  .coluna-item {
+    grid-template-columns:128px minmax(0,1fr)}
+}
 
 @media(max-width:1440px) {
   .ph-top {

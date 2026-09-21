@@ -363,5 +363,61 @@
         "data": "2026-09-21"
       }
     ]
+  },
+  {
+    "id": "cfc-ia-contabilidade-seguranca-dados",
+    "origem": "externo",
+    "categoria": "IA",
+    "titulo": "IA generativa na contabilidade: como usar sem expor os dados",
+    "resumo": "Artigo da Comissão de Tecnologia e Inovação do CFC mostra dois caminhos para usar o ChatGPT e outros modelos de linguagem com dados contábeis, dentro da LGPD: busca cognitiva em nuvem controlada e modelos rodando no próprio computador.",
+    "conteudoCompleto": "O Conselho Federal de Contabilidade publicou um artigo de Álvaro Brito, membro da Comissão Permanente de Tecnologia e Inovação do CFC, sobre como levar a inteligência artificial generativa para a rotina contábil sem abrir mão da proteção de dados. O resumo abaixo segue o raciocínio do autor; a íntegra está no site do CFC, no botão ao fim da página.\n## Por que o cuidado\nFerramentas como o ChatGPT aceleram análises e a produção de textos, mas o dado contábil é sensível por natureza: traz a situação financeira detalhada das empresas e, muitas vezes, dados pessoais protegidos pela LGPD. Levar esse material para um serviço aberto na internet é expô-lo.\n[figura 1]\n## Caminho 1: IA na nuvem, com os dados num ambiente controlado\nA primeira saída proposta é combinar o modelo de linguagem com uma plataforma de busca cognitiva — o exemplo do artigo é o Azure AI Search. Em vez de receber os arquivos inteiros, o modelo consulta um índice dos documentos e recebe só o necessário para responder.\n• Indexar: os documentos financeiros, como planilhas e PDFs, viram um índice pesquisável.\n• Consultar: a busca separa as informações que respondem à pergunta e as entrega ao modelo.\n• Controlar: todo o processamento fica dentro de um ambiente sob controle da organização.\n## Caminho 2: o modelo no próprio computador\nA segunda saída é rodar o modelo de linguagem localmente. O autor cita o Jan.ai, que permite conversar com modelos direto no dispositivo, sem conexão com a internet: as perguntas com dados sensíveis não saem da máquina. A contrapartida é o hardware — modelos grandes, como o Llama 2 de 70 bilhões de parâmetros, pedem mais memória do que um computador comum tem, por isso a proposta usa modelos menores e mais focados.\n## A conclusão do autor\nO ganho da IA generativa na contabilidade é real, desde que venha acompanhado de segurança de dados e conformidade regulatória. Para o autor, a combinação de modelos de linguagem com processamento privado de dados e ambientes controlados é o que permite usar a tecnologia sem colocar em risco a informação dos clientes.\n## Para ler junto\nO artigo é de abril de 2024: nomes e recursos das ferramentas podem ter mudado desde então. Na rotina da área, vale ler também os comunicados do Grupo sobre segurança digital e sobre o Código de Ética e a LGPD, na aba Equatorial da Comunicação.",
+    "dataPublicacao": "2026-09-21",
+    "dataVigencia": null,
+    "fonte": "Conselho Federal de Contabilidade (CFC) — artigo de Álvaro Brito, publicado em 19/04/2024",
+    "urlFonte": "https://cfc.org.br/destaque/artigo-a-revolucao-da-inteligencia-artificial-na-contabilidade-seguranca-de-dados-com-chatgpt/",
+    "link": "https://cfc.org.br/destaque/artigo-a-revolucao-da-inteligencia-artificial-na-contabilidade-seguranca-de-dados-com-chatgpt/",
+    "rotuloLink": "Ler o artigo no site do CFC",
+    "documento": null,
+    "imagem": "assets/images/comunicados/cfc-ia-contabilidade-capa.webp",
+    "imagemAlt": "Ilustração: mesa de contabilidade com planilhas, relatórios e calculadora; fluxos de luz passam por um escudo com cadeado até um painel de assistente de IA.",
+    "figuras": [
+      {
+        "imagem": "assets/images/comunicados/cfc-ia-contabilidade-risco.webp",
+        "alt": "Ilustração: documentos financeiros saem da mesa e são levados por fluxos de dados até uma nuvem pública, com um triângulo de alerta.",
+        "legenda": "O risco: planilhas e relatórios colados num serviço aberto saem do controle da empresa."
+      }
+    ],
+    "nivelImpacto": "Moderado",
+    "empresasImpactadas": [
+      "Grupo Equatorial"
+    ],
+    "areaResponsavel": "CFC — Comissão Permanente de Tecnologia e Inovação",
+    "responsavel": "Eduardo dos Santos Rocha",
+    "palavrasChave": [
+      "inteligência artificial",
+      "IA generativa",
+      "ChatGPT",
+      "LGPD",
+      "segurança de dados",
+      "busca cognitiva",
+      "Azure AI Search",
+      "Jan.ai",
+      "LLM",
+      "CFC"
+    ],
+    "ativo": true,
+    "status": "Publicado",
+    "aprovadoPor": "Eduardo dos Santos Rocha",
+    "dataAprovacao": "2026-09-21",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Eduardo dos Santos Rocha",
+        "data": "2026-09-21"
+      }
+    ],
+    "creditoImagens": "Ilustrações geradas com IA (Gemini)"
   }
 ]

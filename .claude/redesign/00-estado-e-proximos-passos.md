@@ -1,10 +1,15 @@
 # Estado do redesign e próximos passos
 
-Atualizado em 20/09/2026 (2ª rodada) · Branch `ajustes-frontend-dudu` (a partir de `main`,
-que segue em produção para comparação) · **Nada commitado ainda**.
+Atualizado em 21/09/2026 · Branch `ajustes-frontend-dudu` (a partir de `main`,
+que segue em produção para comparação) · **Um commit por assunto**, feito
+pelo Claude assim que o assunto fica pronto (regra em `.claude/CLAUDE.md`).
 
 Leia este arquivo primeiro ao retomar a conversa. Ele resume a intenção, o que
 já foi decidido e feito, e o que vem a seguir.
+
+> **Estado da última sessão e próximos passos imediatos:** `PROJETO_ESTADO_ATUAL.md`
+> na raiz (snapshot) e `PROJETO_ESTADO_RESOLVIDOS.md` (o que foi concluído).
+> Este arquivo guarda o detalhe de design e as decisões travadas.
 
 ---
 
@@ -73,9 +78,11 @@ rodapé com mapa do portal.
    centralizados com ícone, ativo com sublinhado laranja; dropdown branco
    alinhado à esquerda do item, borda superior laranja, **sem "Tudo em…"**;
    teclado e celular (botão "Menu"). Substituiu a barra lateral.
-3. **Capa** — carrossel de destaques 16:9 na metade esquerda (7 s, pausa,
-   setas, pontos, respeita "Reduzir movimento") + Avisos e Acesso rápido na
-   direita; abaixo, "Comunicação recente". Saíram o bloco de apresentação, as
+3. **Capa** — carrossel de destaques (formato do Conecta) com Avisos e
+   Acesso rápido numa coluna ao lado dele a partir de 1200 px (altura pela
+   janela, 21/09 à noite, para a Comunicação aparecer sem rolar); abaixo,
+   **Comunicação em três colunas, uma por origem**, sem faixa de título
+   (21/09, ver item 18 e `03-sistema-visual.md`). Saíram o bloco de apresentação, as
    três métricas e a trilha "Workspace / Visão geral".
 4. **Enfeites removidos** — faixa RADAR, pontos pulsando, kickers em caixa
    alta, setas decorativas. Links externos usam o ícone de link externo.
@@ -90,8 +97,11 @@ rodapé com mapa do portal.
    Portal de Serviços = os 8 serviços do atendimento interno; Gente e Gestão =
    os 8 de RH; Externos = 6 links de terceiros) e nasceu
    **Sistemas e automações**
-   (Contabilidade = automações; Equatorial = 8 atalhos SAP e afins em grade;
-   Externos ainda pendente).
+   (Contabilidade = automações; Equatorial = 5 atalhos SAP e afins em grade;
+   Externos = ferramentas de terceiros, hoje só o iLovePDF). Em 21/09
+   Cronograma de Fechamento e Auditoria saíram dos atalhos Equatorial: eram o
+   mesmo link de dois sistemas da Contabilidade, que continuam em Portais e
+   Links → Contabilidade. O atalho "Outros", sem link, saiu junto.
 8. **Repositório de links (20/09)** — `data/portais.json` serve **duas**
    páginas, separadas pelo campo `destino`: Portais e Links → Equatorial
    (Comunicação, SharePoint, Power BI, Viagens)
@@ -198,10 +208,88 @@ rodapé com mapa do portal.
     documentos) com **a marca oficial da fonte de cada item** (CFC, CPC, IFRS,
     ANEEL, Receita Federal, gov.br, SAP, SharePoint, EY, Python e Grupo
     Equatorial), preenchendo o quadro. **Refeita em 20/09** — ver o item 10.
+17. **Origem do conteúdo (21/09)** — todo conteúdo publicado ganhou o campo
+    `origem` (`contabilidade`, `equatorial` ou `externo`), em 11 arquivos de
+    `data/`. Aparece como **filtro "Origem"** em Documentos → Todos e na busca
+    global, como **selo cheio na cor da origem** onde a tela mistura origens e
+    como linha "Origem" em **toda ficha**. A busca global passou a cobrir também
+    portais, links externos, automações e atalhos corporativos — antes não
+    achava "Paytrack", "ChatGPT" nem o próprio SAP. O "Novo rascunho" pede a
+    origem; a automação grava sempre Contabilidade. Depois da limpeza dos dados
+    ilustrativos e da carga dos e-mails (item 19), a Comunicação tem 1
+    Contabilidade, 6 Equatorial e 1 Externo; documentos 0 + 1 + 8. Detalhes em
+    `03-sistema-visual.md` § 9.
+19. **Comunicados da Comunicação Equatorial (21/09)** — 6 comunicados de
+    origem Equatorial transcritos dos e-mails de `projeto/modelos-emails/`
+    (extraídos em `projeto/brand/referencias/emails/`), publicados e aprovados
+    por Eduardo dos Santos Rocha: segurança digital, Código de Ética nas
+    eleições, Código de Ética e LGPD, MigraSAP (4ª rodada do quiz), Agentes da
+    Inovação e 10 cases de inovação aberta. Estão em `data/noticias.json`
+    (ids `eqtl-*`); imagens em `assets/images/comunicados/`. Peça vertical tem
+    `imagemCapa` (recorte 16:9 do topo) para a lista e a capa; a página mostra a
+    peça inteira. **Regras usadas:** texto fiel à peça, com a Comunicação como
+    fonte; **nenhum link rastreado** (os e-mails passam os cliques por um
+    rastreador com código ligado ao e-mail do Eduardo) — o link do quiz do
+    MigraSAP veio do QR Code da peça. Ficaram de fora, por escolha do usuário:
+    SIPAT (21 a 25/09) e Data Services (até 30/09) como avisos, e o Engaja+;
+    e, por estarem vencidos ou fora do tema, ONEE, Wellhub, "Eu faço a
+    diferença", DDS, Movimente-se, Escola de Eletricistas, Virtus e baixa
+    umidade. **Ver o bloqueio de publicação na seção 7.**
+20. **Carrossel: molde novo e gestão (21/09)** — o slide segue o molde do
+    usuário (Figma 2000×519 em `projeto/comunicados`): fundo, até duas
+    imagens, selo + área, título, subtítulo, descrição e ação, com o texto em
+    HTML. O **slide inteiro é clicável** (antes o texto cobria o botão e só a
+    metade da imagem clicava). Cada slide aponta para um **destino**
+    (comunicado, sistema, portal, link externo, atalho, página ou endereço
+    livre) e herda dele o que deixar em branco. Gestão pela **Administração →
+    Carrossel**, pelo bloco **"Carrossel da capa"** na página do comunicado e
+    pelo **"Destacar no carrossel"** das fichas, com prévia do slide; gravar
+    exige o servidor interno (testado de ponta a ponta com o `server.js` numa
+    cópia dos dados: criar, reordenar, encerrar, excluir, validação). Os três
+    slides de sistemas (Cronograma, IFRS 16, Auditoria) foram refeitos com o
+    fundo e as capturas extraídos dos SVGs para `assets/destaques/`.
+18. **Comunicação refeita (21/09)** — Newsletter Contábil e Notícias &
+    Impactos viraram **uma lista só de comunicados**, com abas **Todos,
+    Contabilidade, Equatorial e Externo**. Cada comunicado é uma **faixa**
+    (imagem à esquerda; selo, categoria e data; título; subtítulo; texto até
+    onde couber) e ganhou **página própria**
+    (`#central/comunicado/<coleção>/<id>`) com o texto na íntegra, as ações e
+    a ficha — o diálogo de leitura saiu. A **capa** trocou "Comunicação
+    recente" por **três colunas, uma por origem**, no formato da capa da CNN
+    Brasil que o usuário enviou. **Paleta das origens** escolhida pelo usuário:
+    Contabilidade verde-água, Equatorial azul do Grupo, Externo roxo; a
+    categoria perdeu a cor. O ProjectHub, cadastrado na Newsletter e em
+    Notícias, aparece uma vez só (nada foi apagado). Detalhes em
+    `03-sistema-visual.md` § 10.
 
 ---
 
 ## 4. Exigências do usuário (travadas — não proponha de novo)
+
+### Origem do conteúdo (21/09)
+- **Três origens**: **Contabilidade** (criado e gerido pela Gerência),
+  **Equatorial** (do Grupo, para a empresa toda) e **Externo** (de fora do
+  Grupo, com tema afim).
+- **Critério: quem escreveu o conteúdo, não o tema.** Análise da equipe sobre
+  uma norma = Contabilidade; notícia reproduzida da ANEEL = Externo;
+  deliberação do Grupo = Equatorial. O tema fica na categoria/grupo.
+- **Cor por origem** (paleta do usuário): Contabilidade verde-água `#0D6B64`,
+  Equatorial azul `#004AAD`, Externo roxo `#6A4BC9`. O **selo é cheio**, com
+  texto branco. A cor é só da origem: a categoria não tem cor própria.
+- **Comunicação tem abas por origem** (Todos, Contabilidade, Equatorial,
+  Externo), pedido do usuário. Nas outras telas que misturam origens
+  (Documentos → Todos, busca global) a origem é filtro, e o selo aparece no
+  cartão. Páginas de uma origem só não levam selo.
+
+### Comunicação e capa (21/09)
+- **Lista de faixas**, uma por comunicado: imagem à esquerda; tipo (origem) e
+  título à direita; subtítulo; texto até onde couber. Clicar abre a **página
+  própria** do comunicado, com endereço próprio.
+- **Capa com três colunas**, uma por origem, no formato da capa da CNN Brasil:
+  título na cor da origem, destaque com o título sobre a imagem, lista com
+  miniatura e marca da origem no canto.
+- Comunicado duplicado entre Newsletter e Notícias aparece **uma vez só**; os
+  registros continuam nos arquivos.
 
 ### Cabeçalho e menu
 - Menu com **ícones**; carrossel **16:9 ocupando metade** da capa.
@@ -263,6 +351,10 @@ rodapé com mapa do portal.
 ### Faixa de busca e filtros
 - **Toda tela de conteúdo tem a mesma faixa**: busca, filtros e "Limpar
   filtros", nessa ordem, com a contagem do resultado no rodapé.
+- **Filtro não repete aba** (21/09). Se a faixa de subpáginas já recorta por um
+  campo, ele não vira `<select>`: o filtro de grupo de Documentos & Normas saiu
+  por isso. Nas outras seções as abas são páginas diferentes e os filtros
+  recortam dentro delas, sem repetição.
 - **A capa não tem** — lá a busca é a do cabeçalho.
 
 ### Conteúdo
@@ -274,14 +366,15 @@ rodapé com mapa do portal.
   interna entra do mesmo jeito — basta dizer isso na ficha.
 - Documentos: **só conteúdo real**, com link oficial verificado.
 - Trabalhar **direto nos arquivos reais** (a `main` segue em produção para
-  comparação). **Nada de commit** sem o usuário pedir.
+  comparação). **Um commit por assunto** assim que ele fica pronto e
+  verificado (`.claude/CLAUDE.md`); `git push` só quando o usuário pedir.
 
 ---
 
 ## 5. Próximos passos
 
-**Nada em avaliação.** As 61 artes foram **aprovadas pelo usuário em
-20/09/2026**. Regerar com `python .claude/tools/arte-marcas.py`; conferir em
+**Nada em avaliação.** As artes foram **aprovadas pelo usuário em
+20/09/2026** (hoje são 60, uma por cartão). Regerar com `python .claude/tools/arte-marcas.py`; conferir em
 `projeto/artes/contato.html` (todas, no tamanho real do cartão) e
 `projeto/artes/telas.html` (as do modo `tela`, ampliadas).
 
@@ -294,10 +387,62 @@ rodapé com mapa do portal.
   exigem o backend opcional ligado.
 - A categoria "IA" duplicada em `config.json` **não existe mais**.
 
+**Consequências da origem (21/09) que aguardam decisão**
+- As duas artes que sobraram dos atalhos retirados
+  (`assets/atalhos/cronograma-fechamento.svg` e `auditoria.svg`) e as receitas
+  delas no gerador **foram apagadas em 21/09**, com o aval do usuário. As artes
+  dos sistemas equivalentes (`assets/sistemas/cronograma-de-fechamento.svg` e
+  `portal-de-auditoria.svg`) continuam. O gerador faz agora 60 artes, uma por
+  cartão.
+- **Acesso rápido mudou sozinho**: ele junta atalhos e sistemas ativos até 8.
+  Sem as duas duplicatas, o **ProjectHub** entrou e o **Portal de Auditoria**
+  ficou de fora pelo limite.
+- **Categorias**: com os exemplos fora, sobraram só "COMUNICADO INTERNO" (o
+  ProjectHub) e "ANEEL". Ao cadastrar comunicados reais, padronizar a grafia
+  (a lista sugerida está em `config.json › newsletterCategorias`) e evitar
+  categorias que repetem a origem ("Grupo", "Interno").
+
+**Carrossel (21/09) — decisões de conteúdo pendentes**
+- **6 slides no ar**, acima do limite recomendado de 5. Encerrar ou pausar um
+  (candidato: Controle de Horas, que ainda usa a ilustração antiga).
+- **Moldes do Figma** (`projeto/comunicados`, 2ª leva de 21/09 já aplicada
+  pela `.claude/tools/moldes-destaques.py`):
+  - o **fundo do IFRS 16 é prévia da VectorStock** (a 2ª leva cortou a faixa da
+    marca d'água, mas a licença continua faltando) — bloqueado em
+    `FUNDOS_BLOQUEADOS`; o slide está no azul `#004389` do molde, com as
+    listras, até vir um fundo licenciado;
+  - **Cronograma e Portal de Auditoria continuam com o mesmo parágrafo** (o
+    texto descreve o Portal de Auditoria e, no Cronograma, cita a si mesmo). No
+    Cronograma segue a descrição do cadastro do sistema;
+  - o **subtítulo** é status no IFRS 16 ("Ativo para uso") e na Auditoria
+    ("Em desenvolvimento"), mas chamada no Cronograma; e a Auditoria está
+    "Ativo" em `sistemas.json` — conferir qual vale;
+  - a área está como **"Executiva IV · Conciliação e Auditoria"** (como no
+    molde), enquanto o portal inteiro usa "Contabilidade IV";
+  - *(resolvido)* `image 6/7` eram o "antes" do Cronograma — painel em Excel e
+    o X claro sobre ele e a planilha —, e agora estão na cena do slide;
+  - Controle de Horas mostra subtítulo e descrição quase iguais (a descrição
+    vem do cadastro do sistema) — definir uma ou deixar só o subtítulo.
+- Contagem de cliques por slide ainda não aparece na aba Carrossel (o portal
+  registra `destaque_open` localmente; falta mostrar).
+
+**Comunicação (21/09) — depende de conteúdo**
+- A Comunicação tem **8 comunicados reais**, todos com imagem: ProjectHub
+  (Contabilidade), tarifas da ANEEL (Externo) e 6 da Comunicação Equatorial
+  (item 19). A coluna Contabilidade da capa só tem o ProjectHub.
+- **A notícia da ANEEL ainda tem resíduo de exemplo**: `responsavel` e
+  `aprovadoPor` são "Marina Oliveira" (perfil fictício removido) e
+  `areaResponsavel` é "Normas e Reporte", área que não existe nas equipes.
+  Definir com o usuário quem assina.
+- A lista **não pagina**: com muitos comunicados, vale paginar ou carregar por
+  partes.
+
 **Bloqueios que dependem do usuário**
-- **Nenhum perfil tem a permissão `administracao`** nos dados de hoje, então o
-  botão "Trocar imagem" e a janela de Administração nunca aparecem. Ou se cria
-  esse perfil, ou a troca de imagem também vale para a Gerência.
+- **Administração (21/09):** Jonathan e Eduardo têm a permissão
+  `administracao`, em `data/usuarios.json`, com o mesmo `id` que têm no quadro
+  das equipes. Quem escolhe um deles na identificação vê o menu Administração
+  e o botão "Trocar imagem". A janela ainda pede o **código de acesso** (hash
+  em `ADMIN_UNLOCK_HASH`, `js/app.js`); o código não está no repositório.
 - **Os atalhos Equatorial não gravam pela API**: `config.json` é somente
   leitura no servidor, então a arte deles só muda editando o JSON.
 - **Dois cartões sem logo oficial** — ONESOURCE e ARGO saem como assinatura
@@ -305,14 +450,31 @@ rodapé com mapa do portal.
   serve a assinatura oficial em SVG.) Ver o fim de `assets/marcas/FONTES.md` para
   trocar. (O Saber saiu dessa lista em 20/09: o banner de entrada dele tem
   lockup próprio, "Gente que Aprende".)
-- **Os seis prints em `assets/sistemas/*.webp`** não são mais usados. Os
-  arquivos estão versionados; apagar só se o usuário confirmar.
+- **As seis ilustrações em `assets/sistemas/*.webp`** (não são prints: são
+  ilustrações geradas de cada sistema). Corrigido em 21/09: **quatro estão em
+  uso** no carrossel da capa (Cronograma, IFRS 16, Portal de Auditoria e
+  Controle de Horas, destaques d3 a d6). **Monitor de Desempenho** e
+  **ProjectHub** estão sem uso. O usuário pediu para manter. Não servem para
+  comunicado de Equatorial: ilustram sistemas da Contabilidade, então um
+  comunicado sobre eles é de origem Contabilidade. Há erros de texto dentro de
+  algumas ("Eestalizado" e "Visão Global" duplicado no Portal de Auditoria;
+  "Fluxo de fechamento" duas vezes no Cronograma) — o do Portal de Auditoria
+  já aparece no carrossel.
 - **A foto do banner da Central de Resultados** veio do site de RI e é um
   licenciamento de banco de imagens (iStock) que a Equatorial contratou para
   aquele site. O portal é publicado no GitHub Pages: vale confirmar com quem
   cuida do RI antes de publicar.
-- Conteúdo real para destaques e avisos (`data/destaques.json`,
-  `data/avisos.json` estão com exemplos marcados).
+- **Dados ilustrativos removidos em 21/09** (aprovado pelo usuário): os 3
+  avisos, 13 comunicados de exemplo (n1 a n5 e 8 notícias), processos,
+  entregas e agenda, os 4 indicadores do Painel, o `resumo` sem uso, a semana
+  fixa, a marca "Dados ilustrativos" do rodapé, as empresas "(exemplo)" das
+  equipes e os perfis fictícios Marina Oliveira e Ana Martins. Ficaram 2
+  comunicados reais (ProjectHub e tarifas da ANEEL); avisos, Painel, Processos,
+  Agenda e Entregas mostram "Nenhum … cadastrado ainda". **Falta conteúdo
+  real** para: avisos, comunicados (a coluna Equatorial da capa está vazia),
+  indicadores, processos, agenda, entregas e as empresas atendidas por equipe.
+  O `dataReferencia` do `config.json` (14/09/2026) é o que o rodapé mostra
+  como "Atualização da base" — atualizar a cada carga.
 
 ---
 
@@ -350,9 +512,19 @@ rodapé com mapa do portal.
   navegador depois de podar**.
 - **Edições por script**: ler o arquivo com `.replace('\\r\\n','\\n')` antes de
   casar trechos de várias linhas.
-- **Nada de commit** sem o usuário pedir.
+- **Commit por assunto** (pedido do usuário em 21/09/2026, regra completa em
+  `.claude/CLAUDE.md`): cada assunto pronto e verificado vira um commit, com a
+  documentação dele; nada na `main`; `git push` só quando o usuário pedir.
 
 ## 7. Pendência de publicação
+
+> **BLOQUEIO antes de qualquer merge na `main` (21/09/2026).** O usuário
+> decidiu que o portal **será interno** e, por isso, autorizou carregar
+> comunicados internos da Comunicação Equatorial (item 19 da seção 3), inclusive
+> uma foto de colaboradores. Mas o workflow ainda publica a `main` em
+> **portal.contabilidade-eqtl.com, sem login**. Enquanto isso não mudar
+> (hospedagem interna ou autenticação), levar esta branch para a `main` põe
+> conteúdo interno na internet. Resolver a hospedagem primeiro.
 
 O workflow `.github/workflows/pages.yml` publica **a pasta inteira** do
 repositório no GitHub Pages (site público). `projeto/` (marca + e-mails

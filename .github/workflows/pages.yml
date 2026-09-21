@@ -34,7 +34,7 @@ jobs:
       # opcional (o site publicado é estático e lê os JSON de data/) e o roteiro
       # de testes. projeto/ já fica fora pelo .gitignore; está aqui por garantia.
       - name: Remover o que não é site
-        run: rm -rf .claude server projeto TESTES.md
+        run: rm -rf .claude server projeto TESTES.md PROJETO_ESTADO_ATUAL.md PROJETO_ESTADO_RESOLVIDOS.md
 
       - name: Empacotar portal estático
         uses: actions/upload-pages-artifact@v4

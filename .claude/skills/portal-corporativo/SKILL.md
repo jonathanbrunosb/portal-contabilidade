@@ -150,12 +150,36 @@ no menu ou na capa.
   **Decisão de 21/09/2026:** formato do **Conecta** (`/esc` do Portal de
   Serviços), medido lá — faixa **larga e baixa** (proporção 3,125), cantos de
   10 px, deslizamento lateral de 0,5 s, setas de 42 px a 15 px das bordas e
-  bolinhas de 9 px no rodapé. Largura total da capa, com Avisos e Acesso
-  rápido em duas colunas abaixo. O slide é **partido** — imagem de um lado,
-  texto do outro, fundo tirado da própria imagem pelo matiz dominante (nunca
-  pela mediana, que entrega cinza). Ver `.claude/redesign/03-sistema-visual.md`.
-- **Abaixo**: conteúdo em container (~1170 px), duas colunas (notícias 2/3 +
-  coluna lateral 1/3: agenda, avisos, acesso rápido).
+  bolinhas de 9 px no rodapé. **Atualizado em 21/09/2026 (noite):** a partir
+  de 1200 px, Avisos e Acesso rápido ficam numa coluna **ao lado** do
+  carrossel, que mede pela altura da janela (`clamp(300px, 46vh, 420px)`),
+  para a Comunicação (três colunas, sem faixa de título) aparecer sem rolar
+  em 1366, 1536 e 1920 px; abaixo de 1200 px, tudo empilha como antes.
+  **Atualizado em 21/09/2026 (2ª versão):**
+  o slide segue o **molde do usuário** (Figma 2000×519, `projeto/comunicados`)
+  — fundo em imagem ou degradê, até duas imagens de um lado, e do outro selo da
+  origem + área, título, subtítulo, descrição e ação, **tudo em HTML** (nunca
+  texto pintado na imagem). **O slide inteiro é clicável.** Cada slide é um
+  registro de `data/destaques.json` que **aponta para um destino** (comunicado,
+  sistema, portal, link externo, atalho, página ou endereço livre) e herda dele
+  o que deixar em branco; gestão pela Administração → Carrossel, pelo bloco na
+  página do comunicado e pelo "Destacar no carrossel" das fichas (exige o
+  servidor interno). No máximo **5 no ar**. Dois formatos: **imagem** (padrão —
+  a imagem na altura toda, se desfazendo num fundo tirado dela, com as listras
+  do molde) e **molde** (fundo e cena gerados dos SVGs por
+  `.claude/tools/moldes-destaques.py`). Do lado do texto, só efeitos que
+  escurecem; contraste medido sobre o fundo real, não pelo `contraste.js`
+  (que não enxerga imagem). Ver
+  `.claude/redesign/03-sistema-visual.md` ("Carrossel de destaques — molde do
+  Figma e gestão").
+- **Comunicação (decisão de 21/09/2026):** uma lista só de comunicados
+  (Newsletter + Notícias), com abas Todos/Contabilidade/Equatorial/Externo,
+  uma **faixa** por comunicado e **página própria** para cada um
+  (`#central/comunicado/<coleção>/<id>`). A capa mostra a Comunicação em
+  **três colunas, uma por origem**, no formato de portal de notícias. Cor por
+  origem: Contabilidade verde-água, Equatorial azul do Grupo, Externo roxo;
+  selo cheio; categoria sem cor. Ver `.claude/redesign/03-sistema-visual.md`
+  § 10.
 - **Celular**: botão "Menu" abre painel com as mesmas seções (não usar
   `<select>` como o CFC); carrossel com proporção mais alta.
 - **Rodapé institucional** com **mapa do portal** (todas as seções/páginas),
@@ -163,8 +187,18 @@ no menu ou na capa.
 - **Sem quadro de título/trilha** nas páginas internas (recusado em 19/09): o
   menu e a faixa de subpáginas já dizem onde se está; o título fica só para
   leitores de tela.
-- **Uma única grade** para todo conteúdo de lista, com a faixa de busca e
-  filtros acima. Tabela sobrou só nos painéis de Gestão.
+- **Uma única grade** (`.pcard`) para todo conteúdo de lista de links e
+  documentos, com a faixa de busca e filtros acima. A exceção é a Comunicação,
+  que é uma lista de **faixas** de leitura (`.comunicado-faixa`), uma por
+  linha. Tabela sobrou só nos painéis de Gestão.
+- **Origem do conteúdo (decisão de 21/09/2026):** todo item publicado em
+  `data/*.json` tem `origem` — `contabilidade` (criado e gerido pela Gerência),
+  `equatorial` (do Grupo, para a empresa toda) ou `externo` (de fora do Grupo).
+  **O critério é quem escreveu, não o tema.** Item novo sem `origem` é
+  cadastro incompleto. Na tela: abas por origem em Comunicação (pedido do
+  usuário); filtro "Origem" em Documentos → Todos e na busca global; selo
+  cheio `.selo-origem` onde a tela mistura origens; linha "Origem" em toda
+  ficha. Ver `.claude/redesign/03-sistema-visual.md` § 9.
 - **Decisão de 20/09/2026:** automações e Documentos & Normas chegaram a virar
   tabela e as duas **voltaram para a grade `.pcard`**, junto com sistemas e
   atalhos. Não há mais tabela de conteúdo no portal.
@@ -195,7 +229,10 @@ no menu ou na capa.
   quebra teclado e leitor de tela. O "i" e o segundo botão ficam por cima e
   continuam clicáveis. Sem destino cadastrado, o cartão não clica. A ficha sai pelo "i".
   Sem arte, entra o ícone da categoria no mesmo espaço.
-  Quem administra troca a arte clicando na própria imagem.
+  Quem administra troca a arte pelo **lápis no canto de cima da imagem**
+  (21/09/2026 — a faixa "Trocar imagem" cobria a arte). Portais e Links e
+  Sistemas e automações abrem na aba **Todos** (tudo da seção, de A a Z, com
+  selo e filtro de origem); Portais e Links tem também a aba **Power BI**.
 
 ## Restrições da stack (não negociáveis)
 
@@ -228,6 +265,9 @@ no menu ou na capa.
    `dudu-check-modais` (o `<dialog>` de detalhes e as janelas de Equipes e
    Administração), `web-design-guidelines` (se instalada) nos arquivos alterados.
 5. **Antes de dizer que terminou** — `verification-before-completion`.
+6. **Commit do assunto** — assunto pronto e verificado vira um commit, com a
+   documentação dele, antes de começar o próximo (regra em `.claude/CLAUDE.md`,
+   pedido do usuário em 21/09/2026). Nada na `main`; `git push` só a pedido.
 
 Trabalhe em fatias pequenas (uma região da tela por vez) e mostre o resultado no
 preview a cada fatia.
@@ -253,3 +293,4 @@ preview a cada fatia.
 - [ ] Cores vêm de tokens; contraste AA (em todos os temas existentes).
 - [ ] Cache-buster atualizado.
 - [ ] Preview conferido nas três larguras e sem erro no console.
+- [ ] Commit do assunto feito (`.claude/CLAUDE.md`).

@@ -86,6 +86,225 @@ convém conferi-lo antes da homologação.
 - Diálogos de edição (Novo rascunho, Administração) não foram medidos: exigem
   o backend opcional.
 
+## Origem do conteúdo — 21/09/2026
+
+Validação no navegador integrado, em 1440, 1024 e 375 px, com os perfis
+Colaborador (Eduardo) e Gerência (Alexandra).
+
+- **Dados**: `origem` gravado em 11 JSONs; o diff mostra só as linhas novas e os
+  três atalhos retirados (Cronograma de Fechamento, Auditoria, Outros).
+- **Filtro Origem**: Notícias com 3 opções (7 Contabilidade + 1 Equatorial + 1
+  Externo = 9 publicadas); Newsletter com 2; Documentos com 2 (Equatorial 1,
+  Externo 8). "Limpar filtros" zera a origem junto com os demais campos.
+- **Busca global**: "sap" traz automações (Contabilidade), os atalhos SAP e SAP
+  HANA (Equatorial) e o serviço SAP do Portal de Serviços; filtrada por
+  Equatorial, 1 resultado do portal. "paytrack" e "chatgpt", que antes não
+  apareciam, agora aparecem com o selo certo. Com Gerência, processos, equipes,
+  agenda e entregas entram como Contabilidade. "Limpar busca" zera a origem.
+- **Fichas**: sistema, automação, atalho, portal, link externo, publicação e
+  aviso mostram a linha "Origem" com o valor esperado.
+- **Altura do cartão**: com selo, igual à do cartão sem selo — 146 px em 1440 e
+  140 px em 1024. Linha de etiquetas das notícias: 1 linha no desktop e até 2
+  no celular, como antes do selo.
+- **Contraste** (`.claude/tools/contraste.js`): `OK` em Newsletter, Notícias,
+  Documentos e na capa com resultados de busca, nas três larguras. Nenhum
+  estouro horizontal e nenhum erro no console.
+- **Documentos sem filtro de grupo**: o `<select>` saiu; as abas continuam
+  recortando (Todos 9, Legislação 2, Grupo Equatorial 1). O filtro Origem só
+  aparece em "Todos" (Externo: 8). "Limpar filtros" numa aba limpa a busca e
+  continua na aba. Contraste `OK` e sem estouro em 375 px.
+- Não testados: o campo Origem do "Novo rascunho" e a gravação da automação
+  pela Administração — o primeiro exige o backend opcional, o segundo o perfil
+  `administracao`, que nenhum usuário tem hoje.
+
+## Comunicação e capa — 21/09/2026
+
+Validação no navegador integrado, em 1440, 1024, ~930 e 375 px.
+
+- **Abas**: Todos 13 comunicados, Contabilidade 10, Equatorial 2, Externo 1. O
+  ProjectHub, cadastrado na Newsletter e em Notícias, aparece uma vez só. Cada
+  aba tem endereço próprio; o filtro de Categoria some onde só há uma
+  categoria (Externo).
+- **Faixa**: imagem à esquerda (340 px em 1440, 278 em 1024, 104 no celular),
+  224 px de altura no desktop; o texto longo some no celular. Clicar em
+  qualquer ponto da faixa abre o comunicado.
+- **Página do comunicado**: abre pela faixa, pela capa, pela busca global e
+  pelo carrossel; o endereço aberto direto (link copiado) carrega a página; o
+  título vai para a aba do navegador; a aba da origem fica marcada; "Voltar
+  para a lista" e o botão Voltar do navegador funcionam. Rascunho e endereço
+  inexistente mostram aviso com link para a lista. `#central/newsletter` (link
+  antigo) leva a "Todos".
+- **Capa**: três colunas de 435 px em 1440 e 308 em 1024; empilham no celular.
+  Título na cor da origem; destaque com o título sobre a imagem; sem imagem, o
+  destaque é a cor da origem. Miniaturas de 128 px (96 entre 860 e 1100 px).
+- **Selo cheio** nos cartões de Documentos: 17,6 px de altura, cartão com a
+  mesma altura de antes (140 px em 1024).
+- **Contraste** (`contraste.js`): `OK` na capa, na lista e na página, nas
+  larguras testadas. Nenhum estouro horizontal, nenhum erro no console. Perfil
+  Gerência: Painel Editorial com os 16 registros.
+
+## Remoção dos dados ilustrativos — 21/09/2026
+
+- **Saíram** (aprovado pelo usuário): 3 avisos, 5 publicações da Newsletter e
+  8 notícias de exemplo, 5 processos, 6 entregas, 3 eventos de agenda, os 4
+  indicadores do Painel, o `resumo` e a semana fixa do `config.json`, as
+  empresas "(exemplo)" das equipes, os perfis fictícios Marina Oliveira e Ana
+  Martins e o avatar `assets/users/2026001.svg`. Uma nova varredura por
+  "demonstrativo/exemplo/ilustrativo" nos dados só encontra falsos positivos
+  (texto alternativo "Ilustração do…", "Demonstrações financeiras").
+- **Capa**: "Nenhum aviso vigente"; Comunicação com ProjectHub
+  (Contabilidade), tarifas da ANEEL (Externo) e "Nenhum comunicado de
+  Equatorial por enquanto"; rodapé "Atualização da base: 14/09/2026", sem a
+  marca de dados ilustrativos.
+- **Perfil Eduardo**: vê o menu Administração e o botão "Trocar imagem" nos
+  cartões; a janela pede o código de acesso, como antes.
+- **Perfil Alexandra (Gerência)**: Painel, Processos, Agenda e Entregas mostram
+  "Nenhum … cadastrado ainda"; Alertas da gerência diz "Nenhum ponto de
+  atenção em processos e entregas"; Painel Editorial com os 3 registros
+  restantes. Contraste `OK`, sem erro no console.
+
+## Comunicados da Comunicação Equatorial — 21/09/2026
+
+- 6 comunicados novos em `data/noticias.json`, origem Equatorial, publicados:
+  a aba Equatorial mostra 6, com filtro de Categoria (Ética e compliance,
+  Inovação, SAP, Segurança da informação). A coluna Equatorial da capa tem
+  destaque (segurança digital) e 4 itens, todos com imagem, nenhuma quebrada.
+- Peças verticais usam o recorte `imagemCapa` na lista e na capa; a página do
+  MigraSAP mostra a peça inteira (794×945) e o botão "Responder ao quiz", que
+  leva ao link tirado do QR Code (sem rastreador).
+- Ficha: fonte da Comunicação com a data do e-mail, área responsável e
+  "Aprovado por Eduardo dos Santos Rocha". Contraste `OK`, sem erro no console.
+
+## Página do comunicado em duas colunas — 21/09/2026
+
+- 1900 px: texto e ficha à esquerda (894 px), peça à direita (652×918,
+  limitada à altura da janela); a página termina em ~1.350 px, antes passava
+  de 2.200.
+- 1440 px: coluna de 662 px + peça de 601 px; imagem horizontal (Código de
+  Ética) ocupa a coluna toda (601×339).
+- 1024 px e 375 px: uma coluna, imagem logo após o título (cartaz limitado a
+  70% da altura da tela). Sem estouro, contraste `OK`, console limpo.
+
+## Carrossel: molde novo e gestão — 21/09/2026
+
+- **Clique**: `elementFromPoint` no título, no resumo e na imagem cai no link do
+  slide; setas, pausa e bolinhas continuam por cima. Clicar no título abriu o
+  comunicado.
+- **Slides**: 6 no ar, com destinos certos (2 comunicados abrem no portal; 4
+  sistemas abrem em outra aba). Cronograma e Auditoria com fundo desenhado e
+  duas imagens; IFRS 16 no azul do molde com o notebook. 1361×353 em 1440;
+  300 px de altura mínima em ~930; empilhado em 375, sem estouro. Contraste
+  `OK`, console limpo.
+- **Gestão com o servidor** (`server.js` numa cópia de `data/`, removida
+  depois): "Destacar no carrossel" num comunicado → formulário com destino
+  travado, datas de hoje a +30 dias e prévia → gravou só destino, agenda,
+  posição e subtítulo; bloco do comunicado passou a "No ar · posição 2".
+  Aba Carrossel: lista por situação, aviso de 7 no ar, Subir renumerou a fila
+  1–7 e a capa acompanhou; "Encerrar agora" e "Excluir" funcionaram. Ficha de
+  portal abre o formulário com o destino travado (slide sem imagens, abre em
+  outra aba). Endereço livre sem título é recusado.
+- **Sem servidor**: o formulário abre com prévia e o botão Salvar desativado,
+  com a explicação.
+
+## Carrossel: 2ª leva dos moldes e formato "imagem" — 21/09/2026
+
+- **Moldes**: `moldes-destaques.py` gerou fundo + cena de Cronograma e
+  Auditoria e só a cena do IFRS 16 (fundo VectorStock bloqueado). Cenas
+  sobrepostas ao fundo conferem com o SVG renderizado (posições do Figma,
+  sombra do painel da Auditoria, X claro sobre o "antes" do Cronograma).
+- **Formato imagem** (ProjectHub, tarifas ANEEL, Controle de Horas): imagem na
+  altura toda e encostada na borda em 1440 e 1024 (zona 628 px e 513 px); no
+  celular, imagem em cima na largura toda, desfazendo-se para baixo.
+- **Contraste sobre o fundo real**: página de teste fora do projeto com os
+  slides empilhados, Edge headless (`--incognito`: sem cache, senão ele usa o
+  CSS velho), fundo fotografado sem o texto, cada linha de texto contra o p95
+  dos pixels. Tudo ≥ 4,5:1 (título ≥ 3:1) em 1440, 1024 e 375; pior caso
+  4,8:1. Antes do ajuste: luz de canto derrubava o apoio para 3,8:1; o fundo
+  do Cronograma deixava a área a 1,7:1 e o título a 2,7:1 (já era assim no
+  molde; corrigido com o halo).
+- **Formulário**: campo Formato alterna a prévia entre `formato-imagem` e
+  `formato-molde`; texto da prévia agora branco/cinza-claro com margem zero
+  (antes, `#dialog-body p` o deixava cinza-escuro sobre o azul).
+- **Console** limpo; perfil Eduardo mantido.
+- **Limite da ferramenta**: o painel do navegador devolveu imagem congelada no
+  modo celular e com a janela aberta (o DOM estava certo); a conferência visual
+  foi feita pela página de teste no Edge headless.
+
+## Lápis, abas Todos e Power BI, agenda na capa, comunicado do CFC, arte do IFRS — 21/09/2026
+
+- **Lápis**: para o perfil de administração, botão redondo de 28 px a 7 px do
+  canto de cima da imagem (`aria-label` "Trocar imagem de <título>"); não
+  cobre mais a arte.
+- **Portais e Links**: abas Todos · Contabilidade · Equatorial · Portal de
+  Serviços · Gente e Gestão · Power BI · Externos. Todos = 33 acessos, todos
+  com selo; filtro Origem (Externo = 6). Power BI = só o BI - Gastos
+  Gerenciáveis, sem filtro de grupo (um grupo só); ele saiu da aba Equatorial
+  (4). **Sistemas e automações → Todos** = 18 itens, com filtro Origem.
+- **Avisos**: a "RR Gerência Contabilidade" (25/09, 08:30–15:30) aparece em
+  primeiro, com a folhinha do dia (sem quem organiza, a pedido do usuário); a
+  ficha mostra data, horário, local "Não informado no convite" e "O convite não traz link de reunião"; o
+  `.ics` sai 11:30Z–18:30Z, sem convidados, com linhas dobradas (RFC 5545).
+- **Comunicado do CFC** (Externo, IA): lista Externo com 2 comunicados; a
+  página tem capa, 5 intertítulos, 1 figura com legenda (duas imagens do Gemini no total, a pedido do usuário; crédito na ficha), botão "Ler o artigo
+  no site do CFC"; nenhuma marca `##`/`[figura]` aparece na página nem na faixa.
+- **Página do comunicado em formato de jornal** (1880 px): texto justificado
+  (16 px) na largura toda; capa flutuando à direita (850×479) e figuras de
+  850 px alternando lados, cada uma abaixo da anterior; nenhuma linha espremida
+  entre imagens (com 46% havia uma linha só com "•" — 49% resolveu); rodapé
+  com a ficha e "Mais comunicados" (4) lado a lado. Em 375: nada flutua,
+  figura de 305 px, rodapé numa coluna, sem rolagem lateral.
+- **Capa, colunas**: os itens menores mostram o subtítulo (texto de 60–78 px
+  ao lado da miniatura de 112 px).
+- **IFRS 16**: cartão refeito da tela de entrada nova; slide com fundo novo —
+  contraste do texto 7,6–12,5:1 em 1440 e 7,2–9,7:1 no celular
+  (`carrossel-teste/contraste.py`).
+- `contraste.js` "OK" na capa, em Portais → Todos e na página do comunicado;
+  sem rolagem lateral em 375; console limpo.
+- **Acesso ao IFRS por esta máquina**: o firewall da rede (FortiGuard)
+  bloqueia `arrendamento.contabilidade-eqtl.com` ("Unrated") e re-assina o
+  certificado; os insumos vieram do Chrome do usuário e da página salva em
+  `projeto/equatorial-links/`.
+
+## Cabeçalho, capa e realce da Comunicação — 21/09/2026 (noite)
+
+- **Fio no cabeçalho**: com a janela mais larga que a foto (747 px), a borda
+  dela aparecia como uma linha vertical. Edge headless a 1513 px/125% e
+  1891 px/100%: o degrau na borda caiu de 11–19 para 0–2 tons.
+- **Capa**: no máximo 4 comunicados por origem — Equatorial 4 (antes 5),
+  Externo 2 (o do CFC como destaque), Contabilidade 1. Conferido também no
+  Chrome do usuário (1536 px, 125%).
+- **Faixa de abas**: nome da seção, busca e lista na mesma coluna — 51 px em
+  1440 e no Chrome do usuário, 41 px em 1024, 29 px em 375.
+- **Realce**: abas de origem com `data-origem` (Todos sem); em Externo, fio,
+  véu e texto roxos; em Portais → Todos, fio de 71 px na aba ativa em
+  `--azul-marca`. Faixa sob o mouse: borda na cor da origem, sombra média,
+  imagem em `scale(1.04)`, título sublinhado, fio de 154 px sob "Ler
+  comunicado completo". Pelo teclado (Tab a partir de "Limpar filtros"), o
+  anel de 3 px contorna a faixa inteira. Sem rolagem lateral; console limpo.
+
+## Capa com a Comunicação à vista — 21/09/2026 (noite)
+
+Medido com Playwright (Chromium, perfil Visitante): altura do carrossel e da
+coluna lateral, e onde começam o título das colunas e as imagens da
+Comunicação. Antes, a Comunicação começava em 780 px (1366×657), 824 px
+(1536×730) e 923 px (1920×950) — sempre abaixo da tela.
+
+| Tela | Carrossel | Coluna lateral | Títulos das colunas | Imagens |
+|---|---|---|---|---|
+| 1280×593 | 823×336 | 365×336 | 537 | 573 |
+| 1366×657 | 883×336 | 391×336 | 537 | 573 |
+| 1536×730 | 1002×336 | 442×336 | 537 | 573 |
+| 1920×911 | 1312×419 | 500×419 | 623 | 659 |
+
+- Bases do carrossel e da coluna alinhadas em todas; sem rolagem lateral;
+  console limpo. 1199 e 1024 px: capa empilhada como antes; 375 px igual.
+- Slides na geometria nova: nenhum texto sai do slide; contraste mínimo
+  4,8:1 (p95 do fundo real, texto escondido). Reticências só onde já havia
+  limite: descrição do Portal de Auditoria (3 linhas) e subtítulo do Controle
+  de Horas em 1366 (2 linhas).
+- Faixa de título "Comunicação" e "Ver todos os comunicados" removidas; o h2
+  continua para leitor de tela (`.sr-only`).
+
 ## Limites e checklist para homologação corporativa
 
 Não houve navegação nos sistemas reais, pois seus endereços não foram fornecidos. Downloads foram validados pelo destino HTTP e atributo de download; o fluxo de salvamento do navegador não foi homologado separadamente. Pausa por hover, preferência de movimento, navegação completa por teclado, zoom de 200% e políticas específicas de Chrome/Edge devem integrar a homologação corporativa. A implementação desses comportamentos está no código, mas não se declara aqui uma certificação de acessibilidade.

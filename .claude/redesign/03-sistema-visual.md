@@ -148,7 +148,75 @@ tabelas ganharam folga vertical, e as caixas de marcar passaram de 18 px para
 
 ## 6. Grade de cartões (`.pcard`)
 
-### Carrossel de destaques (21/09/2026)
+### Carrossel de destaques — molde do Figma e gestão (21/09/2026, 2ª versão)
+
+> **Substitui o slide "partido" descrito logo abaixo** (mantido como histórico
+> das medidas do Conecta e do cálculo de cor de fundo, que continuam valendo).
+
+**Molde:** o do usuário, desenhado no Figma em **2000×519** (proporção 3,85,
+`projeto/comunicados`). Fundo em imagem (`fundoImagem`, `cover`) ou degradê
+(`fundo` → `fundoFim`); **zona de imagens** com 53% da faixa, do lado de
+`lado`, com uma imagem centrada ou duas sobrepostas (a principal no alto, do
+lado de fora; a segunda embaixo, do lado de dentro), com `drop-shadow`
+(`--sombra-imagem`, que segue o recorte de um notebook sem fundo); do outro
+lado, o texto: **selo da origem** (cheio) + fio (`--linha-clara`) + área, título
+(`--fs-xl`, 2 linhas), subtítulo (2), descrição (3) e a ação — seta para
+destino interno, ícone de link externo para destino externo. Altura mínima de
+300 px (em 1024 a proporção sozinha daria 250). No celular, imagens em cima
+(16:9) e texto embaixo. Os moldes em SVG têm o texto **em curvas**: não são
+usados como imagem pronta; o fundo e as capturas foram extraídos para
+`assets/destaques/` (~225 KB contra 6,5 MB) e o texto vem dos dados.
+
+**Dois formatos (21/09/2026, 2ª leva dos moldes + pedido do usuário):**
+
+- **`molde`** — os slides desenhados no Figma. `.claude/tools/moldes-destaques.py`
+  lê os SVGs (padrões `objectBoundingBox` com o recorte do Figma, sombras de
+  `<g filter>`) e gera `<nome>-fundo.webp` (camadas da altura toda) e
+  `<nome>-cena.webp` (as peças nas posições do molde, sobre transparente,
+  recortadas na zona de 53%; escala 2 quando as capturas vieram grandes). A
+  cena ocupa a zona inteira (`.dqb-img-1:only-child{inset:0}`), então a
+  composição do Figma se mantém. `FUNDOS_BLOQUEADOS` exclui o fundo do IFRS 16
+  (prévia da VectorStock: a 2ª leva cortou a marca d'água, mas a licença
+  continua faltando). Com fundo próprio, `.formato-molde.com-fundo:after` põe
+  um **halo escuro** radial atrás do texto (`--halo-texto`, 0,62) e a área vai
+  em branco — sem isso, o Cronograma dava 1,7:1 na área e 2,7:1 no título.
+- **`imagem`** (padrão) — comunicados e sistemas com uma imagem. A imagem ocupa
+  **a altura toda**, encostada na borda, numa zona `--zona:min(56cqw,100cqh*16/9)`
+  (a `.dqb` é `container-type:size` no desktop e `inline-size` no celular) e se
+  desfaz (`mask-image`, 76% → transparente) num **fundo que é ela mesma
+  espelhada e desfocada** (`.dqb-ambiente`, `scale(-1.3,1.3)`,
+  `--desfoque-ambiente`: a borda da peça continua no fundo). No `:after`, de
+  cima para baixo: listras finas a 145° (`--listra-slide`, o grafismo do molde
+  do Cronograma), sombra do canto de fora (`--sombra-canto`), diagonal para
+  `--dqb-fundo-fim` e o véu da cor do slide, que firma **antes** do texto
+  começar. **Regra:** do lado do texto só entram efeitos que escurecem — uma
+  luz de canto clara foi testada e derrubou o apoio para 3,8:1.
+
+Contraste medido sobre o fundo real (Edge headless: fundo fotografado sem o
+texto, cada linha de texto contra o p95 dos pixels): tudo ≥ 4,5:1 em 1440,
+1024 e 375 px; pior caso 4,8:1. A prévia do formulário ficava com texto cinza
+porque `#dialog-body p` vencia as cores do slide: a regra agora é
+`#dialog-body p:not(.dqb p)`.
+
+**O slide inteiro é o alvo do clique:** um `<a class="dqb-abrir">` esticado em
+`z-index:2`, acima do texto (antes o texto, em `z-index:1`, cobria o botão e só
+a metade da imagem clicava). Setas, pausa e bolinhas ficam fora do trilho, em
+`z-index:3`. Destino sem endereço (sistema com link a cadastrar) vira
+`<button>` e abre o aviso de configuração.
+
+**Gestão** (`js/destaques.js`): cada slide aponta para um **destino**
+(`alvo.tipo` + `alvo.ref`: comunicado, sistema, portal, externo, atalho,
+página do portal ou endereço livre) e só guarda o que difere dele. Situação:
+**No ar**, **Agendado**, **Pausado** (`ativo:false`) ou **Encerrado** (depois do
+`fim`). Limite recomendado de **5 no ar** (`LIMITE_NO_AR`). Portas de entrada:
+aba "Carrossel" da Administração, bloco "Carrossel da capa" na página do
+comunicado e "Destacar no carrossel" nas fichas. O formulário abre num
+diálogo largo (`dialog.dialogo-largo`, até 1100 px) com a **prévia do slide**
+(`slideHTML()`, a mesma função do carrossel, dentro de `.dqb-previa inert`).
+Gravar exige o servidor opcional; `initCarousel()` desliga o carrossel
+anterior (`AbortController` + `clearInterval`) antes de redesenhar.
+
+### Carrossel de destaques — 1ª versão, slide partido (histórico)
 
 Formato do **Conecta** (o `/esc` do Portal de Serviços), medido lá: faixa
 **larga e baixa**, não mais meia largura em 16:9.
@@ -211,6 +279,31 @@ resumo 5,7:1, categoria 5,3:1.
 A capa mudou junto: o carrossel é de **largura total** e Avisos + Acesso
 rápido passaram para duas colunas abaixo dele. Em meia largura a faixa de
 3,125 daria 666×213 — baixa demais para caber foto e texto.
+
+**Atualização de 21/09/2026 (noite) — Comunicação à vista sem rolar.** Com a
+faixa de Avisos + Acesso rápido entre o carrossel e a Comunicação, ela
+começava abaixo da tela em todo monitor comum (824 px em 1536×730, 780 em
+1366×657, 923 em 1920×950). Só baixar o carrossel não resolvia: para ver o
+começo das imagens em 1536×730 ele teria de ter ~115 px. A partir de
+**1200 px**:
+
+- Avisos e Acesso rápido sobem para uma **coluna à direita do carrossel**
+  (`clamp(360px, 30%, 500px)`); Avisos no alto, Acesso rápido alinhado à base.
+- O carrossel fica com o resto da largura (não é mais meia largura, e sim
+  ~70%) e mede pela **altura da janela**: `min-height: clamp(300px, 46vh,
+  420px)`, esticando se a coluna ao lado for mais alta — as bases sempre
+  alinhadas. Nessa faixa a imagem do formato "imagem" vai a 50% da largura
+  (era 56%) e o título pode ter 3 linhas.
+- A Comunicação **não mudou** (pedido do usuário): três colunas na largura
+  toda. Saíram a faixa de título "Comunicação" e o "Ver todos os
+  comunicados" (o menu já leva lá; cada coluna tem o seu "Veja mais"); o h2
+  ficou só para leitor de tela.
+- Resultado (título das colunas → começo das imagens): 1280×593 537/573;
+  1366×657 537/573; 1536×730 537/573; 1920×911 623/659. Abaixo de 1200 px a
+  capa segue empilhada como antes.
+- Contraste dos 6 slides na geometria nova (p95 do fundo real): mínimo 4,8:1
+  (Tarifas, em 1366 e 1536). Nos moldes, o Cronograma perde uns pixels da
+  borda esquerda das planilhas.
 
 As grades de Portais e Links listam em **ordem alfabética do título**, não por
 grupo (pedido do usuário em 20/09). O rótulo do grupo continua em cada cartão e
@@ -368,12 +461,11 @@ esquerda quando os campos empilham no celular).
 
 | Tela | Busca por | Filtros |
 |---|---|---|
-| Newsletter Contábil | título, resumo, categoria, fonte | Categoria |
-| Notícias & Impactos | idem + empresas e área responsável | Categoria |
+| Comunicação (Todos e cada origem) | título, subtítulo, texto, categoria, fonte, empresas, área | Categoria (quando a aba tem mais de uma) |
 | Portais e Links → Contabilidade | nome, descrição, equipe | Equipe responsável |
 | Sistemas e automações → Contabilidade | título, descrição, tecnologia, transação | Tecnologia, Status |
 | Sistemas e automações → Equatorial | nome e descrição do atalho | — |
-| Documentos & Normas | título, descrição, grupo, fonte | Grupo |
+| Documentos & Normas | título, descrição, grupo, fonte | Origem (só na aba "Todos") |
 
 Regras:
 
@@ -384,15 +476,181 @@ Regras:
   filtrada e contada sem uma segunda chamada.
 - Toda tela com faixa mostra **a contagem do resultado** no rodapé
   (`role="status"`), no formato "12 automações".
-- Em Documentos o grupo também é aba da faixa de subpáginas: ali "Limpar
-  filtros" usa `aoLimpar` para voltar à aba "Todos", senão a aba marcada
-  mentiria sobre o que está na tela.
-- Os chips de categoria de Notícias viraram um `<select>` na faixa — eram o
-  único controle desse tipo no portal.
+- **Filtro não repete aba.** Em Documentos o grupo é a aba da faixa de
+  subpáginas, então não há `<select>` de grupo na faixa de filtros (saiu em
+  21/09, a pedido do usuário). `navigate()` grava o grupo da aba em `docGrupo`
+  antes de desenhar a tela, e "Limpar filtros" limpa a busca e a origem sem
+  sair da aba. Vale para qualquer tela nova: se a faixa de subpáginas já
+  recorta por um campo, esse campo não vira filtro.
+- Os filtros são montados sobre a lista **da aba aberta**: um filtro que, ali,
+  teria uma opção só não aparece (é o caso da Origem nas abas de grupo de
+  Documentos, todas de uma origem só).
+- O filtro **Origem** vem de `filtroOrigem(id,lista)`: entra **antes** dos
+  outros filtros (é o recorte mais largo) e só aparece quando a lista tem mais
+  de uma origem. Hoje só Documentos → Todos o usa: em Comunicação a origem é a
+  aba. As opções saem de `opcoesOrigem()` (`js/ui.js`), só com as
+  origens presentes e sempre na ordem Contabilidade, Equatorial, Externo.
 
 ---
 
-## 9. Como conferir depois de mexer
+## 9. Origem do conteúdo e o selo (`.selo-origem`, 21/09/2026)
+
+Todo conteúdo publicado tem o campo `origem`, com um de três valores:
+
+| Valor | Rótulo | Quando | Cor (token) |
+|---|---|---|---|
+| `contabilidade` | Contabilidade | escrito, criado ou gerido pela Gerência de Contabilidade | verde-água `#0D6B64` (`--origem-contabilidade`) |
+| `equatorial` | Equatorial | do Grupo, para a empresa toda, não só a Contabilidade | azul do Grupo `#004AAD` (`--origem-equatorial`) |
+| `externo` | Externo | de fora do Grupo: órgão, norma, fornecedor, serviço de terceiro | roxo `#6A4BC9` (`--origem-externo`) |
+
+Paleta escolhida pelo usuário em 21/09/2026. A cor sobre branco e o texto
+branco sobre a cor passam em AA nas três (6,4, 8,1 e 6,1:1). Cada origem tem
+também um fundo claro (`--origem-*-fundo`) para o quadro de quem não tem
+imagem. As classes `.contabilidade`, `.equatorial` e `.externo` (ou o atributo
+`data-origem`) definem `--cor-origem` e `--cor-origem-fundo`, herdadas por tudo
+o que fica dentro.
+
+**O critério é quem escreveu o conteúdo, não o tema** (decisão do usuário em
+21/09/2026). A análise da equipe sobre a IFRS 18 é Contabilidade; a notícia
+reproduzida da ANEEL é Externo; a deliberação do Grupo é Equatorial. O tema
+continua em `categoria`/`grupo`.
+
+- **Onde o selo aparece:** onde a tela **mistura** origens: faixas da
+  Comunicação (aba "Todos" e também nas de origem, como etiqueta do tipo) e
+  página de cada comunicado, cartões de Documentos & Normas (antes do grupo) e
+  resultados da busca global. Nas páginas de Portais e Links e Sistemas e
+  automações o selo **não** entra: a faixa de subpáginas já diz de onde é.
+- **Toda ficha** (o "i" e a página do comunicado) traz a linha "Origem".
+- **Desenho: cheio**, fundo na cor da origem e texto branco (pedido do usuário
+  em 21/09/2026: distinguir de relance). Substituiu a primeira versão,
+  contornada. Para a cor ficar só com a origem, a **categoria perdeu a cor**:
+  nos comunicados ela é texto cinza ao lado do selo, e não mais `.tag` colorida.
+- **Altura:** `line-height:1.3` faz o selo caber na linha de 18 px do rótulo do
+  cartão; o `.pcard` não cresce. O rótulo com selo usa
+  `.meta-label.rotulo-com-selo` (duas classes, para vencer o `display:block` do
+  `.meta-label`, que vem depois no arquivo).
+- **No código:** `ORIGENS`, `seloOrigem()` e `opcoesOrigem()` ficam em
+  `js/ui.js`. Em `js/app.js`, `origemDe(colecao,item)` lê o campo e, quando ele
+  falta, usa o padrão da coleção (`ORIGEM_PADRAO`: sistemas, automações e dados
+  de gestão = Contabilidade; portais e atalhos = Equatorial; externos =
+  Externo). Newsletter, notícias, documentos, avisos e destaques não têm padrão
+  e precisam do campo.
+
+---
+
+## 10. Comunicação e a capa (21/09/2026)
+
+**Comunicação é uma lista só.** A Newsletter Contábil e Notícias & Impactos
+deixaram de ser páginas separadas: `comunicados(data)` (`js/newsletter.js`)
+junta as duas coleções publicadas, do mais recente ao mais antigo. O mesmo
+comunicado cadastrado nas duas (mesmo título) aparece uma vez só, a cópia da
+Newsletter; a outra continua no arquivo e no Painel Editorial. Os dados seguem
+em dois arquivos porque o fluxo editorial grava neles.
+
+- **Abas:** Todos, Contabilidade, Equatorial e Externo (`#central/comunicacao`,
+  `#central/comunicacao-<origem>`). Os endereços antigos
+  (`#central/newsletter`, `#central/noticias`) levam a "Todos".
+- **Faixa (`.comunicado-faixa`):** uma por linha. Imagem à esquerda
+  (`clamp(180px,30%,340px)`, acompanha a altura do texto e tem no mínimo
+  160 px); à direita, selo + categoria + data, título (2 linhas), subtítulo
+  (2) e o texto até onde couber (3), com "Ler comunicado completo". A faixa
+  inteira leva à página: o link do título estica um `::after`, como no
+  `.pcard`. No celular a imagem estreita e o texto longo sai.
+- **Sem imagem** (a maioria hoje): quadro no fundo claro da origem com o ícone
+  de comunicação na cor dela (`.midia-comunicado.sem-imagem`). Imagem que falha
+  ao carregar vira o mesmo quadro (`ligarMidias()`).
+- **Página própria** (`#central/comunicado/<coleção>/<id>`): "Voltar para a
+  lista", selo + categoria + data, título e subtítulo no topo (até 980 px).
+  Abaixo, **duas colunas acima de 1100 px** (ajuste de 21/09 — a primeira
+  versão tinha 800 px e deixava meia tela vazia): à esquerda o texto (72ch),
+  indicadores, ações (fonte, documento, sistema citado) e a "Ficha do
+  comunicado"; à direita a peça inteira, presa no alto da tela (`sticky`) e
+  limitada à altura da janela, para um cartaz vertical não virar uma coluna de
+  1.300 px. Abaixo de 1100 px, uma coluna, com a imagem logo depois do título
+  (até 70% da altura da tela). A faixa de abas continua visível, com a
+  aba da origem marcada; o título do comunicado vai para a aba do navegador.
+  Rascunho ou endereço inexistente mostra aviso com link para a lista.
+- A busca global, o carrossel e as colunas da capa abrem essa página.
+
+**Capa: três colunas, uma por origem** (`colunasOrigem()`), no formato da
+referência que o usuário enviou (capa da CNN Brasil):
+
+- título da coluna na cor da origem, com um quadradinho de 7 px depois;
+- **destaque** 16:10 com o título em branco sobre a imagem, sobre um véu
+  (`--veu-imagem`) na base; sem imagem, o destaque é a própria cor da origem.
+  O destaque tem a cor da origem por baixo, para o título ficar legível
+  enquanto a foto carrega (e o `contraste.js` medir o fundo certo);
+- **sempre os 4 mais recentes da origem** (pedido do usuário em 21/09: antes
+  eram o destaque + outros 4, e o conjunto mudava conforme quem tinha imagem).
+  O destaque é o mais recente dos 4 que tiver imagem; os demais ficam na
+  lista, com **miniatura** 8:7 (128 px; 96 px entre 860 e 1100 px) e a marca
+  da origem num retângulo de 24×7 px no canto;
+- "Veja mais em <origem>", sem seta (seta decorativa está no inventário);
+- abaixo de 860 px as colunas empilham.
+
+**Página do comunicado = matéria de jornal (21/09/2026, 3ª versão, pedido do
+usuário).** O texto ocupa a largura toda, **justificado** e com hifenização
+(`hyphens:auto`, o `<html lang="pt-BR">` dá o idioma); as imagens **flutuam**
+(`float`) e o texto as contorna: a capa à direita (até 49%, encolhe com cartaz
+vertical, altura até a da tela); as figuras do texto alternam esquerda/direita,
+com 49% e `clear:both`. Os 49% são de propósito: com 46%, uma imagem à direita
+e a seguinte à esquerda deixavam uma fresta de ~70 px e a linha que cruzava a
+passagem ficava com uma palavra só; com 49% + 32 px de margem as duas não cabem
+lado a lado e essa linha desce inteira. Acima de 1300 px o corpo sobe para
+`--fs-lg` (a linha ao lado da imagem passa de 800 px). Até 760 px nada
+flutua. Abaixo da matéria (`.comunicado-rodape`, `clear:both`): as ações e, lado
+a lado, a ficha e **"Mais comunicados"** (4, primeiro da mesma origem, com a
+mesma linha da capa: miniatura, título e subtítulo). As versões anteriores —
+coluna de 800 px, e texto e imagens em colunas separadas — deixavam tela vazia.
+
+No `conteudoCompleto`, `## Título` vira `.comunicado-intertitulo` (`--fs-lg`,
+peso forte) e `[figura N]` põe `.comunicado-figura-texto` — imagem com borda e
+`--raio-md`, que abre inteira em outra aba ao clicar, e legenda em `--fs-sm`.
+
+**Realce dos comunicados e das abas (21/09/2026, noite, pedido do usuário).**
+Um vocabulário só para "este item está sob o mouse ou o foco", com os tokens
+de movimento `--ease-saida` (ease-out-quart), `--dur-estado` (0,2 s) e
+`--dur-imagem` (0,6 s):
+
+- **Faixa da lista**: a borda toma a cor da origem (`color-mix` 45% com
+  `--borda`), a sombra sobe para `--sombra-media`, a imagem aproxima para 1,04
+  em 0,6 s, o título ganha sublinhado (que já existe transparente e só ganha
+  cor, então aparece suave) e um fio corre sob "Ler comunicado completo". Ao
+  clicar, a sombra volta ao repouso. O **anel de foco** contorna a faixa
+  inteira (`:has(.comunicado-faixa-link:focus-visible)`), não só o título.
+- **Colunas da capa e "Mais comunicados"**: a mesma aproximação da imagem e o
+  mesmo sublinhado.
+- **Abas**: a `.pg-line` virou um realce que desliza — fio de 3 px no alto e,
+  abaixo, um véu da mesma cor a 9% que some para baixo. Nas abas de origem da
+  Comunicação (`data-origem`, posto pelo `renderSubnav()`), texto, fio e véu
+  tomam a cor da origem e trocam de cor enquanto deslizam; nas demais seções,
+  `--azul-marca`. O `--azul-ativo` saiu das abas: sobre o véu ficava em
+  4,1:1. Medido sobre o véu: marca 6,2, Contabilidade 4,95, Externo 4,7.
+- **Nome da seção na faixa de abas**: recuo de `--respiro-painel` + 1 px (18 px,
+  14 px até 720 px), o mesmo respiro do painel abaixo — nome, busca e lista
+  começam na mesma coluna em qualquer largura.
+- "Reduzir movimento" (sistema ou preferência do portal) tira a aproximação da
+  imagem; borda, sombra e sublinhado continuam marcando o realce.
+
+---
+
+## 12. Ajustes de 21/09/2026 (tarde)
+
+- **Lápis do administrador** (`.pcard-trocar`): botão redondo de 28 px no
+  canto de cima da imagem, fundo branco, borda `--borda`, ícone `pencil`
+  (novo em `ui.js`, junto do `video`). Substitui a faixa "Trocar imagem"
+  que cobria a base da arte.
+- **Abas "Todos"** (`telaTodos()`): a grade de sempre, com o selo da origem em
+  cada cartão (a tela mistura origens) e o filtro Origem — a mesma regra de
+  Documentos → Todos. Filtro de grupo some quando a aba tem um grupo só.
+- **Compromisso em Avisos** (`.aviso-agenda`): no lugar da tarja, a folhinha
+  `.aviso-data` (44 px, borda `--borda-media`, topo de 3 px em `--azul`, dia
+  em `--fs-lg`); à direita, `.aviso-entrar` (botão azul com ícone `video`)
+  quando há link. Em até 480 px o botão desce para baixo do texto.
+
+---
+
+## 13. Como conferir depois de mexer
 
 O script de auditoria de contraste usado aqui está em
 `.claude/tools/contraste.js`: cole no console do preview (ou rode via

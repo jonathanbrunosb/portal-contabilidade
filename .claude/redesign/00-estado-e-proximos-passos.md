@@ -188,9 +188,9 @@ rodapé com mapa do portal.
 
 ### Grade de cartões (vale para todas as telas de lista)
 - O cartão é uma **faixa horizontal**, com **altura de cerca de 1/3** do cartão
-  alto que existiu antes, **dois por linha**. Hoje são **156 px** (173 a 177
-  quando o título ocupa duas linhas) — o usuário achou 199 px alto demais em
-  20/09 e a folga vazia foi cortada.
+  alto que existiu antes, **dois por linha**. Hoje são **145 px** em 1440 e
+  140 em 1024 — o usuário achou 199 px alto demais em 20/09. A altura é do
+  conteúdo: a arte saiu do fluxo e a escala tipográfica encolheu 10%.
 - A **imagem ocupa uma coluna fixa à esquerda**, em altura cheia; as
   informações ficam no restante do espaço.
 - **Clicar em qualquer parte do cartão leva ao destino** (20/09, substitui a

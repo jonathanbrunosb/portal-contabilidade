@@ -49,12 +49,12 @@
      texto abaixo de 12 px. A hierarquia se faz por peso e cor, não por um
      tamanho novo. */
   --fs-xs:.75rem;
-  --fs-sm:.8125rem;
-  --fs-base:.875rem;
-  --fs-md:1rem;
-  --fs-lg:1.125rem;
-  --fs-xl:1.375rem;
-  --fs-2xl:1.875rem;
+  --fs-sm:.78125rem;
+  --fs-base:.8125rem;
+  --fs-md:.90625rem;
+  --fs-lg:1rem;
+  --fs-xl:1.25rem;
+  --fs-2xl:1.6875rem;
   --peso-leve:300;
   --peso-medio:600;
   --peso-forte:700;
@@ -2128,7 +2128,7 @@ th,td {
   position:relative;
   z-index:30;
   color:#fff;
-  background:linear-gradient(100deg,#071f49f2 0%,#071f49d9 38%,#0b376aa6 62%,#075c8070 85%,#075c8047 100%),url("../assets/images/banner/portal-gerencia-contabilidade.webp?v=20260920-40") right 0 top 30%/auto 420px no-repeat;
+  background:linear-gradient(100deg,#071f49f2 0%,#071f49d9 38%,#0b376aa6 62%,#075c8070 85%,#075c8047 100%),url("../assets/images/banner/portal-gerencia-contabilidade.webp?v=20260920-44") right 0 top 30%/auto 420px no-repeat;
   background-color:var(--marinho-escuro)}
 
 .ph-row {
@@ -2488,7 +2488,7 @@ th,td {
 .dq-title {
   display:block;
   max-width:100%;
-  padding:0;
+  padding:2px 0;
   border:0;
   background:none;
   color:var(--texto);
@@ -2882,7 +2882,7 @@ svg.ext {
   display:none}
 
 #page-view #content-view {
-  padding:20px}
+  padding:18px}
 
 /* Capa: comunicação recente */
 .home-news .section-heading a {
@@ -2913,8 +2913,8 @@ svg.ext {
 
 .news-title {
   display:block;
-  margin:3px 0 4px;
-  padding:0;
+  margin:2px 0 3px;
+  padding:2px 0;
   border:0;
   background:none;
   color:var(--texto);
@@ -2959,14 +2959,14 @@ svg.ext {
 .pcard-grid {
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:20px}
+  gap:18px}
 
 .pcard {
   position:relative;
   display:grid;
   grid-template-columns:clamp(150px,32%,220px) minmax(0,1fr);
   grid-template-rows:1fr auto;
-  min-height:156px;
+  min-height:140px;
   background:#fff;
   border:1px solid var(--borda);
   border-radius:var(--raio-xl);
@@ -3018,9 +3018,14 @@ svg.ext {
   border-color:var(--azul);
   box-shadow:var(--sombra-media)}
 
+/* Proporcao fixa: em altura cheia a moldura ia de 1,25 a 1,73 conforme a
+   largura da tela, e a arte — que tem um quadro so — cortava numa das pontas.
+   Com 16:9 aqui e 16:9 na arte, nao corta em largura nenhuma. */
 .pcard-media {
   position:relative;
   grid-row:1 / span 2;
+  align-self:center;
+  aspect-ratio:16 / 9;
   margin:8px 0 8px 8px;
   border:1px solid var(--borda);
   border-radius:var(--raio-md);
@@ -3028,8 +3033,13 @@ svg.ext {
   background:#fff}
 
 /* A arte tem fundo da propria marca e area segura nas bordas, entao preenche
-   o quadro inteiro (cover) em vez de deixar tarja branca (contain). */
+   o quadro inteiro (cover) em vez de deixar tarja branca (contain).
+   `position:absolute` de proposito: com `height:100%` num pai de altura
+   indefinida, o <img> assume a altura intrinseca da arte e passa a DITAR a
+   altura do cartao. Fora do fluxo, quem manda e o conteudo. */
 .pcard-img {
+  position:absolute;
+  inset:0;
   display:block;
   width:100%;
   height:100%;
@@ -3078,7 +3088,7 @@ svg.ext {
   flex-shrink:0}
 
 .pcard-corpo {
-  padding:12px 16px 0;
+  padding:11px 14px 0;
   min-width:0}
 
 /* Etiqueta do cartao: um degrau abaixo do texto, para nao competir com o
@@ -3113,7 +3123,7 @@ svg.ext {
   align-items:center;
   justify-content:space-between;
   gap:10px;
-  padding:8px 16px 12px;
+  padding:7px 14px 11px;
   flex-wrap:nowrap}
 
 .pcard-botoes {
@@ -3164,14 +3174,9 @@ svg.ext {
 @media(max-width:560px) {
   .pcard {
     grid-template-columns:clamp(112px,32%,160px) minmax(0,1fr);
-    min-height:132px}
+    min-height:120px}
 
-  /* Em altura cheia, numa faixa estreita, a moldura fica retrato (0,57) e o
-     `cover` corta 24% de cada lado da marca. No celular ela mantem a
-     proporcao da arte e fica centralizada. */
-  .pcard-media {
-    align-self:center;
-    aspect-ratio:5 / 4}
+
 
   .pcard-corpo {
     padding:12px 12px 0}

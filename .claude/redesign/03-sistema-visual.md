@@ -13,13 +13,23 @@ por **peso e cor**, não inventando um tamanho novo.
 
 | Token | px | Onde se usa |
 |---|---|---|
-| `--fs-xs` | 12 | etiquetas, rótulos, legendas, filtros, `th` e `td` das tabelas antigas |
-| `--fs-sm` | 13 | texto de apoio, células de tabela, descrições |
-| `--fs-base` | 14 | **corpo**; títulos de cartão (em negrito) |
-| `--fs-md` | 16 | títulos de bloco, busca do cabeçalho |
-| `--fs-lg` | 18 | "Portal da Gerência de", títulos de seção |
-| `--fs-xl` | 22 | `h2`, título do diálogo |
-| `--fs-2xl` | 30 | "Contabilidade" no cabeçalho, número de indicador |
+| `--fs-xs` | 12 | etiquetas, rótulos, legendas, filtros |
+| `--fs-sm` | 12,5 | texto de apoio, descrições |
+| `--fs-base` | 13 | **corpo**; títulos de cartão (em negrito) |
+| `--fs-md` | 14,5 | títulos de bloco, busca do cabeçalho |
+| `--fs-lg` | 16 | "Portal da Gerência de", títulos de seção |
+| `--fs-xl` | 20 | `h2`, título do diálogo |
+| `--fs-2xl` | 27 | "Contabilidade" no cabeçalho, número de indicador |
+
+**Redução de 10% em 20/09/2026**, a pedido do usuário ("mais espaços e melhor
+densidade"). Os dois menores degraus não podiam encolher: o piso de 12 px é
+travado, e 10% os levaria a 10,8 e 11,7 px. A escala desceu um degrau — os
+tamanhos médios e grandes caíram de 9 a 11% e os sete degraus continuam
+distintos. Antes: 12, 13, 14, 16, 18, 22, 30.
+
+Depois da redução, dois títulos-botão da capa (`.news-title` e `.dq-title`)
+caíram para 22 px de altura clicável, abaixo dos 24 da WCAG 2.5.8; ganharam
+2 px de recuo vertical.
 
 Pesos: `--peso-leve` 300 (só a primeira linha do título do portal),
 `--peso-medio` 600, `--peso-forte` 700. O corpo usa 400, que é o padrão.
@@ -144,19 +154,20 @@ Normas** (que era tabela até 20/09/2026). Não sobrou tabela no portal fora dos
 painéis de Gestão.
 
 **O cartão é uma faixa horizontal**, não um bloco alto: a imagem ocupa uma
-coluna fixa à esquerda, em altura cheia, e as informações ficam no restante.
+coluna fixa à esquerda, em 16:9 centralizado, e as informações ficam no
+restante.
 Dois por faixa em telas largas, um abaixo de 1100 px — e **continua faixa no
 celular**, com a coluna da imagem encolhendo em vez de a arte subir para cima
 do texto.
 
 | | Medida |
 |---|---|
-| Cartão | 650 × **156** px em 1440 (173–177 com título de duas linhas); raio `--raio-xl` (16), borda 1 px `--borda` |
+| Cartão | 650 × **145** px em 1440 (140 em 1024); raio `--raio-xl` (16), borda 1 px `--borda` |
 | Sombra | `--sombra-sutil` — duas camadas rasas, receita medida em microsoft.com/pt-br |
-| Coluna da imagem | `clamp(150px, 32%, 220px)`, altura cheia, raio `--raio-md`, 8 px de respiro. Abaixo de 560 px: `clamp(112px, 32%, 160px)` com `aspect-ratio: 5/4` centralizada |
+| Coluna da imagem | `clamp(150px, 32%, 220px)`, **`aspect-ratio: 16/9` centralizada**, raio `--raio-md`, 8 px de respiro |
 | Ajuste da arte | `object-fit:cover` — a arte tem fundo da própria marca e área segura nas bordas, então preenche o quadro sem tarja |
 | Conteúdo | rótulo (`.meta-label`), título `--fs-md`/600 em até 2 linhas, descrição `--fs-sm` em até 2 linhas |
-| Ações | faixa no rodapé (56 px): status à esquerda, "i" (32 px) e Acessar/Baixar à direita |
+| Ações | faixa no rodapé (54 px): status à esquerda, "i" (32 px) e Acessar/Baixar à direita |
 
 Regras da grade:
 
@@ -189,14 +200,18 @@ Regras da grade:
   título de duas linhas): `min-height` 176→156, faixa de ações 60→56 px
   (botões 36→32, ainda acima dos 24 da WCAG 2.5.8), rótulo do cartão em
   `--fs-xs` e recuos internos um ponto menores.
-- **A moldura da imagem.** Medida no portal, ela vai de **1,25 a 1,44** de
-  proporção conforme a largura da tela e o tamanho do título. O quadro da arte
-  é 500×400 (1,25), então o corte chega a 7% por borda, só em altura — daí a
-  margem segura de 46 px em cima e embaixo e apenas 40 px nas laterais.
-  No celular a moldura ficava **retrato (0,57)** por causa de uma coluna fixa
-  de 104 px, e o `cover` comia 24% de cada lado da marca; agora ela usa
-  `aspect-ratio: 5/4` centralizada e **não corta nada**. Era a causa principal
-  das assinaturas largas (ServiceNow, Microsoft, CPC) parecerem pequenas.
+- **A moldura da imagem é 16:9 fixo, e a arte também.** Em altura cheia a
+  moldura variava com o cartão — de 1,25 no celular a 1,73 no desktop, 38% de
+  variação — e contra um quadro fixo uma das pontas sempre cortava. Com
+  `aspect-ratio: 16/9` aqui e 512×288 na arte, **não corta em largura
+  nenhuma** e a marca usa o quadro inteiro. Foi o que resolveu as assinaturas
+  largas (ServiceNow, Microsoft, CPC) parecerem pequenas — o problema era o
+  corte, não o tamanho do desenho.
+- **Quem manda na altura do cartão é o conteúdo, não a arte.** `.pcard-img`
+  está em `position:absolute`: com `height:100%` num pai de altura indefinida,
+  o `<img>` assume a altura intrínseca da arte e passa a **ditar** o tamanho do
+  cartão — era por isso que o cartão media 199 px com a arte em 1,10 e 178 px
+  com ela em 1,25. Fora do fluxo, a arte não interfere.
 - **Sem arte, o cartão mostra o ícone da categoria** no mesmo espaço — a
   altura não muda e a grade continua alinhada.
 - Título e descrição são cortados em 2 linhas (`-webkit-line-clamp`) e a faixa

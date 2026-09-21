@@ -162,8 +162,9 @@ no menu ou na capa.
 - **Decisão de 20/09/2026:** automações e Documentos & Normas chegaram a virar
   tabela e as duas **voltaram para a grade `.pcard`**, junto com sistemas e
   atalhos. Não há mais tabela de conteúdo no portal.
-- **Decisão de 20/09/2026 (sistema visual):** escala de 7 tamanhos (12 a
-  30 px, **nada abaixo de 12 px**), 3 pesos, 5 raios e 3 sombras; fonte
+- **Decisão de 20/09/2026 (sistema visual):** escala de 7 tamanhos, hoje de
+  **12 a 27 px** depois da redução de 10% pedida pelo usuário, **nada abaixo de
+  12 px** (o piso não encolhe); 3 pesos, 5 raios e 3 sombras; fonte
   `"Segoe UI", Arial` (a `Inter` saiu da pilha); azul de ação `#0f6cb8` e
   demais cores ajustadas para AA em todo texto.
 - **Decisão de 20/09/2026 (acabamento):** nenhum alvo clicável abaixo de
@@ -181,8 +182,8 @@ no menu ou na capa.
   — tem o passo a passo, os campos do gerador e as armadilhas.
 - **Grade de cartões (`.pcard`), padrão único:** o cartão é uma **faixa
   horizontal** (~176 px de altura), com a imagem numa coluna fixa à esquerda em
-  altura cheia e as informações no restante; **dois por faixa**, e continua
-  faixa no celular. Clique em **qualquer parte do cartão** leva ao destino (decisão de
+  **proporção 16:9** e as informações no restante; **dois por faixa**, e
+  continua faixa no celular. Altura hoje: 145 px em 1440. Clique em **qualquer parte do cartão** leva ao destino (decisão de
   20/09/2026, substitui a anterior): a ação principal estica um `::after` sobre
   o cartão, sem embrulhar tudo num `<a>` — link dentro de link é inválido e
   quebra teclado e leitor de tela. O "i" e o segundo botão ficam por cima e

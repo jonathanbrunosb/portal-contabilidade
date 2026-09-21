@@ -29,14 +29,11 @@ from PIL import Image
 MARCAS = 'assets/marcas'
 TELAS = 'projeto/marcas-telas'   # insumo do gerador; nao vai para o site
 LOGOS = 'assets/logos'
-L, A = 500, 400                  # quadro 1,25: a media das molduras do cartao
+L, A = 512, 288                  # 16:9, a mesma proporcao da moldura do cartao
 
-# Area segura. Medido no portal: a moldura da imagem varia de 1,14 a 1,57 de
-# proporcao conforme a largura da tela e o tamanho do titulo do cartao. Contra
-# o quadro de 1,25 isso corta pouco na largura e ate 10% em cima e embaixo —
-# o oposto do que eu supunha antes, quando a margem lateral de 60 px so
-# espremia a marca a toa.
-MARGEM_X, MARGEM_Y = 40, 46
+# A moldura do cartao e 16:9 fixo, igual a este quadro, entao a arte nao e
+# cortada em largura nenhuma. A margem existe so como respiro visual.
+MARGEM_X, MARGEM_Y = 34, 22
 SANS = 'Segoe UI,Arial,Helvetica,sans-serif'
 SERIF = 'Georgia,Times New Roman,serif'
 INK_CLARO, INK_ESCURO = '#3b4a60', '#ffffff'
@@ -221,24 +218,24 @@ def compor(spec):
 
     if esquerda:
         # Lockup da tela de entrada: logo em cima, titulo e subtitulo abaixo.
-        logo_h = spec.get('logoAltura', 38)
+        logo_h = spec.get('logoAltura', 32)
         corpo.append('<image href="%s" x="%d" y="%d" width="%d" height="%d" '
                      'preserveAspectRatio="xMinYMid meet"/>'
                      % (uri(spec['logo'], spec.get('trocas'), 640,
                             inverter=spec.get('inverter', False)),
-                        MARGEM_X, spec.get('logoY', 56),
-                        spec.get('logoLargura', 168), logo_h))
+                        MARGEM_X, spec.get('logoY', 34),
+                        spec.get('logoLargura', 156), logo_h))
         linhas = quebra(spec['titulo'], spec.get('limite', 15))
         tam = spec.get('tamanhoTitulo', 40)
         altura_linha = tam * 1.06
-        topo = spec.get('baseTitulo', 232) - (len(linhas) - 1) * altura_linha / 2
+        topo = spec.get('baseTitulo', 160) - (len(linhas) - 1) * altura_linha / 2
         for i, linha in enumerate(linhas):
             corpo.append(texto(MARGEM_X, topo + i * altura_linha, linha, cor_titulo,
                                tam, spec.get('pesoTitulo', 600), fonte,
                                espaco=-0.4 if spec.get('serif') else 0))
         if spec.get('subtitulo'):
-            corpo.append(texto(MARGEM_X, topo + (len(linhas) - 1) * altura_linha + 44,
-                               spec['subtitulo'], cor_sub, 17, 500, SANS, opacidade=0.88))
+            corpo.append(texto(MARGEM_X, topo + (len(linhas) - 1) * altura_linha + 34,
+                               spec['subtitulo'], cor_sub, 15, 500, SANS, opacidade=0.88))
     else:
         rotulo = spec.get('rotulo')
         linhas = quebra(rotulo, 20) if rotulo else []
@@ -247,22 +244,22 @@ def compor(spec):
             # presenca as assinaturas largas (ServiceNow, Microsoft, CPC),
             # que sao limitadas pela largura e sobravam curtas.
             if linhas:
-                caixa = (52, 62, L - 104, 174) if len(linhas) == 1 else (52, 54, L - 104, 156)
+                caixa = (48, 34, L - 96, 132) if len(linhas) == 1 else (48, 28, L - 96, 116)
             else:
-                caixa = (46, 78, L - 92, 244)
+                caixa = (40, 36, L - 80, 216)
             corpo.append('<image href="%s" x="%d" y="%d" width="%d" height="%d" '
                          'preserveAspectRatio="xMidYMid meet"/>'
                          % (uri(spec['logo'], spec.get('trocas'), 640), *caixa))
         else:
             assinatura = spec['assinatura']
             tam = min(58, int(58 * 11.0 / max(len(assinatura), 8)))
-            corpo.append(texto(L / 2, 186 if linhas else 212, assinatura, tinta, tam,
+            corpo.append(texto(L / 2, 140 if linhas else 162, assinatura, tinta, tam,
                                700, fonte, 'middle', espaco=0.5))
         if linhas:
-            base = 300 if len(linhas) == 1 else 278
-            tam = min(31, int(31 * 21.0 / max(len(max(linhas, key=len)), 11)))
+            base = 218 if len(linhas) == 1 else 198
+            tam = min(30, int(30 * 21.0 / max(len(max(linhas, key=len)), 11)))
             for i, linha in enumerate(linhas):
-                corpo.append(texto(L / 2, base + i * 36, linha, tinta, tam, 600,
+                corpo.append(texto(L / 2, base + i * 34, linha, tinta, tam, 600,
                                    SANS, 'middle', 0.88))
 
     cabeca = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" width="%d" '
@@ -309,9 +306,9 @@ def showcase(alt, logo, titulo, subtitulo='Executiva Contabilidade IV'):
     # o recorte do cartao pega esse rodape, com a luz do degrade por cima.
     return {'alt': alt, 'showcase': True, 'logo': logo, 'titulo': titulo,
             'subtitulo': subtitulo, 'alinhamento': 'esquerda', 'serif': True,
-            'tamanhoTitulo': 42, 'pesoTitulo': 400, 'limite': 13,
-            'corSub': '#ffffff', 'inverter': True, 'logoY': 92,
-            'logoLargura': 150, 'logoAltura': 34, 'baseTitulo': 236}
+            'tamanhoTitulo': 34, 'pesoTitulo': 400, 'limite': 16,
+            'corSub': '#ffffff', 'inverter': True, 'logoY': 54,
+            'logoLargura': 132, 'logoAltura': 28, 'baseTitulo': 168}
 
 
 PROJECTHUB = {
@@ -321,26 +318,26 @@ PROJECTHUB = {
     'veu': [(0.0, '#0c1019', 0.84), (0.6, '#0c1019', 0.6), (1.0, '#1d4ed8', 0.44)],
     'logo': 'projecthub-logo.png', 'inverter': True, 'titulo': 'ProjectHub',
     'subtitulo': 'Gestão Integrada de Projetos', 'alinhamento': 'esquerda',
-    'tamanhoTitulo': 46, 'limite': 12, 'corTitulo': '#ffffff', 'corSub': '#94a3b8',
+    'tamanhoTitulo': 38, 'limite': 14, 'corTitulo': '#ffffff', 'corSub': '#94a3b8',
 }
 ARRENDAMENTO = {
     'alt': 'IFRS 16 / CPC 06 (R2), sistema de arrendamentos',
     'degrade': ('#f1f5f9', '#e2e8f0', 135), 'logo': 'arrendamento-logo.png',
     'titulo': 'IFRS 16 / CPC 06 (R2)', 'subtitulo': 'Sistema de Gestão de Arrendamentos',
-    'alinhamento': 'esquerda', 'tamanhoTitulo': 34, 'limite': 14,
-    'corTitulo': '#1a3c5e', 'corSub': '#64748b', 'logoLargura': 180, 'logoAltura': 42,
+    'alinhamento': 'esquerda', 'tamanhoTitulo': 28, 'limite': 18,
+    'corTitulo': '#1a3c5e', 'corSub': '#64748b', 'logoLargura': 150, 'logoAltura': 34,
 }
 GESTOR_HORAS = {
     'alt': 'Gestor de Horas, do Grupo Equatorial', 'fundo': '#111827',
     'logo': 'gestorhoras-logo.png', 'titulo': 'Gestor de Horas',
     'subtitulo': 'Executiva Contabilidade IV', 'alinhamento': 'esquerda',
-    'tamanhoTitulo': 40, 'limite': 12, 'corTitulo': '#ffffff', 'corSub': '#9ca3af',
+    'tamanhoTitulo': 33, 'limite': 15, 'corTitulo': '#ffffff', 'corSub': '#9ca3af',
 }
 MONITOR = {
     'alt': 'Monitor de Desempenho, do Grupo Equatorial', 'fundo': EQTL_AZUL,
     'logo': 'grupo-equatorial-branco.png', 'titulo': 'Monitor de Desempenho',
     'subtitulo': 'Executiva Contabilidade IV', 'alinhamento': 'esquerda',
-    'tamanhoTitulo': 38, 'limite': 12, 'corTitulo': '#ffffff', 'corSub': '#b9c6df',
+    'tamanhoTitulo': 31, 'limite': 15, 'corTitulo': '#ffffff', 'corSub': '#b9c6df',
 }
 CENTRAL_RESULTADOS = {
     'alt': 'Central de Resultados, Relação com Investidores do Grupo Equatorial',
@@ -348,7 +345,7 @@ CENTRAL_RESULTADOS = {
     'veu': [(0.0, '#04204a', 0.76), (1.0, '#02407a', 0.54)],
     'logo': 'grupo-equatorial-branco.png', 'titulo': 'Central de Resultados',
     'subtitulo': 'Relação com Investidores', 'alinhamento': 'esquerda',
-    'tamanhoTitulo': 38, 'limite': 12, 'corTitulo': '#ffffff', 'corSub': '#d6def0',
+    'tamanhoTitulo': 31, 'limite': 15, 'corTitulo': '#ffffff', 'corSub': '#d6def0',
 }
 
 
@@ -358,9 +355,9 @@ def planalto(alt, titulo, ementa):
     gov.br (correcao do usuario em 20/09/2026)."""
     return {'alt': alt, 'fundo': BRANCO, 'logo': 'brasao-republica.gif',
             'titulo': titulo, 'subtitulo': ementa, 'alinhamento': 'esquerda',
-            'serif': True, 'tamanhoTitulo': 33, 'pesoTitulo': 400, 'limite': 16,
+            'serif': True, 'tamanhoTitulo': 27, 'pesoTitulo': 400, 'limite': 20,
             'corTitulo': '#1c2433', 'corSub': '#5f6d82',
-            'logoLargura': 68, 'logoAltura': 70}
+            'logoLargura': 54, 'logoAltura': 56}
 
 
 # ------------------------------------------------------------------ cartoes

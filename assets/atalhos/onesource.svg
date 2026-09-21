@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400" width="500" height="400" role="img" aria-label="ONESOURCE, da Thomson Reuters">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 288" width="512" height="288" role="img" aria-label="ONESOURCE, da Thomson Reuters">
 
-<rect width="500" height="400" fill="#16283f"/>
-<text x="250" y="186" text-anchor="middle" fill="#ffffff" fill-opacity="1" font-family="Segoe UI,Arial,Helvetica,sans-serif" font-size="58" font-weight="700" letter-spacing="0.5">ONESOURCE</text>
-<text x="250" y="300" text-anchor="middle" fill="#ffffff" fill-opacity="0.88" font-family="Segoe UI,Arial,Helvetica,sans-serif" font-size="31" font-weight="600" letter-spacing="0.6">Thomson Reuters</text>
+<rect width="512" height="288" fill="#16283f"/>
+<text x="256" y="140" text-anchor="middle" fill="#ffffff" fill-opacity="1" font-family="Segoe UI,Arial,Helvetica,sans-serif" font-size="58" font-weight="700" letter-spacing="0.5">ONESOURCE</text>
+<text x="256" y="218" text-anchor="middle" fill="#ffffff" fill-opacity="0.88" font-family="Segoe UI,Arial,Helvetica,sans-serif" font-size="30" font-weight="600" letter-spacing="0.6">Thomson Reuters</text>
 </svg>

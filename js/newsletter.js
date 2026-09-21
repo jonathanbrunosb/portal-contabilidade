@@ -1,4 +1,4 @@
-import { escapeHTML as e,icon,badge,dateLabel,showDialog,detailGrid,safeURL,comVersao,normalize } from './ui.js?v=20260920-44';
+import { escapeHTML as e,icon,badge,dateLabel,showDialog,detailGrid,safeURL,comVersao,normalize } from './ui.js?v=20260921-13';
 const colors= {
   'ANEEL':'','CPC / IFRS':'purple','DELIBERAÇÃO DO GRUPO':'teal','COMUNICADO INTERNO':'orange','Grupo':'teal','Interno':'orange'
 }

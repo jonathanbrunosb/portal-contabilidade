@@ -2128,7 +2128,7 @@ th,td {
   position:relative;
   z-index:30;
   color:#fff;
-  background:linear-gradient(100deg,#071f49f2 0%,#071f49d9 38%,#0b376aa6 62%,#075c8070 85%,#075c8047 100%),url("../assets/images/banner/portal-gerencia-contabilidade.webp?v=20260920-44") right 0 top 30%/auto 420px no-repeat;
+  background:linear-gradient(100deg,#071f49f2 0%,#071f49d9 38%,#0b376aa6 62%,#075c8070 85%,#075c8047 100%),url("../assets/images/banner/portal-gerencia-contabilidade.webp?v=20260921-13") right 0 top 30%/auto 420px no-repeat;
   background-color:var(--marinho-escuro)}
 
 .ph-row {
@@ -2435,153 +2435,306 @@ th,td {
   clip:rect(0 0 0 0);
   white-space:nowrap}
 
+/* Carrossel de largura total e, abaixo, Avisos + Acesso rapido lado a lado.
+   Era carrossel na metade esquerda; com a faixa larga do Conecta (3,125) meia
+   largura deixaria 666x213 — baixa demais para caber foto e texto. */
 .home-top {
-  display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-  gap:28px;
   margin-bottom:28px}
 
 .dq {
-  min-width:0}
+  min-width:0;
+  margin-bottom:24px}
 
-.dq-frame {
+/* Carrossel de destaques — formato do Conecta (o /esc do Portal de Servicos),
+   medido em 21/09/2026: faixa larga e baixa de 3,125 de proporcao, cantos de
+   10 px, deslizamento lateral de 0,5 s, setas redondas de 42 px a 15 px das
+   bordas e bolinhas de 9 px no rodape.
+
+   Nossos destaques sao noticia com foto, nao banner com dizeres pintados
+   dentro. Entao o slide e partido: imagem de um lado, texto do outro, sobre
+   um fundo tirado da propria imagem (`fundo`/`fundoFim` em destaques.json).
+   E a emenda entre os dois some num degrade, senao ficaria uma foto colada
+   num retangulo de cor. */
+.dqb {
   position:relative;
-  aspect-ratio:16/9;
+  /* Largura explicita: com `width:auto` o navegador resolvia a proporcao
+     encolhendo a LARGURA ate caber no teto de altura, e a faixa deixava de
+     ocupar a capa inteira. Com a largura definida, a proporcao so manda na
+     altura e o teto corta o excesso. */
+  width:100%;
+  aspect-ratio:3.125;
+  /* O modelo tem 377 px de altura, num conteudo de 1148. O nosso vai a 1361
+     de largura e a proporcao sozinha levava a 435 — alto demais. O teto
+     mantem a altura do modelo e deixa a faixa ainda mais baixa nas telas
+     largas, que e o efeito desejado. */
+  max-height:372px;
+  border-radius:10px;
   overflow:hidden;
   background:var(--marinho-escuro)}
 
-.dq-slide {
+.dqb-trilho {
+  display:flex;
+  height:100%;
+  transition:transform .5s ease-in-out}
+
+.dqb-slide {
+  position:relative;
+  flex:0 0 100%;
+  background:linear-gradient(100deg,var(--dqb-fundo) 0%,var(--dqb-fundo-fim) 100%)}
+
+.dqb-slide[data-lado="direita"] {
+  background:linear-gradient(260deg,var(--dqb-fundo) 0%,var(--dqb-fundo-fim) 100%)}
+
+/* A imagem ocupa 62% da faixa, e nao a coluna de 44% que o texto deixa livre:
+   as ilustracoes sao 16:9 e, espremidas numa caixa de 1,38, perdiam 23% da
+   largura no `cover` — cortava o titulo desenhado nelas. Em 62% a caixa fica
+   em 1,94 e o corte passa para 8% em altura, onde ha folga. O texto entra por
+   cima da parte ja esmaecida. */
+.dqb-arte {
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:0;
+  width:62%;
+  overflow:hidden}
+
+.dqb-slide[data-lado="direita"] .dqb-arte {
+  left:auto;
+  right:0}
+
+.dqb-arte img {
+  display:block;
+  width:100%;
+  height:100%;
+  /* `contain`, nao `cover`. A faixa e larga e baixa (2,27 na caixa da arte) e
+     as ilustracoes sao 16:9: no `cover` o corte chegava a 22% da altura e
+     comia o desenho. Com `contain` a ilustracao aparece inteira, encostada na
+     borda de fora; a sobra do outro lado e o proprio fundo, que a mascara ja
+     esmaece. */
+  object-fit:contain;
+  object-position:left center}
+
+.dqb-slide[data-lado="direita"] .dqb-arte img {
+  object-position:right center}
+
+/* A emenda e uma mascara na propria foto, nao uma camada de cor por cima.
+   Cobrir com a cor deixava um corte vertical seco: a camada chegava a cor
+   cheia, mas ao lado dela quem pintava era o degrade do slide, ja noutro
+   tom. Apagando a foto, o que aparece atras e sempre o mesmo fundo. */
+.dqb-arte img {
+  -webkit-mask-image:linear-gradient(90deg,#000 28%,#0000 76%);
+  mask-image:linear-gradient(90deg,#000 28%,#0000 76%)}
+
+.dqb-slide[data-lado="direita"] .dqb-arte img {
+  -webkit-mask-image:linear-gradient(270deg,#000 28%,#0000 76%);
+  mask-image:linear-gradient(270deg,#000 28%,#0000 76%)}
+
+.dqb-texto {
+  position:relative;
+  z-index:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:9px;
+  width:52%;
+  height:100%;
+  margin-left:48%;
+  padding:26px 40px;
+  color:#fff}
+
+.dqb-slide[data-lado="direita"] .dqb-texto {
+  margin-left:0;
+  margin-right:48%}
+
+.dqb-categoria {
+  margin:0;
+  color:#ffffffd1;
+  font-size:var(--fs-xs);
+  font-weight:var(--peso-forte)}
+
+.dqb-titulo {
+  margin:0;
+  font-size:var(--fs-2xl);
+  font-weight:var(--peso-forte);
+  line-height:1.16;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden}
+
+.dqb-resumo {
+  margin:0;
+  max-width:52ch;
+  color:#ffffffdb;
+  font-size:var(--fs-md);
+  line-height:1.45;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden}
+
+/* Nao e botao: o slide inteiro abre o destaque. Serve de indicacao de que
+   ha para onde ir. */
+.dqb-acao {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  margin-top:3px;
+  color:#fff;
+  font-size:var(--fs-base);
+  font-weight:var(--peso-forte)}
+
+.dqb-acao-seta {
+  width:15px;
+  height:15px;
+  transform:rotate(-90deg);
+  transition:transform .25s}
+
+.dqb:hover .ativo .dqb-acao-seta {
+  transform:rotate(-90deg) translateY(3px)}
+
+/* O texto sobe e aparece quando o slide entra. Escalonado, para o olho
+   pousar primeiro no titulo. */
+.dqb-texto > * {
+  opacity:0;
+  transform:translateY(9px);
+  transition:opacity .45s ease,transform .45s ease}
+
+.dqb-slide.ativo .dqb-texto > * {
+  opacity:1;
+  transform:none}
+
+.dqb-slide.ativo .dqb-categoria {
+  transition-delay:.12s}
+
+.dqb-slide.ativo .dqb-titulo {
+  transition-delay:.18s}
+
+.dqb-slide.ativo .dqb-resumo {
+  transition-delay:.24s}
+
+.dqb-slide.ativo .dqb-acao {
+  transition-delay:.3s}
+
+/* Alvo de clique esticado sobre o slide, no mesmo padrao dos cartoes:
+   sem aninhar link dentro de link. */
+.dqb-abrir {
   position:absolute;
   inset:0;
-  opacity:0;
-  visibility:hidden;
-  transition:opacity .6s,visibility .6s}
-
-.dq-slide.on {
-  opacity:1;
-  visibility:visible}
-
-.dq-open {
-  display:block;
-  width:100%;
-  height:100%;
+  border:0;
   padding:0;
-  border:0;
-  background:none}
-
-.dq-open img {
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block}
-
-.dq-bar {
-  display:flex;
-  align-items:center;
-  gap:16px;
-  padding-top:12px}
-
-.dq-caption {
-  flex:1;
-  min-width:0}
-
-.dq-title {
-  display:block;
-  max-width:100%;
-  padding:2px 0;
-  border:0;
   background:none;
-  color:var(--texto);
-  font-size:var(--fs-md);
-  font-weight:var(--peso-forte);
-  text-align:left;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis}
+  cursor:pointer}
 
-.dq-title:hover {
-  color:var(--azul);
-  text-decoration:underline}
+.dqb-abrir:focus-visible,
+.dqb-seta:focus-visible,
+.dqb-pausa:focus-visible,
+.dqb-pontos button:focus-visible {
+  outline:2px solid #fff;
+  outline-offset:-4px}
 
-.dq-caption small {
-  color:var(--texto-apoio);
-  font-size:var(--fs-sm)}
-
-.dq-controls {
-  display:flex;
-  align-items:center;
-  gap:10px}
-
-.dq-controls[hidden] {
-  display:none}
-
-.dq-btn {
+/* Setas: 42 px, circulo, 15 px da borda, centradas — a medida do Conecta. */
+.dqb-seta,
+.dqb-pausa {
+  position:absolute;
+  z-index:3;
   display:grid;
   place-items:center;
-  width:34px;
-  height:34px;
-  border:1px solid var(--borda);
-  background:#fff;
-  color:var(--texto-2)}
+  border:0;
+  border-radius:50%;
+  background:#00000059;
+  color:#fff;
+  cursor:pointer;
+  transition:background .2s}
 
-.dq-btn:hover {
-  border-color:var(--borda-ativa)}
+.dqb-seta:hover,
+.dqb-pausa:hover {
+  background:#000000a6}
 
-.dq-btn .icon {
-  width:16px;
-  height:16px}
+.dqb-seta {
+  top:50%;
+  width:42px;
+  height:42px;
+  transform:translateY(-50%)}
 
-@media(max-width:720px) {
-  .dq-btn {
-  width:44px;
-  height:44px}
+.dqb-ant {
+  left:15px}
 
-}
+.dqb-prox {
+  right:15px}
 
-.dq-prev {
+.dqb-seta .icon {
+  width:19px;
+  height:19px}
+
+.dqb-prev {
   transform:rotate(90deg)}
 
-.dq-next {
+.dqb-next {
   transform:rotate(-90deg)}
 
-.dq-pause-icon {
-  width:10px;
-  height:12px;
+.dqb-pausa {
+  top:15px;
+  right:15px;
+  width:30px;
+  height:30px}
+
+.dqb-pausa-icone {
+  width:8px;
+  height:10px;
   border-left:3px solid currentColor;
   border-right:3px solid currentColor}
 
-.paused .dq-pause-icon {
+.paused .dqb-pausa-icone {
   width:0;
   height:0;
   border-style:solid;
-  border-width:6px 0 6px 10px;
+  border-width:5px 0 5px 8px;
   border-color:transparent transparent transparent currentColor}
 
-.dq-dots {
-  display:flex}
+/* Bolinhas de 9 px centralizadas no rodape, como no Conecta. */
+.dqb-pontos {
+  position:absolute;
+  left:50%;
+  bottom:9px;
+  z-index:3;
+  display:flex;
+  transform:translateX(-50%)}
 
-.dq-dots button {
+.dqb-pontos button {
   display:grid;
   place-items:center;
   width:24px;
   height:24px;
   padding:0;
   border:0;
-  background:none}
+  background:none;
+  cursor:pointer}
 
-.dq-dots button:before {
+.dqb-pontos button:before {
   content:"";
-  width:11px;
-  height:11px;
+  width:9px;
+  height:9px;
   border-radius:50%;
-  background:var(--borda-media)}
+  background:#ffffff8c;
+  transition:background .2s,transform .2s}
 
-.dq-dots button[aria-current="true"]:before {
-  background:var(--marinho)}
+.dqb-pontos button:hover:before {
+  background:#fff}
+
+.dqb-pontos button[aria-current="true"]:before {
+  background:#fff;
+  transform:scale(1.18)}
+
+.dqb-seta[hidden],
+.dqb-pontos[hidden],
+.dqb-pausa[hidden] {
+  display:none}
 
 .home-side {
   display:grid;
-  gap:24px;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:24px 28px;
   align-content:start;
   min-width:0}
 
@@ -2670,14 +2823,56 @@ th,td {
   grid-template-columns:1fr;
   gap:20px}
 
-.dq-bar {
-  flex-wrap:wrap}
+/* Faixa larga nao cabe em tela estreita: a imagem vai para cima e o texto
+   para baixo, no mesmo fundo. */
+.dqb {
+  aspect-ratio:auto}
 
-.dq-caption {
-  flex-basis:100%}
+.dqb-arte,
+.dqb-slide[data-lado="direita"] .dqb-arte {
+  position:relative;
+  left:auto;
+  right:auto;
+  width:100%;
+  aspect-ratio:16/9}
 
-.dq-title {
-  white-space:normal}
+.dqb-texto,
+.dqb-slide[data-lado="direita"] .dqb-texto {
+  width:100%;
+  height:auto;
+  margin:0}
+
+.dqb-arte img,
+.dqb-slide[data-lado="direita"] .dqb-arte img {
+  object-fit:cover;
+  object-position:center;
+  -webkit-mask-image:linear-gradient(180deg,#000 62%,#0000 100%);
+  mask-image:linear-gradient(180deg,#000 62%,#0000 100%)}
+
+.dqb {
+  max-height:none}
+
+.dqb-texto {
+  padding:16px 18px 30px}
+
+.dqb-titulo {
+  font-size:var(--fs-xl)}
+
+.dqb-resumo {
+  font-size:var(--fs-base)}
+
+.dqb-seta {
+  width:40px;
+  height:40px}
+
+.dqb-ant {
+  left:10px}
+
+.dqb-prox {
+  right:10px}
+
+.home-side {
+  grid-template-columns:minmax(0,1fr)}
 
 }
 
@@ -2688,8 +2883,12 @@ th,td {
 }
 
 @media(prefers-reduced-motion:reduce) {
-  .dq-slide,.pg-line {
+  .dqb-trilho,.dqb-texto > *,.dqb-acao-seta,.pg-line,.dqb-pontos button:before {
   transition:none}
+
+.dqb-texto > * {
+  opacity:1;
+  transform:none}
 
 }
 
@@ -3001,16 +3200,14 @@ svg.ext {
   position:relative;
   z-index:2}
 
-/* O corpo tambem sobe, senao o esticado engole o mouse e o texto do cartao
-   nao pode ser selecionado. O clique aqui e tratado no JS (`ligarCliqueDoCorpo`
-   em app.js), que so navega quando nao houve selecao. */
+/* O corpo fica ABAIXO do esticado, de proposito: o cartao e um alvo so.
+   Em 20/09 ele chegou a subir (`z-index:2`) para deixar o texto selecionavel,
+   com o clique tratado no JS; o usuario testou e recusou — arrastar o mouse
+   dentro do cartao selecionava texto em vez de parecer um botao. Agora o
+   esticado cobre tudo e o texto nao e alvo de mouse. */
 .pcard-corpo {
-  position:relative;
-  z-index:2}
-
-.pcard-corpo h3,
-.pcard-corpo p {
-  cursor:text}
+  -webkit-user-select:none;
+  user-select:none}
 
 /* Com o cartao inteiro clicavel, o foco do teclado precisa aparecer no cartao
    todo, nao so no botao. */

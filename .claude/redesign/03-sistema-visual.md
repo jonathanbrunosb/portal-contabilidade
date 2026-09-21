@@ -148,6 +148,74 @@ tabelas ganharam folga vertical, e as caixas de marcar passaram de 18 px para
 
 ## 6. Grade de cartões (`.pcard`)
 
+### Carrossel de destaques (21/09/2026)
+
+Formato do **Conecta** (o `/esc` do Portal de Serviços), medido lá: faixa
+**larga e baixa**, não mais meia largura em 16:9.
+
+| Medida | Valor (medido no Conecta) |
+|---|---|
+| Proporção | **3,125**, com **teto de 372 px de altura** |
+| Cantos | 10 px, `overflow:hidden` |
+| Troca | `transform .5s ease-in-out` — desliza de lado, não esmaece |
+| Setas | 42 px, círculo, `#00000059`, 15 px das bordas, centradas |
+| Bolinhas | 9 px, brancas (55% / 100%), centralizadas no rodapé |
+| Pausa | 30 px, canto superior direito |
+
+**O slide é partido, e isso é nosso.** No Conecta os dizeres vêm pintados
+dentro do banner; os nossos destaques são notícia com foto. Então: imagem de
+um lado (62% da faixa), texto do outro, e o **fundo sai da própria imagem**.
+O lado alterna a cada destaque, com `lado` no JSON para fixar.
+
+- **A altura tem teto.** A proporção sozinha, numa faixa de 1361, dava 435 px
+  — alto demais; o modelo tem 377 px de altura absoluta. Com `max-height:372px`
+  a faixa fica ainda mais baixa nas telas largas (3,66 em 1440), que é o
+  efeito desejado. **`width:100%` é obrigatório junto:** com `width:auto` o
+  navegador honra a proporção encolhendo a *largura* até caber no teto, e a
+  faixa deixa de ocupar a capa inteira.
+- **A emenda é máscara na foto, não camada de cor por cima.** Cobrir a foto com
+  `--dqb-fundo` deixava um corte vertical seco: a camada chegava à cor cheia,
+  mas ao lado dela quem pintava era o degradê do slide, já noutro tom. Com
+  `mask-image` a foto se apaga e o que aparece atrás é sempre o mesmo fundo.
+  O degradê do slide corre no sentido da foto (100° / 260°), para ela sempre
+  encostar na ponta clara e o texto ficar na funda.
+- **A ilustração cabe inteira: `contain`, não `cover`.** A caixa da arte é
+  62% da faixa (2,27 de proporção) e as ilustrações são 16:9 — no `cover` o
+  corte chegava a 22% da altura e comia o desenho. Com `contain` e
+  `object-position` na borda de fora, a ilustração aparece **sem corte
+  nenhum**, encostada na borda; a sobra do outro lado é o próprio fundo. A
+  máscara termina antes da borda da ilustração (76% da caixa contra 78% onde
+  ela acaba), então o recorte reto dela já está transparente.
+- `fundo` e `fundoFim` ficam em `data/destaques.json`, visíveis para quem
+  edita. São calculados por `.claude/tools/fundo-destaques.py` a partir da
+  imagem:
+  **histograma de matiz ponderado pela saturação**, ignorando cinza, sombra e
+  estouro de branco; saturação alta nesse matiz e luminosidade baixada só até
+  o branco ter 7:1.
+- **Mediana da borda não serve.** Foi a primeira tentativa e deu `#425467`,
+  `#3e5277` — lousa. A mediana puxa para o cinza e escurecer sem mexer na
+  saturação só entrega cinza mais escuro. Com o matiz dominante saem
+  `#0b56a8`, `#105e75`, `#156174`. Há um **piso de saturação de 0,64**: as
+  ilustrações do portal são azuis lavados e batem nele, e sem o piso três
+  slides sairiam quase da mesma cor.
+
+**Comunicado sem foto não entra.** Em 21/09 foram geradas placas escuras com a
+marca do assunto (ANEEL, IFRS, Grupo) para os quatro comunicados publicados sem
+imagem. O usuário recusou: numa faixa dessas, placa de logo ao lado de texto
+não parece notícia, parece anúncio. Comunicado sem foto fica fora do carrossel
+até ter imagem própria.
+
+Contraste medido nos 6 slides, nas duas pontas do degradê: título 7,0:1,
+resumo 5,7:1, categoria 5,3:1.
+
+A capa mudou junto: o carrossel é de **largura total** e Avisos + Acesso
+rápido passaram para duas colunas abaixo dele. Em meia largura a faixa de
+3,125 daria 666×213 — baixa demais para caber foto e texto.
+
+As grades de Portais e Links listam em **ordem alfabética do título**, não por
+grupo (pedido do usuário em 20/09). O rótulo do grupo continua em cada cartão e
+no filtro.
+
 Padrão único de **todas** as telas de lista: Portais e Links → Contabilidade,
 Sistemas e automações → Contabilidade e → Equatorial, e **Documentos &
 Normas** (que era tabela até 20/09/2026). Não sobrou tabela no portal fora dos

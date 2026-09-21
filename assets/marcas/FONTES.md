@@ -36,12 +36,15 @@ botão **"Trocar imagem"**, na própria imagem do cartão.
 | `datylon.svg` | Datylon | site oficial (ícone da marca) |
 | `actio.png` | Actio | site oficial (ícone 192 px) |
 | `paytrack.png` | Paytrack | site oficial (ícone 150 px) |
+| `qulture-rocks.svg` | Qulture.Rocks | assinatura horizontal oficial (239×34), da tela de entrada. Vem na plum `#5A0048` do cartão branco do login; o gerador a troca por branco para pousar sobre o magenta |
+| `senior-marca.png` | Senior Sistemas | arquivo de personalização do tenant do Grupo, no bucket público da Senior |
+| `passatempo.png` | Passatempo (jornada de trabalho, Grupo Equatorial) | servida pela própria ficha do catálogo, no Portal de Serviços. Fica em `projeto/marcas-telas/` porque é marca interna e já vai embutida no SVG |
 | `qulture-rocks.png` | Qulture.Rocks | site oficial (ícone 32 px — pequeno demais, **não usado**) |
 
 ## Telas de entrada reproduzidas
 
-Nove cartões não usam logo sobre cor chapada: a arte **reproduz a tela de
-entrada do destino**. Os insumos (foto de fundo e logo de cada sistema) ficam
+Vinte e dois cartões não usam logo sobre cor chapada: a arte **reproduz a tela
+de entrada do destino**. Os insumos (foto de fundo e logo de cada sistema) ficam
 em `projeto/marcas-telas/`, **fora do site publicado** — já vão embutidos no
 SVG, não precisam ser servidos.
 
@@ -56,9 +59,34 @@ SVG, não precisam ser servidos.
 | Central de Resultados | foto do banner do site de RI + véu azul + logo + título |
 | Lei nº 6.404/1976 | Brasão das Armas da República, do Planalto |
 | Lei Complementar nº 214/2025 | idem |
+| Portal de Serviços (8 cartões) | foto de fundo do próprio portal + véu nas cores dele + logo Grupo Equatorial branca; o título diz qual serviço é |
+| Conecta — Central do Funcionário | o banner de entrada, recortado na chamada "Bem-vindos ao Conecta."; **sem lockup nosso**, o banner já é o dele |
+| Gente e Gestão | o banner da campanha de RH, janela fechada em 1,19 e ancorada à direita para não cortar frase pela metade; **sem lockup nosso** |
+| Portal do Empregado | a moldura da plataforma Senior (bloco da marca, `#333579`) com a marca da Senior e o título |
+| Qulture.Rocks | o magenta da tela de entrada (`#5a0048` com focos de luz) e a assinatura oficial em branco |
+| Saber — Universidade Corporativa | o banner de entrada, que tem lockup próprio ("Gente que Aprende / Conhecimento para transformar o futuro" com o selo dos dois capacetes); **sem lockup nosso** |
 
 > As telas precisam ser lidas **em largura de desktop** (1600 px): o ProjectHub,
 > por exemplo, esconde o painel de identidade em tela estreita.
+
+> O `/esc` é o **Conecta**, portal com identidade própria — banner de entrada,
+> barra de menu `#333579` e seções suas. Insumos em `projeto/marcas-telas/`:
+> `esc-conecta-banner.png`, `esc-gente-banner.png` e `esc-logo.png`, todos
+> servidos pelo próprio portal.
+
+> O banner do Saber não pode ser baixado daqui: o CDN da plataforma serve por
+> **URL assinada da CloudFront** (`403 MissingKey`) e o canvas da página fica
+> manchado por ser outro domínio. O arquivo em `projeto/marcas-telas/` é o
+> recorte que o usuário salvou e entregou. Se ele mudar, peça um recorte novo.
+
+> Os nove cartões do Portal de Serviços mostravam a marca do **fornecedor**
+> (ServiceNow, Microsoft, SAP) — que não é para onde o link leva: todos abrem
+> um item do catálogo do portal do Grupo. Trocados em 20/09 pela tela real,
+> lida em 1600 px. Insumos: `portal-servicos-fundo.jpg` e
+> `portal-servicos-logo.png`, servidos pelo próprio portal
+> (`portaldeservicos.equatorialenergia.com.br`); a foto foi recortada na faixa
+> que a tela mostra. Como a mesma tela serve nove cartões, cada KB embutido é
+> cobrado nove vezes — daí `fotoLargura` e `logoFonte` no spec.
 
 > A foto do banner da Central de Resultados é licenciamento de banco de imagens
 > (iStock) contratado para o site de RI. Como o portal é publicado, confirme com
@@ -66,15 +94,13 @@ SVG, não precisam ser servidos.
 
 ## Cartões sem logo oficial
 
-Quatro marcas não têm arquivo utilizável que eu tenha conseguido obter. A arte
+Duas marcas não têm arquivo utilizável que eu tenha conseguido obter. A arte
 sai como **assinatura tipográfica** sobre a cor da marca, e está sinalizada no
 gerador em `ASSINATURA`:
 
 | Cartão | Por quê |
 |---|---|
 | ONESOURCE (Thomson Reuters) | o que o Commons tem sob "Thomson" é a marca antiga da Thomson Corporation, não a da Thomson Reuters |
-| Learning.rocks | o site devolve o mesmo ícone do Qulture.Rocks |
-| Qulture.Rocks | só expõe um ícone de 32 px |
 | ARGO (Pontes Tur) | o site não respondeu |
 
 Para trocar qualquer uma delas: salve o arquivo aqui, aponte o nome em

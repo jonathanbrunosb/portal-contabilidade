@@ -144,10 +144,16 @@ no menu ou na capa.
   `--acento-laranja` de 3 px. Cada seção é **um link** para a sua primeira
   página, com `aria-current` quando qualquer página dela está aberta. Ela
   **substitui a barra lateral**.
-- **Carrossel de destaques** de largura total abaixo do menu: troca a cada
-  7 s, transição de 0,6 s, pontos de paginação + setas, **botão de pausa**,
-  pausa no hover/foco, `alt` e título em texto, respeita
+- **Carrossel de destaques**: troca a cada 7 s, transição de 0,6 s, **botão de
+  pausa**, pausa no hover/foco, `alt` e título em texto, respeita
   `prefers-reduced-motion`. Usa as artes da Comunicação (repertório).
+  **Decisão de 21/09/2026:** formato do **Conecta** (`/esc` do Portal de
+  Serviços), medido lá — faixa **larga e baixa** (proporção 3,125), cantos de
+  10 px, deslizamento lateral de 0,5 s, setas de 42 px a 15 px das bordas e
+  bolinhas de 9 px no rodapé. Largura total da capa, com Avisos e Acesso
+  rápido em duas colunas abaixo. O slide é **partido** — imagem de um lado,
+  texto do outro, fundo tirado da própria imagem pelo matiz dominante (nunca
+  pela mediana, que entrega cinza). Ver `.claude/redesign/03-sistema-visual.md`.
 - **Abaixo**: conteúdo em container (~1170 px), duas colunas (notícias 2/3 +
   coluna lateral 1/3: agenda, avisos, acesso rápido).
 - **Celular**: botão "Menu" abre painel com as mesmas seções (não usar

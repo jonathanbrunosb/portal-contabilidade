@@ -217,6 +217,18 @@
           "tab": "portais-equatorial"
         },
         {
+          "label": "Portal de Serviços",
+          "icon": "check",
+          "target": "central",
+          "tab": "portais-servicos"
+        },
+        {
+          "label": "Gente e Gestão",
+          "icon": "users",
+          "target": "central",
+          "tab": "portais-gente"
+        },
+        {
           "label": "Externos",
           "icon": "globe",
           "target": "central",

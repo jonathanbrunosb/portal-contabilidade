@@ -86,18 +86,48 @@ rodapé com mapa do portal.
    de 3 px que desliza até o item sob o mouse/foco, 0,25 s). Substituiu a
    "Central de conteúdo" com 5 abas.
 7. **Menus reorganizados** — "Sistemas" virou **Portais e Links**
-   (Contabilidade = sistemas da área; Equatorial = 20 portais do Grupo;
-   Externos = 7 links de terceiros) e nasceu **Sistemas e automações**
+   (Contabilidade = sistemas da área; Equatorial = 5 portais do Grupo;
+   Portal de Serviços = os 8 serviços do atendimento interno; Gente e Gestão =
+   os 8 de RH; Externos = 6 links de terceiros) e nasceu
+   **Sistemas e automações**
    (Contabilidade = automações; Equatorial = 8 atalhos SAP e afins em grade;
    Externos ainda pendente).
-8. **Repositório de links (20/09)** — `data/portais.json` (Portais e Links →
-   Equatorial, agrupado em Portal de Serviços, Comunicação e aprendizagem,
-   SharePoint, Power BI, Pessoas e RH, Viagens) e `data/externos.json`
+8. **Repositório de links (20/09)** — `data/portais.json` serve **duas**
+   páginas, separadas pelo campo `destino`: Portais e Links → Equatorial
+   (Comunicação, SharePoint, Power BI, Viagens)
+   Portais e Links → **Portal de Serviços** (Atendimento, Acessos e senhas,
+   Solicitações por assunto) e Portais e Links → **Gente e Gestão** (Central
+   do Funcionário, Desempenho e carreira, Benefícios e jornada). As duas
+   separações são de 20/09: os nove itens
+   do atendimento interno pesavam metade da tela Equatorial e não conversavam
+   com os outros grupos; e o `/esc` não é uma página solta, é um **portal
+   próprio — o Conecta** — com barra de menu e seções suas, então o cartão
+   "Central do Funcionário" saiu de Pessoas e RH e virou a página dele. Logo
+   depois o usuário mandou levar **todo o RH** para lá — Actio, Qulture.Rocks,
+   Portal do Colaborador e EQTL Previ —, então o grupo "Pessoas e RH" deixou
+   de existir em Equatorial, que ficou só com o que não é gente: comunicação,
+   SharePoint, Power BI e viagens.
+
+   Duas correções do usuário logo depois: o cartão **Meus favoritos** saiu (a
+   lista de favoritos do Conecta era pessoal; o que ele queria ali era o
+   **Saber**, que estava solto em Equatorial com o nome do fornecedor,
+   "Learning.rocks") e **Minha Jornada de Trabalho** veio do Portal de
+   Serviços para cá, com o endereço corrigido para o domínio
+   `portaldeservicos` — estava cadastrado em `service-now.com`, que é o mesmo
+   item do catálogo por outra porta. Depois o **Portal do Colaborador**
+   (`portaldocolaborador.equatorial.corp`, rede interna, só com VPN) saiu e
+   entrou o **Portal do Empregado**, na plataforma Senior por SSO.
+   `data/externos.json`
    (Portais e Links → Externos: Auditoria, Inteligência artificial, Arquivos e
    documentos, Referências visuais). Ambos com faixa de busca, filtro por grupo
-   e contagem. O cartão mostra o **domínio de destino** no rodapé e a ficha do
+   e contagem, e listam em **ordem alfabética do título** (decisão de 20/09:
+   o grupo continua no rótulo do cartão e no filtro, mas quem procura um nome
+   varre a lista de A a Z sem precisar saber em que gaveta ele está). O cartão
+   mostra o **domínio de destino** no rodapé e a ficha do
    "i" traz uma **observação** quando o acesso tem pegadinha (rede interna,
-   workspace pessoal do Power BI, envio de arquivo a serviço público). Origem:
+   workspace pessoal do Power BI, envio de arquivo a serviço público).
+   `telaDeLinks()` é a mesma função para as quatro páginas; `destino` é o que
+   reparte cada coleção. Origem:
    o export de favoritos em `projeto/equatorial-links/`, alocado item a item em
    `alocacao.md`. Snowflake e ONESOURCE TAX ONE entraram nos atalhos.
 9. **Arte de todos os cartões (20/09, 61 SVGs)** — `.claude/tools/arte-marcas.py`
@@ -270,9 +300,11 @@ rodapé com mapa do portal.
   esse perfil, ou a troca de imagem também vale para a Gerência.
 - **Os atalhos Equatorial não gravam pela API**: `config.json` é somente
   leitura no servidor, então a arte deles só muda editando o JSON.
-- **Quatro cartões sem logo oficial** — ONESOURCE, Learning.rocks,
-  Qulture.Rocks e ARGO saem como assinatura tipográfica. Ver o fim de
-  `assets/marcas/FONTES.md` para trocar.
+- **Dois cartões sem logo oficial** — ONESOURCE e ARGO saem como assinatura
+  tipográfica. (O Qulture.Rocks saiu dessa lista em 20/09: a tela de entrada
+  serve a assinatura oficial em SVG.) Ver o fim de `assets/marcas/FONTES.md` para
+  trocar. (O Saber saiu dessa lista em 20/09: o banner de entrada dele tem
+  lockup próprio, "Gente que Aprende".)
 - **Os seis prints em `assets/sistemas/*.webp`** não são mais usados. Os
   arquivos estão versionados; apagar só se o usuário confirmar.
 - **A foto do banner da Central de Resultados** veio do site de RI e é um

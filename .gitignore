@@ -28,3 +28,4 @@ skills-lock.json
 !.claude/skills/portal-corporativo/
 !.claude/skills/dudu-check-cores/
 !.claude/skills/dudu-check-modais/
+__pycache__/

@@ -1,11 +1,11 @@
-import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260920-44';
-import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js?v=20260920-44';
-import { initializeNavigation,markCurrentSection,bindTabs,selectTab } from './navigation.js?v=20260920-44';
-import { renderNewsletter,showArticle,loadNoticias,ultimaAtualizacaoLabel,noticiaCategorias,filterNoticias,renderNoticias } from './newsletter.js?v=20260920-44';
-import { renderTeamStructure } from './teams.js?v=20260920-44';
-import { initCarousel } from './carousel.js?v=20260920-44';
-import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,comVersao,notify } from './ui.js?v=20260920-44';
-import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js?v=20260920-44';
+import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260921-13';
+import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js?v=20260921-13';
+import { initializeNavigation,markCurrentSection,bindTabs,selectTab } from './navigation.js?v=20260921-13';
+import { renderNewsletter,showArticle,loadNoticias,ultimaAtualizacaoLabel,noticiaCategorias,filterNoticias,renderNoticias } from './newsletter.js?v=20260921-13';
+import { renderTeamStructure } from './teams.js?v=20260921-13';
+import { initCarousel } from './carousel.js?v=20260921-13';
+import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,comVersao,notify } from './ui.js?v=20260921-13';
+import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js?v=20260921-13';
 let data,currentTab='newsletter',currentAdminTab='equipes',currentUser,currentMenu=[],navSections=[];
 const $=selector=>document.querySelector(selector);
 // Capability required to see each menu target / page section / searchable collection.
@@ -13,7 +13,7 @@ const TARGET_ACCESS= {
   central:'conteudo',equipes:'time',processos:'gerencial',painel:'gerencial',agenda:'gerencial',editorial:'gerencial',administracao:'administracao'
 }
 ;
-const CENTRAL_TABS=['newsletter','noticias','sistemas','portais-equatorial','portais-externos','documentos','automacoes','atalhos-equatorial','automacoes-externos'];
+const CENTRAL_TABS=['newsletter','noticias','sistemas','portais-equatorial','portais-servicos','portais-gente','portais-externos','documentos','automacoes','atalhos-equatorial','automacoes-externos'];
 // Páginas ainda sem conteúdo definido (o usuário vai desenhar).
 const PAGINAS_EM_DEFINICAO=[];
 const SECTION_ACCESS= {
@@ -82,15 +82,6 @@ function cardPortal(o) {
 // O corpo do cartao fica acima do link esticado, para o texto poder ser
 // selecionado. Em troca, o clique nele chega aqui: navega so quando o usuario
 // nao estava selecionando texto, e nunca por cima de um link ou botao.
-function ligarCliqueDoCorpo() {
-  document.addEventListener('click', event => {
-    const corpo = event.target.closest('.pcard-corpo');
-    if(!corpo || event.target.closest('a,button')) return;
-    if(String(getSelection() || '').trim()) return;
-    corpo.closest('.pcard')?.querySelector('.pcard-principal')?.click();
-  }
-  );
-}
 const acaoAcessar = (url, nome, marca = 'data-quick') => `<a class="primary-btn pcard-acessar" href="${e(url)}" target="_blank" rel="noopener noreferrer" ${marca}="${e(nome)}">Acessar${icon('external').replace('class="icon"','class="icon ext"')}</a>`;
 const acaoBaixar = (url, nome) => `<a class="primary-btn pcard-acessar" href="${e(url)}" download data-doc-title="${e(nome)}">${icon('download')}Baixar</a>`;
 const ACAO_PENDENTE = '<span class="meta-label pcard-pendente">Acesso em configuração</span>';
@@ -137,8 +128,11 @@ function portalCard(colecao) {
 }
 // Ordem dos grupos: a do próprio arquivo, que é como o usuário os organizou.
 const gruposDe=lista=>[...new Set(lista.map(item=>item.grupo).filter(Boolean))];
-// Uma tela de grade filtrável por grupo, usada por Portais → Equatorial e
-// Portais → Externos: muda a coleção, o texto de apoio e nada mais.
+// Uma tela de grade filtrável por grupo, usada por Portais → Equatorial,
+// Portal de Serviços, Gente e Gestão e Externos: muda a coleção, o texto de
+// apoio e nada mais.
+// `destino` reparte uma mesma coleção em telas diferentes (portais.json serve
+// duas; externos.json, outras duas).
 function telaDeLinks( {colecao,destino,prefixo,rotuloBusca,placeholder,rodape,vazio,singular,plural} ) {
   const lista=(data[colecao]||[]).filter(item=>!destino||!item.destino||item.destino===destino);
   const ordem=gruposDe(lista);
@@ -147,8 +141,11 @@ function telaDeLinks( {colecao,destino,prefixo,rotuloBusca,placeholder,rodape,va
   $('#content-view').innerHTML=`${barraFiltro({busca,filtros})}<div class="pcard-grid" id="${prefixo}-cards"></div><div class="content-footer"><span id="${prefixo}-count" role="status" aria-live="polite"></span><span>${e(rodape)}</span></div>`;
   ligarBarraFiltro({busca,filtros,aoMudar:()=> {
     const query=normalize($(`#${prefixo}-busca`).value),grupo=$(`#${prefixo}-grupo`).value;
+    // Ordem alfabética do título, e não por grupo (pedido do usuário em
+    // 20/09): o grupo continua no rótulo do cartão e no filtro, mas quem
+    // procura um nome varre a lista de A a Z sem saber em que gaveta ele está.
     const visiveis=lista.filter(item=>(!grupo||item.grupo===grupo)&&normalize(`${item.nome} ${item.descricao||''} ${item.grupo||''} ${item.link||''}`).includes(query))
-      .sort((a,b)=>(ordem.indexOf(a.grupo)-ordem.indexOf(b.grupo))||a.nome.localeCompare(b.nome,'pt-BR'));
+      .sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
     $(`#${prefixo}-cards`).innerHTML=visiveis.map(portalCard(colecao)).join('')||`<p class="empty-state">${e(vazio)}</p>`;
     $(`#${prefixo}-count`).textContent=contagem(visiveis.length,singular,plural);
   }
@@ -333,10 +330,26 @@ function renderContent(tab) {
     );
   }
   if(tab==='portais-equatorial')telaDeLinks( {
-    colecao:'portais',prefixo:'por',rotuloBusca:'Pesquisar portal do Grupo Equatorial',
+    colecao:'portais',destino:'portais-equatorial',prefixo:'por',rotuloBusca:'Pesquisar portal do Grupo Equatorial',
     placeholder:'Nome, descrição, grupo ou endereço…',
     rodape:'Portais corporativos do Grupo. O acesso depende da sua identificação de rede — o portal só centraliza os endereços.',
     vazio:'Nenhum portal corresponde aos filtros.',singular:'portal',plural:'portais'
+  }
+  );
+  if(tab==='portais-servicos')telaDeLinks( {
+    colecao:'portais',destino:'portais-servicos',prefixo:'psv',
+    rotuloBusca:'Pesquisar serviço do Portal de Serviços',
+    placeholder:'Nome, descrição, grupo ou endereço…',
+    rodape:'Atendimento interno do Grupo, no Portal de Serviços. Abrir chamado, acompanhar ocorrência e pedir acesso exigem a identificação de rede.',
+    vazio:'Nenhum serviço corresponde aos filtros.',singular:'serviço',plural:'serviços'
+  }
+  );
+  if(tab==='portais-gente')telaDeLinks( {
+    colecao:'portais',destino:'portais-gente',prefixo:'gen',
+    rotuloBusca:'Pesquisar em Gente e Gestão',
+    placeholder:'Nome, descrição, grupo ou endereço…',
+    rodape:'Sistemas de gente do Grupo: Conecta, aprendizagem, desempenho, benefícios e jornada. Cada um tem o seu próprio acesso — a ficha do “i” avisa quando tem pegadinha.',
+    vazio:'Nenhum acesso corresponde aos filtros.',singular:'acesso',plural:'acessos'
   }
   );
   if(tab==='portais-externos')telaDeLinks( {
@@ -1318,7 +1331,6 @@ async function init() {
       showDialog('Central de notificações','Alertas da gerência',`<p>${alerts.length} pontos de atenção na base demonstrativa.</p>${alerts.map(({item,collection})=>`<article class="content-card"><h3>${e(item.nome)}</h3><p>${e(item.responsavel)}</p><div class="card-bottom">${badge(item.status)}<button class="text-btn" data-record="${collection}:${e(item.id)}">Ver detalhes</button></div></article>`).join('')||'<p>Nenhum alerta.</p>'}`);
     }
     ;
-    ligarCliqueDoCorpo();
     document.addEventListener('click',event=> {
       const record=event.target.closest('[data-record]');
       if(record) {

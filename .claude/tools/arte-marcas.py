@@ -98,16 +98,30 @@ def uri(nome, trocas=None, largura_max=520, pasta=None, inverter=False):
     return CACHE[chave]
 
 
-def foto(nome, largura=620):
-    """Recorta a foto na proporcao do quadro, pelo centro, e embute."""
+def foto(nome, largura=620, recorte=0.5, zoom=1.0):
+    """Recorta a foto na proporcao do quadro e embute.
+
+    `recorte` e a ancora horizontal, de 0 (borda esquerda) a 1 (direita); o
+    padrao 0,5 centraliza. `zoom` fecha a janela antes do recorte, para deixar
+    de fora o que nao deve entrar.
+
+    Banner de campanha costuma ter dizeres nas duas pontas, e o recorte do
+    quadro corta uma delas pela metade — fica a sobra de uma frase. Foi o caso
+    do Conecta ("Bem-vindos ao Conecta." numa ponta) e do banner de Gente e
+    Gestao ("Agora, todos os serviços de RH estão a um clique." na outra).
+    Meça onde a frase termina e escolha a janela que a inclui inteira ou a
+    deixa toda de fora.
+    """
     im = Image.open(os.path.join(TELAS, nome)).convert('RGB')
     alvo = float(L) / A
-    if im.width / float(im.height) > alvo:
-        larg = int(im.height * alvo)
-        im = im.crop(((im.width - larg) // 2, 0, (im.width + larg) // 2, im.height))
-    else:
-        alt = int(im.width / alvo)
-        im = im.crop((0, (im.height - alt) // 2, im.width, (im.height + alt) // 2))
+    # Arredondo em vez de truncar: com `int()` a janela perdia 1 px de altura
+    # em foto de proporcao quase 16:9, e isso mexia em arte ja aprovada.
+    jl = min(im.width, int(round(im.height * alvo)))
+    ja = min(im.height, int(round(jl / alvo)))
+    jl, ja = int(jl / zoom), int(ja / zoom)
+    x = int((im.width - jl) * min(max(recorte, 0.0), 1.0))
+    y = (im.height - ja) // 2
+    im = im.crop((x, y, x + jl, y + ja))
     im = im.resize((largura, int(largura / alvo)), Image.LANCZOS)
     buf = io.BytesIO()
     im.save(buf, 'JPEG', quality=80, optimize=True)
@@ -183,9 +197,25 @@ def fundo_showcase():
     return corpo, defs
 
 
-def fundo_foto(arquivo, veu=None):
+def focos_de_luz(focos, comeco=0):
+    """Manchas radiais sobre o fundo, como as do painel do Cronograma e as
+    da tela de entrada do Qulture. Cada foco e (cx, cy, raio, cor, opacidade,
+    parada intermediaria)."""
+    corpo, defs = [], []
+    for n, (cx, cy, r, cor, op, meio) in enumerate(focos, comeco):
+        defs.append('<radialGradient id="f%d" cx="%s" cy="%s" r="%g">'
+                    '<stop offset="0" stop-color="%s" stop-opacity="%g"/>'
+                    '<stop offset="%g" stop-color="%s" stop-opacity="%g"/>'
+                    '<stop offset="1" stop-color="%s" stop-opacity="0"/></radialGradient>'
+                    % (n, cx, cy, r, cor, op, meio, cor, op, cor))
+        corpo.append('<rect width="%d" height="%d" fill="url(#f%d)"/>' % (L, A, n))
+    return corpo, defs
+
+
+def fundo_foto(arquivo, veu=None, largura=620, recorte=0.5, zoom=1.0):
     corpo = ['<image href="%s" x="0" y="0" width="%d" height="%d" '
-             'preserveAspectRatio="xMidYMid slice"/>' % (foto(arquivo), L, A)]
+             'preserveAspectRatio="xMidYMid slice"/>'
+             % (foto(arquivo, largura, recorte, zoom), L, A)]
     defs = []
     if veu:
         paradas = ''.join('<stop offset="%g" stop-color="%s" stop-opacity="%g"/>' % p for p in veu)
@@ -198,7 +228,9 @@ def fundo_foto(arquivo, veu=None):
 def compor(spec):
     """spec: dict com fundo, logo, titulo, subtitulo, rotulo, alinhamento."""
     if 'foto' in spec:
-        corpo, defs = fundo_foto(spec['foto'], spec.get('veu'))
+        corpo, defs = fundo_foto(spec['foto'], spec.get('veu'),
+                                 spec.get('fotoLargura', 620), spec.get('recorte', 0.5),
+                                 spec.get('zoom', 1.0))
         fundo_claro = spec.get('claro', False)
     elif 'showcase' in spec:
         corpo, defs = fundo_showcase()
@@ -210,18 +242,61 @@ def compor(spec):
         corpo, defs = fundo_solido(spec.get('fundo', BRANCO))
         fundo_claro = claro(spec.get('fundo', BRANCO))
 
+    if spec.get('focos'):
+        mais_corpo, mais_defs = focos_de_luz(spec['focos'], 20)
+        corpo += mais_corpo
+        defs += mais_defs
+
+    if spec.get('soFundo'):
+        # A tela de entrada ja tem marca e tipografia dela (o banner do
+        # Conecta traz "Bem-vindos ao Conecta." e a logo). Sobrepor o nosso
+        # lockup seria escrever por cima do que ja esta escrito.
+        cabeca = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" width="%d" '
+                  'height="%d" role="img" aria-label="%s">' % (L, A, L, A, escapa(spec['alt'])))
+        meio = ('<defs>%s</defs>' % ''.join(defs)) if defs else ''
+        return cabeca + '\n' + meio + '\n' + '\n'.join(corpo) + '\n</svg>\n'
+
     tinta = INK_CLARO if fundo_claro else INK_ESCURO
     cor_titulo = spec.get('corTitulo', tinta)
     cor_sub = spec.get('corSub', tinta)
     fonte = SERIF if spec.get('serif') else SANS
     esquerda = spec.get('alinhamento', 'centro') == 'esquerda'
 
-    if esquerda:
+    if esquerda and spec.get('disposicao') == 'lado':
+        # Marca compacta (quase quadrada) pede o lockup deitado: ela cresce a
+        # esquerda e o texto ocupa a direita. Empilhada, uma marca quadrada
+        # cabia so num cantinho e metade da arte ficava vazia — foi o que o
+        # usuario apontou no Portal do Empregado em 20/09.
+        larg = spec.get('logoLargura', 118)
+        alt = spec.get('logoAltura', 118)
+        corpo.append('<image href="%s" x="%d" y="%g" width="%g" height="%g" '
+                     'preserveAspectRatio="xMidYMid meet"/>'
+                     % (uri(spec['logo'], spec.get('trocas'), spec.get('logoFonte', 640),
+                            inverter=spec.get('inverter', False)),
+                        MARGEM_X, (A - alt) / 2.0, larg, alt))
+        texto_x = MARGEM_X + larg + spec.get('vao', 26)
+        linhas = quebra(spec['titulo'], spec.get('limite', 12))
+        tam = spec.get('tamanhoTitulo', 34)
+        altura_linha = tam * 1.12
+        recuo_sub = 32 if spec.get('subtitulo') else 0
+        altura = (len(linhas) - 1) * altura_linha + tam + recuo_sub
+        base = (A - altura) / 2.0 + tam * 0.86
+        for i, linha in enumerate(linhas):
+            corpo.append(texto(texto_x, base + i * altura_linha, linha, cor_titulo,
+                               tam, spec.get('pesoTitulo', 600), fonte,
+                               espaco=-0.4 if spec.get('serif') else 0))
+        if spec.get('subtitulo'):
+            corpo.append(texto(texto_x, base + (len(linhas) - 1) * altura_linha + recuo_sub,
+                               spec['subtitulo'], cor_sub, 15, 500, SANS, opacidade=0.88))
+    elif esquerda:
         # Lockup da tela de entrada: logo em cima, titulo e subtitulo abaixo.
         logo_h = spec.get('logoAltura', 32)
         corpo.append('<image href="%s" x="%d" y="%d" width="%d" height="%d" '
                      'preserveAspectRatio="xMinYMid meet"/>'
-                     % (uri(spec['logo'], spec.get('trocas'), 640,
+                     % (uri(spec['logo'], spec.get('trocas'),
+                            # A marca aparece com ~60 px de largura na tela; 640
+                            # e o teto historico. Arte nova pede o que precisa.
+                            spec.get('logoFonte', 640),
                             inverter=spec.get('inverter', False)),
                         MARGEM_X, spec.get('logoY', 34),
                         spec.get('logoLargura', 156), logo_h))
@@ -249,7 +324,9 @@ def compor(spec):
                 caixa = (40, 36, L - 80, 216)
             corpo.append('<image href="%s" x="%d" y="%d" width="%d" height="%d" '
                          'preserveAspectRatio="xMidYMid meet"/>'
-                         % (uri(spec['logo'], spec.get('trocas'), 640), *caixa))
+                         % (uri(spec['logo'], spec.get('trocas'),
+                                spec.get('logoFonte', 640),
+                                inverter=spec.get('inverter', False)), *caixa))
         else:
             assinatura = spec['assinatura']
             tam = min(58, int(58 * 11.0 / max(len(assinatura), 8)))
@@ -277,6 +354,7 @@ MARCA = {
     'gemini': ('gemini.svg', BRANCO, {}), 'coolors': ('coolors.svg', BRANCO, {}),
     'datylon': ('datylon.svg', BRANCO, {}), 'ilovepdf': ('ilovepdf.svg', BRANCO, {}),
     'actio': ('actio.png', BRANCO, {}), 'paytrack': ('paytrack.png', BRANCO, {}),
+    'passatempo': ('passatempo.png', BRANCO, {}),
     'cfc': ('cfc.png', BRANCO, {}), 'cpc': ('cpc.png', BRANCO, {}),
     'ifrs': ('ifrs.svg', BRANCO, {}), 'aneel': ('aneel.png', BRANCO, {}),
     'receita': ('receita-federal.svg', BRANCO, {}),
@@ -284,12 +362,19 @@ MARCA = {
     'ey': ('ey.svg', '#2e2e38', {'#161d23': '#ffffff'}),
     'wetransfer': ('wetransfer.svg', '#409fff', {'#000': '#ffffff'}),
     'equatorial': ('grupo-equatorial-branco.png', EQTL_AZUL, {}),
+    # A marca oficial e a plum `#5A0048` do cartao branco do login; sobre o
+    # magenta da tela ela precisa sair em branco.
+    'qulture': ('qulture-rocks.svg', '#5a0048', {'#5A0048': '#ffffff'}),
 }
-ASSINATURA = {'onesource': ('ONESOURCE', '#16283f'), 'learning-rocks': ('learning.rocks', '#151b2e'),
-              'qulture-rocks': ('Qulture.Rocks', '#1d1b3a'), 'argo': ('ARGO', '#0b3b6f')}
+ASSINATURA = {'onesource': ('ONESOURCE', '#16283f'), 'argo': ('ARGO', '#0b3b6f')}
 
 
 def marca(alt, chave, rotulo=None):
+    """O `rotulo` so entra quando diferencia: a mesma marca servindo varios
+    cartoes (SAP, Python, Receita) ou uma marca que nao e o nome do destino
+    (Meta -> Workplace, OpenAI -> ChatGPT). Repetir embaixo o que a assinatura
+    ja escreve em cima e ruido — saiu de Actio, Paytrack, WeTransfer e
+    Datylon em 20/09."""
     arquivo, fundo, trocas = MARCA[chave]
     return {'alt': alt, 'logo': arquivo, 'fundo': fundo, 'trocas': trocas, 'rotulo': rotulo}
 
@@ -349,15 +434,103 @@ CENTRAL_RESULTADOS = {
 }
 
 
+def portal_servicos(titulo, subtitulo='Portal de Serviços'):
+    """Tela de entrada do Portal de Servicos (ServiceNow do Grupo), lida em
+    1600 px: foto de fundo ja tingida de indigo, barra `#25418e` no topo e a
+    logo Grupo Equatorial branca a esquerda. Os nove cartoes usavam a marca do
+    fornecedor (ServiceNow, Microsoft, SAP) — que nao e para onde o link leva.
+    Agora todos mostram a tela real, e o titulo diz qual servico e."""
+    return {'alt': 'Portal de Serviços do Grupo Equatorial',
+            'foto': 'portal-servicos-fundo.jpg',
+            # A foto ja vem tingida; o veu so garante o contraste do texto
+            # branco, nas cores da propria tela (roxo a esquerda, azul da
+            # barra de topo a direita).
+            'veu': [(0.0, '#2b1a5e', 0.48), (1.0, '#25418e', 0.33)],
+            'logo': 'portal-servicos-logo.png',
+            'titulo': titulo, 'subtitulo': subtitulo, 'alinhamento': 'esquerda',
+            'tamanhoTitulo': 31, 'limite': 16, 'corTitulo': '#ffffff',
+            'corSub': '#dbe3f6', 'logoLargura': 140, 'logoAltura': 31,
+            # A moldura do cartao tem 220 px: 520 na foto e 280 na marca ja
+            # cobrem tela de 2x. Como a mesma tela serve nove cartoes, cada KB
+            # a mais e cobrado nove vezes.
+            'logoFonte': 280, 'fotoLargura': 520}
+
+
+# ------------------------------------------- Conecta (Central do Funcionario)
+CONECTA = {
+    # O banner de entrada ja e o lockup da tela: "Bem-vindos ao Conecta.",
+    # o subtitulo e a logo. Recorte 0,14 porque o centro do banner (2103 px)
+    # deixaria a chamada de fora.
+    'alt': 'Conecta, a Central do Funcionário do Grupo Equatorial',
+    'foto': 'esc-conecta-banner.png', 'recorte': 0.14, 'soFundo': True,
+    'fotoLargura': 520,
+}
+CONECTA_GENTE = {
+    # Primeira tentativa: banner + o nosso lockup por cima, como a tela faz.
+    # Nao serve — o banner ja tem a marca Equatorial e dizeres proprios nas
+    # duas pontas, e o lockup entregava duas logos e texto sobre texto. O
+    # banner e o lockup. Recorte 0,55 para a marca do banner caber inteira.
+    'alt': 'Gente e Gestão, no Conecta do Grupo Equatorial',
+    'foto': 'esc-gente-banner.png', 'recorte': 1.0, 'zoom': 1.19, 'soFundo': True,
+    'fotoLargura': 520,
+}
+SABER = {
+    # O banner de entrada tem lockup proprio — "Gente que Aprende /
+    # Conhecimento para transformar o futuro", com o selo dos dois capacetes —
+    # entao ele e a arte, sem nada nosso por cima. Eu tinha descartado esse
+    # banner como texto de campanha e usado o roxo `#7b1fa2` da plataforma;
+    # o usuario corrigiu em 20/09.
+    #
+    # O arquivo vem do recorte que o usuario mandou: o CDN da plataforma serve
+    # por URL assinada da CloudFront e recusa qualquer cliente sem o cookie
+    # dele, entao nao da para baixar daqui.
+    'alt': 'Gente que Aprende, a universidade corporativa do Grupo Equatorial',
+    'foto': 'saber-banner.png', 'soFundo': True, 'fotoLargura': 520,
+}
+
+
+EMPREGADO = {
+    # Plataforma Senior personalizada para o Grupo. O cinza e o resto da
+    # lateral; o que vale e o bloco da marca, no alto: `#333579`, medido no
+    # `.logo-preview`. (Correcao do usuario em 20/09 — eu tinha pegado o cinza.)
+    # A marca do Grupo tambem esta no arquivo de personalizacao do tenant, mas
+    # nesta tela nao aparece.
+    'alt': 'Portal do Empregado, na plataforma Senior do Grupo Equatorial',
+    'degrade': ('#333579', '#1d1e4d', 160), 'logo': 'senior-marca.png',
+    'titulo': 'Portal do Empregado', 'subtitulo': 'Gestão de pessoas · Senior',
+    'alinhamento': 'esquerda', 'tamanhoTitulo': 31, 'limite': 15,
+    'corTitulo': '#ffffff', 'corSub': '#c3c5ee',
+    # A marca e quase quadrada (159x150): no empilhado ela cabia num cantinho.
+    'disposicao': 'lado', 'logoLargura': 112, 'logoAltura': 112,
+    'tamanhoTitulo': 34, 'limite': 11, 'logoFonte': 320,
+}
+
+
+QULTURE = {
+    # Tela de entrada lida em 1600 px: fundo plum `#5a0048` com manchas de luz
+    # magenta, e o cartao branco no meio com a marca. Aqui a marca vem em
+    # branco sobre o fundo dela — o cartao branco nao cabe em 220 px.
+    'alt': 'Qulture.Rocks',
+    'degrade': ('#5a0048', '#3d0031', 150),
+    'focos': [('26%', '46%', 0.46, '#f75080', 0.60, 0.30),
+              ('78%', '60%', 0.40, '#c2185b', 0.52, 0.26),
+              ('50%', '18%', 0.34, '#931d5c', 0.44, 0.22)],
+    # Sem rotulo: a assinatura ja escreve o nome do destino, e ela e unica —
+    # a mesma regra que tirou o rotulo de Actio e Paytrack.
+    'logo': 'qulture-rocks.svg', 'trocas': {'#5A0048': '#ffffff'},
+}
+
+
 def planalto(alt, titulo, ementa):
     """Pagina do Planalto: brasao da Republica sobre branco, texto em serifada.
     O link vai direto ao texto da lei, entao a marca certa e o brasao, nao o
     gov.br (correcao do usuario em 20/09/2026)."""
+    # O brasao e quadrado (463x468): mesmo caso da borboleta da Senior.
     return {'alt': alt, 'fundo': BRANCO, 'logo': 'brasao-republica.gif',
             'titulo': titulo, 'subtitulo': ementa, 'alinhamento': 'esquerda',
-            'serif': True, 'tamanhoTitulo': 27, 'pesoTitulo': 400, 'limite': 20,
-            'corTitulo': '#1c2433', 'corSub': '#5f6d82',
-            'logoLargura': 54, 'logoAltura': 56}
+            'disposicao': 'lado', 'serif': True, 'tamanhoTitulo': 26,
+            'pesoTitulo': 400, 'limite': 15, 'corTitulo': '#1c2433',
+            'corSub': '#5f6d82', 'logoLargura': 104, 'logoAltura': 104}
 
 
 # ------------------------------------------------------------------ cartoes
@@ -411,33 +584,36 @@ CARTOES = {
         'central-resultados-eqtl': CENTRAL_RESULTADOS,
     },
     'portais': {
-        'portal-servicos-home': marca('ServiceNow', 'servicenow', 'Portal de Serviços'),
-        'portal-servicos-ocorrencias': marca('ServiceNow', 'servicenow', 'Minhas ocorrências'),
-        'portal-servicos-acesso': marca('ServiceNow', 'servicenow', 'Acesso a sistemas'),
-        'portal-servicos-sap': marca('SAP', 'sap', 'Solicitações SAP'),
-        'portal-servicos-incidentes': marca('ServiceNow', 'servicenow', 'Problemas gerais'),
-        'portal-servicos-office365': marca('Microsoft', 'microsoft', 'Acesso Office 365'),
-        'portal-servicos-powerbi': marca('Microsoft Power BI', 'power-bi', 'Publicação em nuvem'),
-        'portal-servicos-senha': marca('ServiceNow', 'servicenow', 'Redefinição de senha'),
-        'portal-servicos-jornada': marca('ServiceNow', 'servicenow', 'Jornada de trabalho'),
+        'portal-servicos-home': portal_servicos('Portal de Serviços', 'Atendimento interno do Grupo'),
+        'portal-servicos-ocorrencias': portal_servicos('Minhas ocorrências'),
+        'portal-servicos-acesso': portal_servicos('Acesso a sistemas'),
+        'portal-servicos-sap': portal_servicos('Solicitações SAP'),
+        'portal-servicos-incidentes': portal_servicos('Problemas gerais'),
+        'portal-servicos-office365': portal_servicos('Acesso Office 365'),
+        'portal-servicos-powerbi': portal_servicos('Power BI na nuvem'),
+        'portal-servicos-senha': portal_servicos('Redefinição de senha'),
         'workplace': marca('Meta', 'meta', 'Workplace'),
-        'learning-rocks': assinatura('Learning.rocks', 'learning-rocks'),
         'sharepoint-eqtl-go': marca('Microsoft SharePoint', 'sharepoint', 'Equipe EQTL GO'),
         'bi-gastos-gerenciaveis': marca('Microsoft Power BI', 'power-bi', 'Gastos Gerenciáveis'),
-        'central-funcionario': marca('ServiceNow', 'servicenow', 'Central do Funcionário'),
-        'actio': marca('Actio', 'actio', 'Actio'),
-        'portal-colaborador': marca('Grupo Equatorial', 'equatorial', 'Portal do Colaborador'),
+        'conecta-central-funcionario': CONECTA,
+        'conecta-gente-gestao': CONECTA_GENTE,
+        'saber-universidade': SABER,
+        # A marca ocupa no maximo 432 px do quadro; 640 de origem so pesava.
+        'jornada-de-trabalho': dict(marca('Passatempo, do Grupo Equatorial', 'passatempo'),
+                                    logoFonte=460),
+        'actio': marca('Actio', 'actio'),
+        'portal-do-empregado': EMPREGADO,
         'eqtl-previ': marca('Grupo Equatorial', 'equatorial', 'EQTL Previ'),
-        'qulture-rocks': assinatura('Qulture.Rocks', 'qulture-rocks'),
+        'qulture-rocks': QULTURE,
         'argo-pontes': assinatura('ARGO, da Pontes Tur', 'argo', 'Pontes Tur'),
-        'paytrack': marca('Paytrack', 'paytrack', 'Paytrack'),
+        'paytrack': marca('Paytrack', 'paytrack'),
     },
     'externos': {
         'ey-canvas': marca('EY', 'ey', 'Canvas · Client Portal'),
         'chatgpt': marca('ChatGPT, da OpenAI', 'openai', 'ChatGPT'),
         'gemini': marca('Google Gemini', 'gemini'),
-        'wetransfer': marca('WeTransfer', 'wetransfer', 'WeTransfer'),
-        'datylon-graficos': marca('Datylon', 'datylon', 'Datylon'),
+        'wetransfer': marca('WeTransfer', 'wetransfer'),
+        'datylon-graficos': marca('Datylon', 'datylon'),
         'coolors-paletas': marca('Coolors', 'coolors'),
         'ilovepdf': marca('iLovePDF', 'ilovepdf'),
     },
@@ -451,8 +627,13 @@ def confere_contraste():
     for chave, (arquivo, fundo, _) in MARCA.items():
         if not arquivo.endswith('.png'):
             continue
-        caminho = next(os.path.join(b, arquivo) for b in (MARCAS, LOGOS)
-                       if os.path.exists(os.path.join(b, arquivo)))
+        # Mesma ordem de busca do `uri()`: marca do Grupo que so existe como
+        # insumo de tela (Passatempo) mora em TELAS, nao em MARCAS.
+        caminho = next((os.path.join(b, arquivo) for b in (MARCAS, TELAS, LOGOS)
+                        if os.path.exists(os.path.join(b, arquivo))), None)
+        if not caminho:
+            avisos.append('%s: arquivo %s nao encontrado' % (chave, arquivo))
+            continue
         opacos = [p for p in Image.open(caminho).convert('RGBA').getdata() if p[3] > 120]
         if not opacos:
             continue

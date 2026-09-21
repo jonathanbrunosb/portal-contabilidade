@@ -102,7 +102,13 @@ pasta da coleção. Os campos do spec:
 | `titulo`, `subtitulo` | o lockup da tela de entrada |
 | `alinhamento` | `esquerda` (modo `tela`) ou `centro` (modo `marca`) |
 | `serif` | `True` quando o sistema usa serifada (Georgia) |
-| `logoY`, `logoLargura`, `logoAltura`, `baseTitulo` | posição do bloco |
+| `logoY`, `logoLargura`, `logoAltura`, `baseTitulo` | posição do bloco (empilhado) |
+| `disposicao` | `'lado'` põe a marca grande à esquerda e o texto à direita, os dois centrados na vertical. **Use em marca quase quadrada** (proporção abaixo de ~2,5): empilhada ela cabe num cantinho e sobra meia arte vazia |
+| `vao` | respiro entre a marca e o texto no `lado` (padrão 26) |
+| `focos` | manchas radiais `(cx, cy, raio, cor, opacidade, parada)` sobre qualquer fundo, para reproduzir tela com luz (Qulture) |
+| `recorte`, `zoom` | âncora horizontal (0 = esquerda, 1 = direita) e fechamento da janela da foto. O centro nem sempre é o que identifica a tela |
+| `soFundo` | `True` quando a própria tela já traz marca e dizeres: o fundo vira a arte inteira, sem lockup nosso |
+| `logoFonte`, `fotoLargura` | quantos pixels embutir da marca (teto 640) e da foto (padrão 620). A moldura tem 220 px na tela: 280 e 520 já cobrem 2x. Vale mexer quando a mesma arte serve vários cartões |
 | `tamanhoTitulo`, `pesoTitulo`, `limite` | corpo do título e onde quebrar linha |
 | `corTitulo`, `corSub` | as cores medidas no site |
 | `rotulo` | modo `marca`: o texto que diferencia quando a marca se repete |
@@ -110,9 +116,60 @@ pasta da coleção. Os campos do spec:
 Atalhos prontos: `marca(alt, chave, rotulo)`, `assinatura(alt, chave, rotulo)`
 e `showcase(alt, logo, titulo)` para o painel do Cronograma/Auditoria.
 
+### Quando a tela já tem o lockup dela
+
+Banner de campanha costuma vir **com a marca e os dizeres embutidos** — foi o
+caso do Conecta ("Bem-vindos ao Conecta." + logo) e do banner de Gente e
+Gestão. Pôr o nosso lockup por cima entrega **duas logos** e texto sobre texto.
+Nesses casos use `soFundo: True`: o banner é o lockup, e quem nomeia o cartão é
+o título ao lado dele, na grade.
+
+Mire a janela com `recorte` e `zoom` em vez de aceitar o centro. **Meça onde a
+frase termina** antes de escolher — o recorte tem de pegar a chamada inteira ou
+deixá-la toda de fora; meia frase na borda é o que estraga o cartão:
+
+```python
+im = Image.open('projeto/marcas-telas/<banner>')
+cols = [x for x in range(int(im.width * .45))
+        if any(min(im.convert('RGB').getpixel((x, y))) > 200
+               for y in range(int(im.height * .3), int(im.height * .7)))]
+print(max(cols), max(cols) / im.width)   # onde acaba o texto claro da esquerda
+```
+
+### Uma tela só para vários cartões
+
+Quando vários cartões levam a **partes do mesmo sistema** — os nove do Portal
+de Serviços são itens do mesmo catálogo — todos usam a **mesma tela**, e quem
+diferencia é o `titulo` (o serviço) com o `subtitulo` fixo (o sistema). Não
+invente uma marca por cartão: a do fornecedor da plataforma (ServiceNow,
+Microsoft, SAP) leva a crer que o link vai para lá, e não vai.
+
+Nesse caso o peso conta nove vezes. Meça o arquivo e encolha o que está
+embutido com `fotoLargura` e `logoFonte` até o cartão ficar na casa dos 25 KB.
+
+### Layout: empilhado ou deitado
+
+Meça a proporção da marca antes de escolher:
+
+| Proporção | Layout | Exemplos |
+|---|---|---|
+| acima de ~3 (assinatura larga) | empilhado, o padrão | Grupo Equatorial, ProjectHub, Cronograma |
+| abaixo de ~2,5 (quase quadrada) | `disposicao: 'lado'` | borboleta da Senior (1,07), Brasão da República (0,99) |
+
+```python
+im = Image.open(caminho).convert('RGBA'); c = im.split()[3].getbbox()
+if c: im = im.crop(c)
+print(im.width / float(im.height))
+```
+
 ### Marca repetida pede rótulo
 
-Se a mesma logo já serve a outro cartão, **é obrigatório** um rótulo abaixo
+O rótulo só entra quando **diferencia**: a mesma logo servindo vários cartões,
+ou uma marca que não é o nome do destino (Meta → Workplace, OpenAI → ChatGPT).
+Repetir embaixo o que a assinatura já escreve em cima é ruído — saiu de Actio,
+Paytrack, WeTransfer e Datylon em 20/09.
+
+Quando a mesma logo já serve a outro cartão, **é obrigatório** um rótulo abaixo
 dela. Use o que diferencia de verdade: a transação (`ME23N`, `FB03`,
 `S_ALR_87012277`), a norma (`SPED · ECD`, `LC 214/2025`), o ambiente
 (`HANA · Ambiente QA`) ou o sistema (`Gastos Gerenciáveis`).

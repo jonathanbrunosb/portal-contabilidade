@@ -1,6 +1,7 @@
 [
   {
     "id": "s1",
+    "origem": "contabilidade",
     "nome": "IFRS 16 / CPC 06",
     "descricao": "Gestão de contratos, passivos, ativo de direito de uso, eventos contratuais e reportes.",
     "icon": "file",
@@ -11,6 +12,7 @@
   },
   {
     "id": "s2",
+    "origem": "contabilidade",
     "nome": "Monitor de Desempenho",
     "descricao": "Gestão da equipe, avaliações, feedbacks, carreira e desenvolvimento.",
     "icon": "chart",
@@ -21,6 +23,7 @@
   },
   {
     "id": "s3",
+    "origem": "contabilidade",
     "nome": "Controle de Horas",
     "descricao": "Banco de horas, folgas, compensações e acompanhamento por colaborador.",
     "icon": "clock",
@@ -31,6 +34,7 @@
   },
   {
     "id": "s4",
+    "origem": "contabilidade",
     "nome": "ProjectHub — Gerenciador de Projetos",
     "descricao": "Gestão de projetos, tarefas, prazos, responsáveis e acompanhamento das iniciativas da área.",
     "icon": "grid",
@@ -41,6 +45,7 @@
   },
   {
     "id": "s5",
+    "origem": "contabilidade",
     "nome": "Cronograma de Fechamento",
     "descricao": "Fluxo de fechamento contábil, acompanhamento de processos e reportes finais da competência.",
     "icon": "calendar",
@@ -51,6 +56,7 @@
   },
   {
     "id": "s6",
+    "origem": "contabilidade",
     "nome": "Portal de Auditoria",
     "descricao": "Solicitações, etapas anuais, visão global e relatórios de desempenho por área da auditoria.",
     "icon": "shield",

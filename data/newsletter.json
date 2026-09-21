@@ -155,6 +155,7 @@
   },
   {
     "id": "n6-projecthub-lancamento",
+    "origem": "contabilidade",
     "categoria": "COMUNICADO INTERNO",
     "titulo": "ProjectHub: nova solução integra a gestão de projetos da Contabilidade",
     "resumo": "Criado pelo time da Contabilidade, o ProjectHub concentra planejamento, execução, prazos, recursos, riscos e indicadores em uma única visão, fortalecendo a governança e a tomada de decisão.",

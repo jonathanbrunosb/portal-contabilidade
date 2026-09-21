@@ -43,6 +43,14 @@
   --verde-agua-claro:#8ee5e1;
   --acento-laranja:#cd572f;
   --laranja-marcador:#c04f29;
+  /* Origem do conteúdo (21/09/2026): a cor sobre branco e o texto branco
+     sobre a cor passam em AA nas três (6,4, 8,1 e 6,1:1). */
+  --origem-contabilidade:var(--verde-agua);
+  --origem-equatorial:var(--azul-marca);
+  --origem-externo:var(--roxo);
+  --origem-contabilidade-fundo:var(--verde-agua-fundo);
+  --origem-equatorial-fundo:var(--azul-suave);
+  --origem-externo-fundo:var(--roxo-fundo);
   --ph-laranja:var(--acento-laranja);
   --ph-tarja:rgba(1,14,40,.55);
   /* Escala tipográfica curta: 12 / 13 / 14 / 16 / 18 / 22 / 30 px. Nada de
@@ -369,6 +377,52 @@ main {
 .tag.orange {
   color:var(--laranja);
   background:var(--ambar-fundo)}
+
+/* Cor de cada origem, herdada pelos filhos: selo, título da coluna da capa,
+   marca do canto da miniatura e quadro de quem não tem imagem. */
+.contabilidade,[data-origem="contabilidade"] {
+  --cor-origem:var(--origem-contabilidade);
+  --cor-origem-fundo:var(--origem-contabilidade-fundo)}
+
+.equatorial,[data-origem="equatorial"] {
+  --cor-origem:var(--origem-equatorial);
+  --cor-origem-fundo:var(--origem-equatorial-fundo)}
+
+.externo,[data-origem="externo"] {
+  --cor-origem:var(--origem-externo);
+  --cor-origem-fundo:var(--origem-externo-fundo)}
+
+/* Selo de origem: quem escreveu o conteúdo. Cheio, na cor da origem, com
+   texto branco (pedido do usuário em 21/09/2026: distinguir de relance). A
+   categoria perdeu a cor para a cor ficar só com a origem. `line-height:1.3`
+   cabe na linha de 18 px do rótulo do cartão, sem crescer o .pcard. */
+.selo-origem {
+  display:inline-flex;
+  align-items:center;
+  flex:0 0 auto;
+  padding:1px 7px;
+  border-radius:var(--raio-xs);
+  background:var(--cor-origem,var(--texto-apoio));
+  color:#fff;
+  font-size:var(--fs-xs);
+  font-weight:var(--peso-medio);
+  line-height:1.3;
+  white-space:nowrap}
+
+/* Rótulo com selo na frente (cartão de Documentos, resultado da busca): numa
+   linha só, o rótulo corta com reticências antes de empurrar o título. Duas
+   classes, para vencer o `display:block` do .meta-label, que vem depois. */
+.meta-label.rotulo-com-selo {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:0}
+
+.rotulo-com-selo>span:last-child {
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap}
 
 .card-date {
   color:var(--texto-apoio);
@@ -977,6 +1031,24 @@ tbody tr:hover {
 
 .search-section .card-grid {
   grid-template-columns:repeat(3,minmax(0,1fr))}
+
+.search-section .section-heading {
+  flex-wrap:wrap}
+
+/* Filtro de origem da busca global, ao lado de "Limpar busca". */
+.search-acoes {
+  display:flex;
+  align-items:center;
+  gap:12px}
+
+.search-acoes select {
+  min-width:0;
+  background:var(--superficie-sutil);
+  border:1px solid var(--borda);
+  padding:7px 10px;
+  border-radius:var(--raio-sm);
+  color:var(--texto);
+  font-size:var(--fs-sm)}
 
 .filter-bar {
   display:flex;

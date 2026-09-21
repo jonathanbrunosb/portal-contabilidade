@@ -1,6 +1,7 @@
 [
   {
     "id": "portal-servicos-office365",
+    "origem": "equatorial",
     "nome": "Acesso Office 365",
     "destino": "portais-servicos",
     "descricao": "Solicitação de licença e acesso ao Microsoft 365: Teams, Outlook, SharePoint e OneDrive corporativos.",
@@ -11,6 +12,7 @@
   },
   {
     "id": "portal-servicos-ocorrencias",
+    "origem": "equatorial",
     "nome": "Minhas ocorrências",
     "destino": "portais-servicos",
     "descricao": "Acompanhamento dos chamados e requisições abertos por você ou em seu nome, com o status e o prazo de cada um.",
@@ -21,6 +23,7 @@
   },
   {
     "id": "portal-servicos-home",
+    "origem": "equatorial",
     "nome": "Portal de Serviços",
     "destino": "portais-servicos",
     "descricao": "Página inicial do atendimento interno do Grupo (ServiceNow): abertura de chamado, catálogo de serviços e base de conhecimento.",
@@ -31,6 +34,7 @@
   },
   {
     "id": "portal-servicos-powerbi",
+    "origem": "equatorial",
     "nome": "Power BI — publicação em nuvem",
     "destino": "portais-servicos",
     "descricao": "Pedido de publicação de relatório do Power BI no ambiente em nuvem, com a área responsável e o público que vai consumir o painel.",
@@ -41,6 +45,7 @@
   },
   {
     "id": "portal-servicos-senha",
+    "origem": "equatorial",
     "nome": "Redefinição de senha",
     "destino": "portais-servicos",
     "descricao": "Troca da senha de rede usada para entrar no computador e nos sistemas corporativos. Resolve na hora, sem abrir chamado.",
@@ -51,6 +56,7 @@
   },
   {
     "id": "portal-servicos-sap",
+    "origem": "equatorial",
     "nome": "SAP — solicitações",
     "destino": "portais-servicos",
     "descricao": "Item do catálogo dedicado a demandas de SAP: perfil de acesso, liberação de transação, correção de cadastro e abertura de período.",
@@ -61,6 +67,7 @@
   },
   {
     "id": "portal-servicos-incidentes",
+    "origem": "equatorial",
     "nome": "Sistemas — problemas gerais",
     "destino": "portais-servicos",
     "descricao": "Registro de incidente em sistemas corporativos: erro, indisponibilidade ou comportamento inesperado. É o mesmo item do catálogo Cibernix.",
@@ -71,6 +78,7 @@
   },
   {
     "id": "portal-servicos-acesso",
+    "origem": "equatorial",
     "nome": "Solicitar acesso a sistemas",
     "destino": "portais-servicos",
     "descricao": "Formulário do catálogo para pedir acesso a um sistema corporativo. Informe o sistema, o perfil desejado e o gestor aprovador.",
@@ -81,6 +89,7 @@
   },
   {
     "id": "actio",
+    "origem": "equatorial",
     "nome": "Actio",
     "destino": "portais-gente",
     "descricao": "Gestão de metas e desempenho. Acompanhe o painel de indicadores individuais e da equipe ao longo do ciclo.",
@@ -91,6 +100,7 @@
   },
   {
     "id": "conecta-central-funcionario",
+    "origem": "equatorial",
     "nome": "Conecta — Central do Funcionário",
     "destino": "portais-gente",
     "descricao": "Portal de RH do Grupo: contracheque, cartão de ponto, férias, benefícios e as solicitações de pessoal, num só lugar.",
@@ -102,6 +112,7 @@
   },
   {
     "id": "eqtl-previ",
+    "origem": "equatorial",
     "nome": "EQTL Previ",
     "destino": "portais-gente",
     "descricao": "Área do participante do plano de previdência complementar: saldo acumulado, contribuições e simulações de benefício.",
@@ -112,6 +123,7 @@
   },
   {
     "id": "conecta-gente-gestao",
+    "origem": "equatorial",
     "nome": "Gente e Gestão",
     "destino": "portais-gente",
     "descricao": "Seção de RH do Conecta, com os tópicos de Educação Corporativa, Desempenho, Folha e Benefícios, Segurança e Medicina do Trabalho, Viagens e Férias.",
@@ -122,6 +134,7 @@
   },
   {
     "id": "jornada-de-trabalho",
+    "origem": "equatorial",
     "nome": "Minha Jornada de Trabalho",
     "destino": "portais-gente",
     "descricao": "Passatempo: solicitação de horas adicionais à jornada — antes do expediente, no intervalo ou depois dele.",
@@ -133,6 +146,7 @@
   },
   {
     "id": "portal-do-empregado",
+    "origem": "equatorial",
     "nome": "Portal do Empregado",
     "destino": "portais-gente",
     "descricao": "Contracheque, cartão de ponto, aviso de férias, banco de horas, inclusão de dependentes e registro de ponto on-line.",
@@ -144,6 +158,7 @@
   },
   {
     "id": "qulture-rocks",
+    "origem": "equatorial",
     "nome": "Qulture.Rocks",
     "destino": "portais-gente",
     "descricao": "Avaliação de desempenho e feedback: ciclos de avaliação, registros de 1:1 e plano de desenvolvimento individual.",
@@ -154,6 +169,7 @@
   },
   {
     "id": "saber-universidade",
+    "origem": "equatorial",
     "nome": "Saber — Universidade Corporativa",
     "destino": "portais-gente",
     "descricao": "Plataforma de aprendizagem do Grupo: trilhas obrigatórias, cursos por competência e o histórico de conclusão de cada um.",
@@ -164,6 +180,7 @@
   },
   {
     "id": "argo-pontes",
+    "origem": "equatorial",
     "nome": "ARGO — Pontes Tur",
     "destino": "portais-equatorial",
     "descricao": "Reserva de viagens corporativas: passagem, hospedagem e fluxo de aprovação do gestor.",
@@ -174,6 +191,7 @@
   },
   {
     "id": "bi-gastos-gerenciaveis",
+    "origem": "equatorial",
     "nome": "BI - Gastos Gerenciáveis",
     "destino": "portais-equatorial",
     "descricao": "Painel de acompanhamento dos gastos gerenciáveis: realizado contra orçado, por centro de custo e natureza. Base da análise mensal da Controladoria.",
@@ -185,6 +203,7 @@
   },
   {
     "id": "sharepoint-eqtl-go",
+    "origem": "equatorial",
     "nome": "Equipe EQTL GO",
     "destino": "portais-equatorial",
     "descricao": "Site da equipe de Goiás no SharePoint: documentos compartilhados, listas de controle e comunicados da operação local.",
@@ -195,6 +214,7 @@
   },
   {
     "id": "paytrack",
+    "origem": "equatorial",
     "nome": "Paytrack",
     "destino": "portais-equatorial",
     "descricao": "Prestação de contas de despesas de viagem: adiantamento, anexo de comprovantes e pedido de reembolso.",
@@ -205,6 +225,7 @@
   },
   {
     "id": "workplace",
+    "origem": "equatorial",
     "nome": "Rede Colaborativa Workplace",
     "destino": "portais-equatorial",
     "descricao": "Rede social corporativa do Grupo: comunicados oficiais, grupos por área e transmissões da liderança.",

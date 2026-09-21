@@ -162,6 +162,7 @@
   },
   {
     "id": "aneel-tarifas-equatorial-para-2026",
+    "origem": "externo",
     "categoria": "ANEEL",
     "titulo": "Aprovadas as novas tarifas da Equatorial Pará",
     "resumo": "O reajuste tarifário anual da Equatorial Pará foi aprovado pela ANEEL e alcança aproximadamente 3,12 milhões de unidades consumidoras em 228 municípios. A tarifa residencial terá variação de 6,70%, enquanto o efeito médio para o consumidor será de 6,94%.",
@@ -361,6 +362,7 @@
   },
   {
     "id": "interno-projecthub-lancamento-2026",
+    "origem": "contabilidade",
     "categoria": "Interno",
     "titulo": "ProjectHub: nova solução integra a gestão de projetos da Contabilidade",
     "resumo": "Criado pelo time da Contabilidade, o ProjectHub concentra planejamento, execução, prazos, recursos, riscos e indicadores em uma única visão, fortalecendo a governança e a tomada de decisão.",

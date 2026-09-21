@@ -94,6 +94,7 @@
   "links": [
     {
       "nome": "SAP",
+      "origem": "equatorial",
       "icon": "grid",
       "link": "https://unifica.equatorialenergia.com.br:9230/sap/bc/nwbc/nwbc_sapguilink?sap-language=PT",
       "descricao": "Acesso corporativo ao SAP (NWBC).",
@@ -102,6 +103,7 @@
     },
     {
       "nome": "SAP HANA - Ambiente QA",
+      "origem": "equatorial",
       "icon": "chart",
       "link": "https://fiori-qass4.sap.equatorialenergia.com.br:44382/sap/bc/ui2/flp?sap-client=300&sap-language=PT#Shell-home",
       "descricao": "Fiori Launchpad do SAP HANA — ambiente de homologação (QA).",
@@ -118,6 +120,7 @@
     },
     {
       "nome": "SharePoint",
+      "origem": "equatorial",
       "icon": "globe",
       "link": null,
       "descricao": "Acesso corporativo. Cadastre o endereço validado pela organização.",
@@ -134,6 +137,7 @@
     },
     {
       "nome": "Snowflake",
+      "origem": "equatorial",
       "icon": "chart",
       "link": "https://app.snowflake.com/",
       "descricao": "Plataforma de dados em nuvem do Grupo. Consulta às bases analíticas e execução das queries usadas nas extrações da área.",
@@ -142,6 +146,7 @@
     },
     {
       "nome": "ONESOURCE TAX ONE",
+      "origem": "equatorial",
       "icon": "file",
       "link": "https://www.onesourcetax.com/",
       "descricao": "Suíte fiscal da Thomson Reuters usada na apuração e nas obrigações tributárias. O acesso entra pelo SSO corporativo.",

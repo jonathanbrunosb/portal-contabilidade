@@ -1,6 +1,7 @@
 [
   {
     "id": "chatgpt",
+    "origem": "externo",
     "nome": "ChatGPT",
     "descricao": "Assistente de IA da OpenAI. Ajuda a redigir e revisar textos, explicar uma norma em linguagem simples, montar fórmulas e esboçar roteiros de automação.",
     "icon": "radar",
@@ -12,6 +13,7 @@
   },
   {
     "id": "coolors-paletas",
+    "origem": "externo",
     "nome": "Coolors — paletas em alta",
     "descricao": "Galeria e gerador de paletas de cores, com o código hexadecimal pronto para copiar. Ajuda a padronizar as cores de apresentações e painéis.",
     "icon": "image",
@@ -22,6 +24,7 @@
   },
   {
     "id": "datylon-graficos",
+    "origem": "externo",
     "nome": "Datylon — tipos de gráfico",
     "descricao": "Catálogo comentado de tipos de gráfico, com exemplo de cada um e a situação em que funciona melhor. Consulta rápida antes de montar relatório ou painel.",
     "icon": "chart",
@@ -32,6 +35,7 @@
   },
   {
     "id": "ey-canvas",
+    "origem": "externo",
     "nome": "EY Canvas — Client Portal",
     "descricao": "Portal da EY para a auditoria independente. É por onde chegam as solicitações de evidência (PBC) e por onde os arquivos do fechamento sobem para o time de auditoria.",
     "icon": "shield",
@@ -42,6 +46,7 @@
   },
   {
     "id": "gemini",
+    "origem": "externo",
     "nome": "Google Gemini",
     "descricao": "Assistente de IA do Google, com leitura de imagem e PDF. Alternativa ao ChatGPT para resumir documento longo e conferir raciocínio de cálculo.",
     "icon": "radar",
@@ -53,6 +58,7 @@
   },
   {
     "id": "wetransfer",
+    "origem": "externo",
     "nome": "WeTransfer",
     "descricao": "Envio de arquivo grande por link, acima do limite do e-mail. Usado na troca de bases e evidências com auditoria e consultorias.",
     "icon": "link",
@@ -64,6 +70,7 @@
   },
   {
     "id": "ilovepdf",
+    "origem": "externo",
     "nome": "iLovePDF",
     "descricao": "Automatiza tarefas repetitivas de PDF no navegador: juntar, dividir, comprimir, converter para Word ou Excel, numerar páginas e proteger com senha, em lote.",
     "icon": "file",

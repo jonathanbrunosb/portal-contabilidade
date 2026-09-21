@@ -1,6 +1,7 @@
 [
   {
     "id": "cpc-pronunciamentos",
+    "origem": "externo",
     "grupo": "Normas contábeis",
     "titulo": "CPC — Pronunciamentos Técnicos",
     "descricao": "Lista oficial dos pronunciamentos do Comitê de Pronunciamentos Contábeis (CPC 00 a CPC 52), com datas de aprovação e divulgação.",
@@ -11,6 +12,7 @@
   },
   {
     "id": "cfc-nbc",
+    "origem": "externo",
     "grupo": "Normas contábeis",
     "titulo": "CFC — Normas Brasileiras de Contabilidade (NBC)",
     "descricao": "Estrutura, classificação e revisões das Normas Brasileiras de Contabilidade técnicas e profissionais.",
@@ -21,6 +23,7 @@
   },
   {
     "id": "ifrs-standards",
+    "origem": "externo",
     "grupo": "Normas contábeis",
     "titulo": "IFRS Accounting Standards",
     "descricao": "Normas IFRS e materiais relacionados, no navegador oficial da IFRS Foundation.",
@@ -31,6 +34,7 @@
   },
   {
     "id": "aneel-mcse",
+    "origem": "externo",
     "grupo": "Setor elétrico",
     "titulo": "ANEEL — Manual de Contabilidade do Setor Elétrico (MCSE)",
     "descricao": "Página de Informações Econômico-Financeiras da ANEEL, com as versões do MCSE (2015, 2022 e 2022 revisado).",
@@ -41,6 +45,7 @@
   },
   {
     "id": "sped-ecd",
+    "origem": "externo",
     "grupo": "Obrigações acessórias",
     "titulo": "SPED — Escrituração Contábil Digital (ECD)",
     "descricao": "Página do projeto ECD no SPED: manuais, leiautes, programa validador e publicações.",
@@ -51,6 +56,7 @@
   },
   {
     "id": "sped-ecf",
+    "origem": "externo",
     "grupo": "Obrigações acessórias",
     "titulo": "SPED — Escrituração Contábil Fiscal (ECF)",
     "descricao": "Página do projeto ECF no SPED: manuais, leiautes, programa e publicações.",
@@ -61,6 +67,7 @@
   },
   {
     "id": "lei-6404",
+    "origem": "externo",
     "grupo": "Legislação",
     "titulo": "Lei nº 6.404/1976 — Lei das Sociedades por Ações",
     "descricao": "Texto compilado da Lei das S.A., base das demonstrações financeiras societárias.",
@@ -71,6 +78,7 @@
   },
   {
     "id": "lc-214-2025",
+    "origem": "externo",
     "grupo": "Legislação",
     "titulo": "Lei Complementar nº 214/2025 — Reforma Tributária (IBS e CBS)",
     "descricao": "Institui o IBS, a CBS e o Imposto Seletivo, regulamentando a reforma tributária do consumo.",
@@ -81,6 +89,7 @@
   },
   {
     "id": "eqtl-central-resultados",
+    "origem": "equatorial",
     "grupo": "Grupo Equatorial",
     "titulo": "Equatorial — Central de Resultados",
     "descricao": "Demonstrações financeiras, releases e apresentações de resultados publicados pela Relação com Investidores.",

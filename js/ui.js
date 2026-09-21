@@ -18,6 +18,15 @@ export function hydrateIcons(root=document) {
 }
 export const statusColor = status => /atenção|alto|alerta/i.test(status) ? 'yellow' : /pendente|crítico|recusado/i.test(status) ? 'red' : /andamento|moderado|revisão/i.test(status) ? 'purple' : /dia|prazo|concluído|ativo|baixo|publicado/i.test(status) ? 'green' : '';
 export const badge = (text,extraClass='') => `<span class="badge ${statusColor(text)}${extraClass?' '+extraClass:''}">${escapeHTML(text)}</span>`;
+// Origem do conteúdo: quem escreveu, não o tema (decisão de 21/09/2026). Uma
+// análise da equipe sobre a IFRS 18 é Contabilidade; a notícia reproduzida da
+// ANEEL é Externo. O tema continua na categoria/grupo de cada coleção.
+export const ORIGENS = {
+  contabilidade:'Contabilidade',equatorial:'Equatorial',externo:'Externo'
+};
+export const seloOrigem = origem => ORIGENS[origem] ? `<span class="selo-origem ${origem}">${ORIGENS[origem]}</span>` : '';
+// Opções do filtro "Origem": só as que existem na lista, na ordem fixa acima.
+export const opcoesOrigem = lista => Object.entries(ORIGENS).filter(([valor])=>lista.some(item=>item.origem===valor)).map(([valor,rotulo])=>({valor,rotulo}));
 // Only HTTP(S) and same-origin relative links are supported; reject script/data URLs.
 // Versao do portal, lida do proprio endereco deste modulo (`?v=` que o
 // index.html carimba). Nao ha um segundo numero para manter.

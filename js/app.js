@@ -4,7 +4,7 @@ import { initializeNavigation,markCurrentSection,bindTabs,selectTab } from './na
 import { renderNewsletter,showArticle,loadNoticias,ultimaAtualizacaoLabel,noticiaCategorias,filterNoticias,renderNoticias } from './newsletter.js?v=20260921-13';
 import { renderTeamStructure } from './teams.js?v=20260921-46';
 import { initCarousel } from './carousel.js?v=20260921-13';
-import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,comVersao,notify } from './ui.js?v=20260921-13';
+import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,comVersao,notify,ORIGENS,seloOrigem,opcoesOrigem } from './ui.js?v=20260921-46';
 import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js?v=20260921-46';
 let data,currentTab='newsletter',currentAdminTab='equipes',currentUser,currentMenu=[],navSections=[];
 const $=selector=>document.querySelector(selector);
@@ -26,9 +26,18 @@ const EDITORIAL_CATEGORIAS= {
 }
 ;
 const COLLECTION_ACCESS= {
-  newsletter:'conteudo',noticias:'conteudo',sistemas:'conteudo',documentos:'conteudo',portais:'conteudo',externos:'conteudo',equipes:'time',usuarios:'time',processos:'gerencial',agenda:'gerencial',entregas:'gerencial'
+  newsletter:'conteudo',noticias:'conteudo',sistemas:'conteudo',documentos:'conteudo',portais:'conteudo',externos:'conteudo',automacoes:'conteudo',links:'conteudo',equipes:'time',usuarios:'time',processos:'gerencial',agenda:'gerencial',entregas:'gerencial'
 }
 ;
+// Origem de cada registro (contabilidade | equatorial | externo). O conteúdo
+// publicado traz o campo `origem` no próprio JSON; as coleções de uma origem só
+// e os dados de gestão da gerência caem no padrão abaixo quando o campo falta
+// (automação criada antes do campo existir, por exemplo).
+const ORIGEM_PADRAO= {
+  sistemas:'contabilidade',automacoes:'contabilidade',equipes:'contabilidade',usuarios:'contabilidade',processos:'contabilidade',agenda:'contabilidade',entregas:'contabilidade',portais:'equatorial',links:'equatorial',externos:'externo'
+}
+;
+const origemDe=(collection,item)=>item?.origem||ORIGEM_PADRAO[collection]||'';
 function applyAccess(user) {
   Object.entries(SECTION_ACCESS).forEach(([id,capability])=> {
     document.getElementById(id).hidden=!hasAccess(user,capability);
@@ -77,7 +86,14 @@ function cardPortal(o) {
   // acao ("Acesso em configuracao"), nada e esticado e o cartao nao clica.
   const acao = (o.acao || '').replace('class="primary-btn pcard-acessar"',
     'class="primary-btn pcard-acessar pcard-principal"');
-  return `<article class="pcard"><div class="pcard-media${url ? '' : ' sem-imagem'}">${media}${trocar}</div><div class="pcard-corpo">${o.rotulo ? `<p class="meta-label">${e(o.rotulo)}</p>` : ''}<h3>${e(o.titulo)}</h3><p class="pcard-texto">${e(o.descricao || '')}</p></div><div class="pcard-acoes">${o.statusHTML || '<span></span>'}<span class="pcard-botoes">${info}${acao}</span></div></article>`;
+  // Selo de origem só onde a tela mistura origens (Documentos & Normas). Nas
+  // páginas que já são de uma origem só, repetir o mesmo selo em todo cartão
+  // seria ruído: a faixa de subpáginas já diz de onde é.
+  const selo = seloOrigem(o.origem);
+  const rotulo = o.rotulo || selo
+    ? `<p class="meta-label${selo ? ' rotulo-com-selo' : ''}">${selo}${o.rotulo ? `<span>${e(o.rotulo)}</span>` : ''}</p>`
+    : '';
+  return `<article class="pcard"><div class="pcard-media${url ? '' : ' sem-imagem'}">${media}${trocar}</div><div class="pcard-corpo">${rotulo}<h3>${e(o.titulo)}</h3><p class="pcard-texto">${e(o.descricao || '')}</p></div><div class="pcard-acoes">${o.statusHTML || '<span></span>'}<span class="pcard-botoes">${info}${acao}</span></div></article>`;
 }
 // O corpo do cartao fica acima do link esticado, para o texto poder ser
 // selecionado. Em troca, o clique nele chega aqui: navega so quando o usuario
@@ -163,7 +179,7 @@ function documentCard(item) {
   const link=safeURL(item.link),arquivo=safeURL(item.arquivo);
   return cardPortal( {
     imagem:item.imagem,icone:ICONE_GRUPO[item.grupo]||'file',titulo:item.titulo,descricao:item.descricao,
-    rotulo:item.grupo,statusHTML:`<span class="meta-label pcard-fonte">${e(item.fonte||'Fonte a cadastrar')}</span>`,
+    rotulo:item.grupo,origem:item.origem,statusHTML:`<span class="meta-label pcard-fonte">${e(item.fonte||'Fonte a cadastrar')}</span>`,
     acao:`${link?acaoAcessar(link,item.titulo,'data-doc-link'):''}${arquivo?acaoBaixar(arquivo,item.titulo):''}`||ACAO_PENDENTE,
     registro:`documentos:${item.id}`
   }
@@ -175,10 +191,15 @@ function gruposDocumentos() {
   const extras=[...new Set(data.documentos.map(d=>d.grupo).filter(g=>g&&!definidos.includes(g)))];
   return [...definidos,...extras].filter(g=>data.documentos.some(d=>d.grupo===g));
 }
+// O grupo de Documentos & Normas é escolhido pela aba da faixa de subpáginas
+// ("Todos" = ''), não por um filtro: navigate() grava aqui antes de desenhar.
+// Um <select> de grupo na faixa de filtros repetia as abas e saiu em 21/09.
+let docGrupo='';
+const documentosDaAba=()=>data.documentos.filter(item=>!docGrupo||item.grupo===docGrupo);
 function documentResults() {
-  const query=normalize($('#doc-search')?.value),grupo=$('#doc-filter')?.value;
+  const query=normalize($('#doc-search')?.value),origem=$('#doc-origem')?.value;
   const ordem=gruposDocumentos();
-  const records=data.documentos.filter(item=>(!grupo||item.grupo===grupo)&&normalize(JSON.stringify(item)).includes(query))
+  const records=documentosDaAba().filter(item=>(!origem||item.origem===origem)&&normalize(JSON.stringify(item)).includes(query))
     .sort((a,b)=>(ordem.indexOf(a.grupo)-ordem.indexOf(b.grupo))||a.titulo.localeCompare(b.titulo,'pt-BR'));
   $('#document-results').innerHTML=records.map(documentCard).join('')||'<p class="empty-state">Nenhum documento encontrado. Tente outro grupo ou termo.</p>';
   $('#doc-count').textContent=`${records.length} ${records.length===1?'referência oficial':'referências oficiais'}`;
@@ -288,6 +309,13 @@ function ligarBarraFiltro({busca,filtros=[],aoMudar,aoLimpar}) {
   aoMudar();
 }
 const contagem=(n,singular,plural)=>`${n} ${n===1?singular:plural}`;
+// Filtro "Origem" das telas que misturam origens. Entra antes dos demais — é o
+// recorte mais largo — e só quando a lista tem mais de uma origem: com uma só,
+// o filtro teria uma opção e nada a filtrar.
+function filtroOrigem(id,lista) {
+  const opcoes=opcoesOrigem(lista);
+  return opcoes.length>1?[{id,rotulo:'Origem',todos:'Todas as origens',opcoes}]:[];
+}
 // Lista de valores distintos de um campo, para montar um <select> de filtro.
 const valoresDe=(lista,campo)=>[...new Set(lista.map(item=>item[campo]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
 function renderContent(tab) {
@@ -380,10 +408,12 @@ function renderContent(tab) {
     );
   }
   if(tab==='documentos') {
-    const filtros=[{id:'doc-filter',rotulo:'Grupo',todos:'Todos os grupos',opcoes:gruposDocumentos()}];
+    // Sem filtro de grupo: o grupo é a aba. A origem só entra quando a aba
+    // aberta mistura origens — hoje, só "Todos".
+    const filtros=filtroOrigem('doc-origem',documentosDaAba());
     const busca={id:'doc-search',rotulo:'Pesquisar documentos e normas',placeholder:'Título, descrição, grupo ou fonte…'};
     $('#content-view').innerHTML=`${barraFiltro({busca,filtros})}<div class="pcard-grid" id="document-results"></div><div class="content-footer"><span id="doc-count" role="status" aria-live="polite"></span><span>Referências oficiais: o endereço de cada uma foi conferido na fonte — a data está na ficha do documento.</span></div>`;
-    ligarBarraFiltro({busca,filtros,aoMudar:documentResults,aoLimpar:()=>navigate(subnavTargets[0])});
+    ligarBarraFiltro({busca,filtros,aoMudar:documentResults});
   }
   if(tab==='automacoes') {
     const filtros=[
@@ -500,11 +530,8 @@ function navigate(item,updateHistory=true) {
     track('admin_view');
   }
   else if(item.tab) {
+    if(item.tab==='documentos')docGrupo=item.grupo??'';
     renderContent(item.tab);
-    if(item.grupo!==undefined&&$('#doc-filter')) {
-      $('#doc-filter').value=item.grupo;
-      documentResults();
-    }
   }
   else activateMenu(item);
   renderSubnav(item);
@@ -561,7 +588,7 @@ function openAviso(id) {
   const aviso=data.avisos.find(a=>a.id===id);
   if(!aviso)return;
   track('aviso_open',{aviso:aviso.titulo});
-  showDialog(aviso.titulo,`Aviso · ${AVISO_TIPOS[aviso.tipo]||'Info'}`,`<p>${e(aviso.texto)}</p>${detailGrid({'Quando':aviso.janela||'—','Área responsável':aviso.area||'—'})}${aviso.demonstrativo?'<p class="muted">Aviso de exemplo — substitua em data/avisos.json.</p>':''}`);
+  showDialog(aviso.titulo,`Aviso · ${AVISO_TIPOS[aviso.tipo]||'Info'}`,`<p>${e(aviso.texto)}</p>${detailGrid({'Quando':aviso.janela||'—','Área responsável':aviso.area||'—','Origem':ORIGENS[aviso.origem]})}`);
 }
 function renderHome() {
   const destaques=(data.destaques||[]).filter(vigente).sort((a,b)=>(a.ordem??99)-(b.ordem??99));
@@ -672,6 +699,7 @@ function openNewDraft() {
   const categorias=data.config.newsletterCategorias||[];
   showDialog('Novo rascunho','Painel editorial',`<form id="draft-form">
     <label class="field">Tipo<select id="draft-tipo"><option value="newsletter">Newsletter Contábil</option><option value="noticias">Notícias &amp; Impactos</option></select></label>
+    <label class="field">Origem — quem escreveu o conteúdo<select id="draft-origem">${Object.entries(ORIGENS).map(([valor,rotulo])=>`<option value="${valor}">${rotulo}</option>`).join('')}</select></label>
     <label class="field">Categoria<input id="draft-categoria" list="draft-categorias" required></label>
     <datalist id="draft-categorias">${categorias.map(c=>`<option value="${e(c)}">`).join('')}</datalist>
     <label class="field">Título<input id="draft-titulo" required></label>
@@ -687,6 +715,7 @@ function openNewDraft() {
     const tipo=$('#draft-tipo').value;
     const body= {
       id:`redacao-${Date.now()}`,
+      origem:$('#draft-origem').value,
       categoria:$('#draft-categoria').value.trim(),
       titulo:$('#draft-titulo').value.trim(),
       resumo:$('#draft-resumo').value.trim(),
@@ -894,6 +923,8 @@ function openAutomationForm(item) {
       if(urlRaw&&!safeURL(urlRaw))throw new Error('URL inválida. Use um endereço http(s) válido.');
       const body= {
         id:automationEditState.id,
+        // A página de automações é Sistemas e automações › Contabilidade.
+        origem:'contabilidade',
         categoriaPortal:'Automações',
         tipo:$('#admin-aut-tipo').value.trim(),
         familia:$('#admin-aut-familia').value,
@@ -1054,13 +1085,13 @@ function showRecord(collection,id) {
   }
   if(collection==='sistemas') {
     const url=safeURL(item.link);
-    showDialog(item.nome,'Sistema da área',`<p>${e(item.descricao)}</p>${detailGrid({'Responsável':item.responsavel||'—','Status':item.status||'—','Endereço':url?'Cadastrado':'Aguardando cadastro'})}${url?acaoAcessar(url,item.nome):'<p class="muted">O endereço deste sistema ainda não foi cadastrado. Solicite o link ao responsável da área.</p>'}`);
+    showDialog(item.nome,'Sistema da área',`<p>${e(item.descricao)}</p>${detailGrid({'Responsável':item.responsavel||'—','Origem':ORIGENS[origemDe(collection,item)],'Status':item.status||'—','Endereço':url?'Cadastrado':'Aguardando cadastro'})}${url?acaoAcessar(url,item.nome):'<p class="muted">O endereço deste sistema ainda não foi cadastrado. Solicite o link ao responsável da área.</p>'}${botaoDestacar('sistema',item.id)}`);
     return;
   }
   if(collection==='portais'||collection==='externos') {
     const url=safeURL(item.link);
     const externo=collection==='externos';
-    showDialog(item.nome,item.grupo||(externo?'Link externo':'Portal do Grupo'),`<p>${e(item.descricao)}</p>${item.observacao?`<p class="muted">${e(item.observacao)}</p>`:''}${detailGrid({'Grupo':item.grupo||'—','Endereço':url?dominioDe(url):'Aguardando cadastro','Acesso':externo?'Cadastro próprio do serviço':'Identificação de rede do Grupo'})}${url?acaoAcessar(url,item.nome):'<p class="muted">O endereço deste item ainda não foi cadastrado.</p>'}`);
+    showDialog(item.nome,item.grupo||(externo?'Link externo':'Portal do Grupo'),`<p>${e(item.descricao)}</p>${item.observacao?`<p class="muted">${e(item.observacao)}</p>`:''}${detailGrid({'Grupo':item.grupo||'—','Origem':ORIGENS[origemDe(collection,item)],'Endereço':url?dominioDe(url):'Aguardando cadastro','Acesso':externo?'Cadastro próprio do serviço':'Identificação de rede do Grupo'})}${url?acaoAcessar(url,item.nome):'<p class="muted">O endereço deste item ainda não foi cadastrado.</p>'}${botaoDestacar(externo?'externo':'portal',item.id)}`);
     return;
   }
   if(collection==='usuarios') {
@@ -1072,12 +1103,12 @@ function showRecord(collection,id) {
   }
   if(collection==='automacoes') {
     const url=safeURL(item.url);
-    showDialog(item.titulo,'Automação',`<p>${e(item.descricao)}</p>${detailGrid({'Categoria no portal':item.categoriaPortal,'Tecnologia':item.tipo,'Status de desenvolvimento':item.statusDesenvolvimento,'Situação do acesso':url?'Disponível':'Acesso em configuração'})}${url?`<a class="primary-btn" href="${e(url)}" target="_blank" rel="noopener noreferrer">Acessar automação${icon('external').replace('class="icon"','class="icon ext"')}</a>`:'<p class="muted">O acesso pelo portal ainda está em configuração.</p>'}`);
+    showDialog(item.titulo,'Automação',`<p>${e(item.descricao)}</p>${detailGrid({'Categoria no portal':item.categoriaPortal,'Origem':ORIGENS[origemDe(collection,item)],'Tecnologia':item.tipo,'Status de desenvolvimento':item.statusDesenvolvimento,'Situação do acesso':url?'Disponível':'Acesso em configuração'})}${url?`<a class="primary-btn" href="${e(url)}" target="_blank" rel="noopener noreferrer">Acessar automação${icon('external').replace('class="icon"','class="icon ext"')}</a>`:'<p class="muted">O acesso pelo portal ainda está em configuração.</p>'}`);
     return;
   }
   if(collection==='documentos') {
     const link=safeURL(item.link),arquivo=safeURL(item.arquivo);
-    showDialog(item.titulo,item.grupo||'Documentos & Normas',`<p>${e(item.descricao)}</p>${detailGrid({'Fonte':item.fonte||'—','Grupo':item.grupo||'—','Link verificado em':item.verificadoEm?dateLabel(item.verificadoEm):'—'})}<div class="doc-actions">${link?`<a class="primary-btn" href="${e(link)}" target="_blank" rel="noopener noreferrer" data-doc-link="${e(item.titulo)}">Acessar na fonte oficial${icon('external').replace('class="icon"','class="icon ext"')}</a>`:''}${arquivo?` <a class="primary-btn" href="${e(arquivo)}" download data-doc-title="${e(item.titulo)}">Baixar</a>`:''}</div>`);
+    showDialog(item.titulo,item.grupo||'Documentos & Normas',`<p>${e(item.descricao)}</p>${detailGrid({'Fonte':item.fonte||'—','Origem':ORIGENS[item.origem],'Grupo':item.grupo||'—','Link verificado em':item.verificadoEm?dateLabel(item.verificadoEm):'—'})}<div class="doc-actions">${link?`<a class="primary-btn" href="${e(link)}" target="_blank" rel="noopener noreferrer" data-doc-link="${e(item.titulo)}">Acessar na fonte oficial${icon('external').replace('class="icon"','class="icon ext"')}</a>`:''}${arquivo?` <a class="primary-btn" href="${e(arquivo)}" download data-doc-title="${e(item.titulo)}">Baixar</a>`:''}</div>`);
     return;
   }
   showDialog(item.nome,collection==='agenda'?'Agenda da gerência':collection==='entregas'?'Entrega da semana':'Processo crítico',`<p>${e(item.descricao)}</p>${detailGrid({'Responsável':item.responsavel,'Prazo / data':item.data?dateLabel(item.data):/^\d{4}-/.test(item.prazo)?dateLabel(item.prazo):item.prazo,'Status / tipo':item.status||item.tipo,'Horário':item.horario||'Não se aplica'})}`);
@@ -1087,7 +1118,7 @@ function showLinkInfo(index) {
   const item=data.config.links[Number(index)];
   if(!item)return;
   const url=safeURL(item.link);
-  showDialog(item.nome,'Acesso corporativo',`<p>${e(item.descricao||'Acesso utilizado pela Gerência de Contabilidade.')}</p>${detailGrid({'Responsável':item.responsavel||'Administração do portal','Endereço':url?'Cadastrado':'Aguardando cadastro'})}${url?acaoAcessar(url,item.nome):'<p class="muted">O endereço deste acesso ainda não foi cadastrado. Solicite o link ao responsável da área.</p>'}`);
+  showDialog(item.nome,'Acesso corporativo',`<p>${e(item.descricao||'Acesso utilizado pela Gerência de Contabilidade.')}</p>${detailGrid({'Responsável':item.responsavel||'Administração do portal','Origem':ORIGENS[origemDe('links',item)],'Endereço':url?'Cadastrado':'Aguardando cadastro'})}${url?acaoAcessar(url,item.nome):'<p class="muted">O endereço deste acesso ainda não foi cadastrado. Solicite o link ao responsável da área.</p>'}${botaoDestacar('atalho',item.nome)}`);
 }
 // Clicar na imagem do cartão (só para quem administra) troca a arte. Grava no
 // backend quando ele está ativo; sem backend, só automações têm guarda local
@@ -1145,26 +1176,44 @@ async function salvarImagemCartao(collection,item,imagem) {
     notify(error.message);
   }
 }
+// Coleções da busca global, na ordem dos resultados, e o nome de cada uma no
+// cartão do resultado.
+const BUSCA_COLECOES= {
+  newsletter:'Comunicação',noticias:'Comunicação',sistemas:'Sistemas da área',automacoes:'Automações',links:'Atalhos corporativos',portais:'Portais do Grupo',externos:'Links externos',documentos:'Documentos & Normas',processos:'Processos',equipes:'Equipes',usuarios:'Colaboradores',agenda:'Agenda',entregas:'Entregas'
+}
+;
+// Os atalhos (config.json › links) não têm id: a posição na lista faz esse
+// papel, como no "i" do cartão (`links:<posição>`, aberto por showLinkInfo).
+const registrosDaBusca=collection=>collection==='links'
+  ?data.config.links.map((item,index)=>({...item,id:String(index)})).filter(item=>!item.target)
+  :data[collection]||[];
 function search(query) {
   const normalized=normalize(query.trim());
   $('#search-section').hidden=!normalized;
   if(!normalized)return 0;
+  const origem=$('#search-origem')?.value||'';
+  // Comunicados: só os que a Comunicação mostra (publicados, sem a cópia
+  // duplicada entre Newsletter e Notícias).
+  const visiveis=new Set(comunicados(data).map(({item,colecao})=>`${colecao}:${item.id}`));
   const matches=[];
-  for(const collection of ['newsletter','noticias','processos','sistemas','documentos','equipes','usuarios','agenda','entregas']) {
+  for(const collection of Object.keys(BUSCA_COLECOES)) {
     if(!hasAccess(currentUser,COLLECTION_ACCESS[collection]))continue;
-    for(const item of data[collection]) {
-      if((collection==='newsletter'||collection==='noticias')&&item.status!=='Publicado')continue;
+    for(const item of registrosDaBusca(collection)) {
+      if((collection==='newsletter'||collection==='noticias')&&!visiveis.has(`${collection}:${item.id}`))continue;
+      if(collection==='automacoes'&&item.ativo===false)continue;
+      const origemItem=origemDe(collection,item);
+      if(origem&&origemItem!==origem)continue;
       if(normalize(JSON.stringify(item)).includes(normalized))matches.push( {
-        collection,item
+        collection,item,origem:origemItem
       }
       );
     }
   }
-  $('#search-count').textContent=`${matches.length} resultado${matches.length===1?'':'s'} para “${query.trim()}”`;
+  $('#search-count').textContent=`${matches.length} resultado${matches.length===1?'':'s'} para “${query.trim()}”${origem?` em ${ORIGENS[origem]}`:''}`;
   $('#search-results').innerHTML=matches.map(( {
-    collection,item
+    collection,item,origem
   }
-  )=>`<article class="content-card"><span class="meta-label">${e(({newsletter:'Newsletter',noticias:'Notícias',usuarios:'Colaboradores'})[collection]||collection)}</span><h3>${e(item.titulo||item.nome)}</h3><p>${e(item.resumo||item.descricao||item.cargo||'')}</p><button class="text-btn" data-record="${e(collection)}:${e(item.id)}">Ver detalhes</button></article>`).join('')||'<p class="empty-state">Nenhum resultado. Experimente “conciliações”, “IFRS” ou “Contabilidade IV”.</p>';
+  )=>`<article class="content-card"><p class="meta-label rotulo-com-selo">${seloOrigem(origem)}<span>${e(BUSCA_COLECOES[collection])}</span></p><h3>${e(item.titulo||item.nome)}</h3><p>${e(item.resumo||item.descricao||item.cargo||'')}</p><button class="text-btn" data-record="${e(collection)}:${e(item.id)}">Ver detalhes</button></article>`).join('')||'<p class="empty-state">Nenhum resultado. Experimente “SAP”, “IFRS” ou “Contabilidade IV”.</p>';
   return matches.length;
 }
 function preferences() {
@@ -1306,8 +1355,11 @@ async function init() {
       if(event.target.value&&$('#home-view').hidden)navigate({target:'inicio'},false);
       search(event.target.value);
     };
+    $('#search-origem').innerHTML=`<option value="">Todas as origens</option>${Object.entries(ORIGENS).map(([valor,rotulo])=>`<option value="${valor}">${rotulo}</option>`).join('')}`;
+    $('#search-origem').onchange=()=>search($('#global-search').value);
     $('#clear-search').onclick=()=> {
       $('#global-search').value='';
+      $('#search-origem').value='';
       search('');
       $('#global-search').focus();
     }

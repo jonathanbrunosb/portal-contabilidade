@@ -23,8 +23,12 @@ import base64
 import io
 import os
 import re
+import sys
 
 from PIL import Image
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import arte_arrendamento  # noqa: E402  (tela do IFRS 16, composta a parte)
 
 MARCAS = 'assets/marcas'
 TELAS = 'projeto/marcas-telas'   # insumo do gerador; nao vai para o site
@@ -226,7 +230,11 @@ def fundo_foto(arquivo, veu=None, largura=620, recorte=0.5, zoom=1.0):
 
 # -------------------------------------------------------------- composicao
 def compor(spec):
-    """spec: dict com fundo, logo, titulo, subtitulo, rotulo, alinhamento."""
+    """spec: dict com fundo, logo, titulo, subtitulo, rotulo, alinhamento.
+    `pronto` e uma funcao que ja devolve o SVG inteiro (tela composta demais
+    para os campos, como a do IFRS 16)."""
+    if 'pronto' in spec:
+        return spec['pronto'](spec['alt'])
     if 'foto' in spec:
         corpo, defs = fundo_foto(spec['foto'], spec.get('veu'),
                                  spec.get('fotoLargura', 620), spec.get('recorte', 0.5),
@@ -405,13 +413,11 @@ PROJECTHUB = {
     'subtitulo': 'Gestão Integrada de Projetos', 'alinhamento': 'esquerda',
     'tamanhoTitulo': 38, 'limite': 14, 'corTitulo': '#ffffff', 'corSub': '#94a3b8',
 }
-ARRENDAMENTO = {
-    'alt': 'IFRS 16 / CPC 06 (R2), sistema de arrendamentos',
-    'degrade': ('#f1f5f9', '#e2e8f0', 135), 'logo': 'arrendamento-logo.png',
-    'titulo': 'IFRS 16 / CPC 06 (R2)', 'subtitulo': 'Sistema de Gestão de Arrendamentos',
-    'alinhamento': 'esquerda', 'tamanhoTitulo': 28, 'limite': 18,
-    'corTitulo': '#1a3c5e', 'corSub': '#64748b', 'logoLargura': 150, 'logoAltura': 34,
-}
+# A tela de entrada mudou em 21/09/2026 (painel branco + painel azul recortado
+# por uma curva, foto das torres e o "Contrato de Arrendamento"). O desenho e
+# composto demais para os campos do spec: mora em arte_arrendamento.py, que
+# tambem faz o fundo do slide do IFRS 16 no carrossel.
+ARRENDAMENTO = {'alt': 'IFRS 16 / CPC 06 (R2), sistema de arrendamentos', 'pronto': arte_arrendamento.cartao}
 GESTOR_HORAS = {
     'alt': 'Gestor de Horas, do Grupo Equatorial', 'fundo': '#111827',
     'logo': 'gestorhoras-logo.png', 'titulo': 'Gestor de Horas',

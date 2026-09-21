@@ -234,6 +234,8 @@ imagem não desenhou.
 | Logo **escura** num fundo escuro | o arquivo é a versão escura e o site a inverte por CSS (ProjectHub, Cronograma) | `inverter: True` |
 | Conteúdo **cortado** na borda | `object-fit: cover` corta até 10% de cada lado | nada essencial fora de **60 px nas laterais e 44 px em cima e embaixo** do quadro 440×400 |
 | Identidade **não aparece** no site | você abriu em janela estreita | 1600 px |
+| Site da área **não abre** nesta máquina (`*.contabilidade-eqtl.com`) | o firewall da rede (FortiGuard) bloqueia o domínio como "Unrated" e re-assina o certificado — Edge headless, curl e o painel do app recebem erro ou a página de bloqueio | não clique em "Proceed": leia pelo Chrome do usuário (Claude in Chrome) ou peça a página salva (Ctrl+S) — ela traz o CSS e as imagens em `<nome>_files/` e abre offline no Edge. Foi o caminho do IFRS 16 em 21/09 |
+| Tela **composta demais** para os campos do spec | painel dividido por curva, várias camadas (IFRS 16, login de 21/09) | escreva a composição num módulo à parte e registre `{'alt': ..., 'pronto': funcao}` em `CARTOES` — ver `arte_arrendamento.py` |
 
 ---
 

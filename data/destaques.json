@@ -74,8 +74,9 @@
     "titulo": "IFRS 16 / CPC 06: contratos de arrendamento em um só lugar",
     "subtitulo": "Ativo para uso",
     "rotulo": "Executiva IV · Conciliação e Auditoria",
-    "fundo": "#004389",
-    "fundoFim": "#062f5c",
+    "fundoImagem": "assets/destaques/ifrs-16-login-fundo.webp",
+    "fundo": "#0751b1",
+    "fundoFim": "#03265d",
     "imagens": [
       "assets/destaques/ifrs-16-cena.webp"
     ],

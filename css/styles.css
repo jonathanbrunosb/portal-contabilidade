@@ -3389,6 +3389,59 @@ th,td {
   margin-left:auto;
   color:var(--texto-apoio-2)}
 
+/* Capa a partir de 1200 px (21/09/2026, noite — pedido do usuário: a
+   Comunicação só aparecia rolando a tela). Avisos e Acesso rápido sobem para
+   uma coluna ao lado do carrossel e a Comunicação, sem mudar nada nela, começa
+   logo abaixo dessa faixa. O carrossel deixa a proporção do molde e passa a
+   medir pela ALTURA da janela, que é o que decide o que cabe sem rolar: 46%
+   dela, entre 300 e 420 px. Medido: a Comunicação começava em 824 px em
+   1536×730 (94 px abaixo da tela) e 780 px em 1366×657. */
+@media(min-width:1200px) {
+  .home-top {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) clamp(360px,30%,500px);
+    gap:28px}
+
+  /* A altura é piso, não teto: se a coluna ao lado passar dela (nomes longos
+     do Acesso rápido quebrando linha em 1366 px), o carrossel estica junto e
+     as bases continuam alinhadas. */
+  .dq {
+    display:flex;
+    flex-direction:column;
+    margin-bottom:0}
+
+  .dqb {
+    flex:1 1 auto;
+    aspect-ratio:auto;
+    min-height:clamp(300px,46vh,420px)}
+
+  /* Mais estreita, a faixa dá à imagem 50% (era 56%) e deixa o título ir a
+     3 linhas: em 1366 px ele cortava na 2ª. */
+  .formato-imagem {
+    --zona:min(50cqw,100cqh * 16 / 9)}
+
+  .dqb-titulo {
+    -webkit-line-clamp:3}
+
+  /* A coluna tem a altura do carrossel: Avisos no alto, Acesso rápido
+     alinhado à base dele — a faixa fecha num retângulo só. */
+  .home-side {
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    gap:20px}
+
+  .home-side .acesso {
+    column-gap:16px}
+
+  /* Linhas justas: nome longo ("Cronograma de Fechamento") quebra em duas
+     sem dobrar a altura da linha; o alvo continua acima de 24 px. */
+  .home-side .acesso a {
+    gap:8px;
+    padding:6px 4px;
+    line-height:1.2}
+}
+
 @media(max-width:900px) {
   .home-top {
   grid-template-columns:1fr;
@@ -3723,26 +3776,10 @@ svg.ext {
 /* ===== Capa: Comunicação em três colunas, uma por origem (21/09/2026) =====
    Formato de portal de notícias, na referência que o usuário enviou (capa da
    CNN Brasil): título da coluna na cor da origem, um destaque com o título
-   sobre a imagem e, abaixo, a lista com miniatura à esquerda. */
-.home-comunicacao {
-  margin-top:8px}
-
-.home-comunicacao-topo {
-  display:flex;
-  align-items:baseline;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:16px;
-  padding-bottom:10px;
-  border-bottom:1px solid var(--borda)}
-
-.home-comunicacao-topo h2 {
-  margin:0;
-  color:var(--texto)}
-
-.home-comunicacao-topo .text-btn {
-  font-size:var(--fs-base);
-  font-weight:var(--peso-medio)}
+   sobre a imagem e, abaixo, a lista com miniatura à esquerda. Sem faixa de
+   título "Comunicação" nem "Ver todos" (pedido do usuário em 21/09/2026: o
+   menu já leva à Comunicação e cada coluna tem o seu "Veja mais"); o h2 fica
+   só para leitor de tela, acima dos títulos das colunas (h3). */
 
 .colunas-origem {
   display:grid;

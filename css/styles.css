@@ -2449,7 +2449,13 @@ th,td {
   position:relative;
   z-index:30;
   color:#fff;
-  background:linear-gradient(100deg,#071f49f2 0%,#071f49d9 38%,#0b376aa6 62%,#075c8070 85%,#075c8047 100%),url("../assets/images/banner/portal-gerencia-contabilidade.webp?v=20260921-13") right 0 top 30%/auto 420px no-repeat;
+  /* A foto é mais escura que o fundo sólido: sem a camada do meio, a borda
+     esquerda dela vira um fio vertical em telas mais largas que ela (747 px). */
+  --ph-foto-largura:calc(420px * 1672 / 940);
+  background:
+    linear-gradient(100deg,#071f49f2 0%,#071f49d9 38%,#0b376aa6 62%,#075c8070 85%,#075c8047 100%),
+    linear-gradient(90deg,var(--marinho-escuro) 0 2px,color-mix(in srgb,var(--marinho-escuro) 55%,transparent) 18%,transparent 45%) right 0 top 0/var(--ph-foto-largura) 100% no-repeat,
+    url("../assets/images/banner/portal-gerencia-contabilidade.webp?v=20260921-46") right 0 top 30%/auto 420px no-repeat;
   background-color:var(--marinho-escuro)}
 
 .ph-row {

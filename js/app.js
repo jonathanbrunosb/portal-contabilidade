@@ -579,8 +579,7 @@ function renderPeriod() {
   const period = new Date(config.competencia + '-01T12:00:00');
   const month = period.toLocaleDateString('pt-BR', {month: 'long'});
   $('.period').textContent = `Competência: ${month} de ${period.getFullYear()}`;
-  $('#entregas .week-label').textContent = `Semana ${String(config.semanaLabel||'').toLowerCase()}`;
-  $('#pf-updated').textContent = `${config.demonstracao ? 'Dados ilustrativos' : 'Base local'} · Atualização da base: ${reference.toLocaleDateString('pt-BR')}`;
+  $('#pf-updated').textContent = `Atualização da base: ${reference.toLocaleDateString('pt-BR')}`;
 }
 
 // Capa: vigência de destaques e avisos pela data do dispositivo (AAAA-MM-DD).
@@ -639,12 +638,14 @@ function renderPortalMap(sections) {
   const gerencia=data.equipes.find(team=>team.tipo==='gerencia');
   if(gerencia)$('#pf-area').textContent=gerencia.nome;
 }
+// Painel da gerência. Os dados ilustrativos saíram em 21/09/2026: cada bloco
+// sem registro mostra que ainda não há nada cadastrado, em vez de sumir.
 function renderDashboard() {
   const config=data.config;
-  $('#kpis').innerHTML=config.kpis.map(k=>`<article class="kpi"><div class="kpi-top"><span>${e(k.nome)}</span>${icon(k.icon)}</div><div class="kpi-value">${e(k.valor)}${badge(k.status)}</div><div class="progress ${e(k.cor)}" role="progressbar" aria-label="${e(k.metrica)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Number(k.progresso)}"><span style="width:${Math.max(0,Math.min(100,Number(k.progresso)))}%"></span></div><p class="kpi-foot">${e(k.metrica)}</p></article>`).join('');
-  $('#process-table').innerHTML=data.processos.map(p=>`<tr><td><button class="text-btn" data-record="processos:${e(p.id)}">${e(p.nome)}</button></td><td>${e(p.responsavel)}</td><td>${e(p.prazo)}</td><td>${badge(p.status)}</td></tr>`).join('');
-  $('#agenda-list').innerHTML=data.agenda.slice().sort((a,b)=>a.data.localeCompare(b.data)).map(a=>`<button class="agenda-event" data-record="agenda:${e(a.id)}"><span class="event-date">${e(a.data.slice(-2))}<small>${e(new Date(a.data+'T12:00:00').toLocaleDateString('pt-BR',{month:'short'}).replace('.','').toUpperCase())}</small></span><span class="event-copy"><strong>${e(a.nome)}</strong><small>${e(a.horario)}· ${e(a.responsavel)}</small></span></button>`).join('');
-  $('#deliveries').innerHTML=data.entregas.map(d=>`<button class="delivery" data-record="entregas:${e(d.id)}"><strong>${e(d.nome)}</strong><small>${e(d.responsavel)}</small><span class="delivery-bottom"><span>${e(dateLabel(d.prazo))}</span>${badge(d.status)}</span></button>`).join('');
+  $('#kpis').innerHTML=(config.kpis||[]).map(k=>`<article class="kpi"><div class="kpi-top"><span>${e(k.nome)}</span>${icon(k.icon)}</div><div class="kpi-value">${e(k.valor)}${badge(k.status)}</div><div class="progress ${e(k.cor)}" role="progressbar" aria-label="${e(k.metrica)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Number(k.progresso)}"><span style="width:${Math.max(0,Math.min(100,Number(k.progresso)))}%"></span></div><p class="kpi-foot">${e(k.metrica)}</p></article>`).join('')||'<p class="empty-state">Nenhum indicador cadastrado ainda.</p>';
+  $('#process-table').innerHTML=data.processos.map(p=>`<tr><td><button class="text-btn" data-record="processos:${e(p.id)}">${e(p.nome)}</button></td><td>${e(p.responsavel)}</td><td>${e(p.prazo)}</td><td>${badge(p.status)}</td></tr>`).join('')||'<tr><td colspan="4" class="empty-state">Nenhum processo cadastrado ainda.</td></tr>';
+  $('#agenda-list').innerHTML=data.agenda.slice().sort((a,b)=>a.data.localeCompare(b.data)).map(a=>`<button class="agenda-event" data-record="agenda:${e(a.id)}"><span class="event-date">${e(a.data.slice(-2))}<small>${e(new Date(a.data+'T12:00:00').toLocaleDateString('pt-BR',{month:'short'}).replace('.','').toUpperCase())}</small></span><span class="event-copy"><strong>${e(a.nome)}</strong><small>${e(a.horario)}· ${e(a.responsavel)}</small></span></button>`).join('')||'<p class="empty-state">Nenhum compromisso cadastrado ainda.</p>';
+  $('#deliveries').innerHTML=data.entregas.map(d=>`<button class="delivery" data-record="entregas:${e(d.id)}"><strong>${e(d.nome)}</strong><small>${e(d.responsavel)}</small><span class="delivery-bottom"><span>${e(dateLabel(d.prazo))}</span>${badge(d.status)}</span></button>`).join('')||'<p class="empty-state">Nenhuma entrega cadastrada ainda.</p>';
 }
 function editorialActions(collection,item) {
   if(item.status==='Rascunho')return `<button class="text-btn" data-editorial="${e(collection)}:${e(item.id)}:revisao">Enviar para revisão</button>`;
@@ -728,7 +729,7 @@ function openNewDraft() {
     <label class="field">Conteúdo completo<textarea id="draft-conteudo" required></textarea></label>
     <label class="field">Nível de impacto<select id="draft-impacto"><option>Baixo</option><option selected>Moderado</option><option>Alto</option></select></label>
     <label class="field">Área responsável<input id="draft-area" value="${e(currentUser.area||'')}"></label>
-    <label class="field">Empresas impactadas (separadas por vírgula)<input id="draft-empresas" placeholder="Empresa A (exemplo), Empresa B (exemplo)"></label>
+    <label class="field">Empresas impactadas (separadas por vírgula)<input id="draft-empresas" placeholder="Ex.: Equatorial Pará, Equatorial Maranhão"></label>
     <button class="primary-btn" type="submit">Salvar rascunho</button>
   </form>`);
   $('#draft-form').onsubmit=async event=> {
@@ -1129,7 +1130,7 @@ function showRecord(collection,id) {
     showDialog(item.titulo,item.grupo||'Documentos & Normas',`<p>${e(item.descricao)}</p>${detailGrid({'Fonte':item.fonte||'—','Origem':ORIGENS[item.origem],'Grupo':item.grupo||'—','Link verificado em':item.verificadoEm?dateLabel(item.verificadoEm):'—'})}<div class="doc-actions">${link?`<a class="primary-btn" href="${e(link)}" target="_blank" rel="noopener noreferrer" data-doc-link="${e(item.titulo)}">Acessar na fonte oficial${icon('external').replace('class="icon"','class="icon ext"')}</a>`:''}${arquivo?` <a class="primary-btn" href="${e(arquivo)}" download data-doc-title="${e(item.titulo)}">Baixar</a>`:''}</div>`);
     return;
   }
-  showDialog(item.nome,collection==='agenda'?'Agenda da gerência':collection==='entregas'?'Entrega da semana':'Processo crítico',`<p>${e(item.descricao)}</p>${detailGrid({'Responsável':item.responsavel,'Prazo / data':item.data?dateLabel(item.data):/^\d{4}-/.test(item.prazo)?dateLabel(item.prazo):item.prazo,'Status / tipo':item.status||item.tipo,'Horário':item.horario||'Não se aplica'})}`);
+  showDialog(item.nome,collection==='agenda'?'Agenda da gerência':collection==='entregas'?'Entrega':'Processo crítico',`<p>${e(item.descricao)}</p>${detailGrid({'Responsável':item.responsavel,'Prazo / data':item.data?dateLabel(item.data):/^\d{4}-/.test(item.prazo)?dateLabel(item.prazo):item.prazo,'Status / tipo':item.status||item.tipo,'Horário':item.horario||'Não se aplica'})}`);
 }
 // O "i" do atalho mostra a ficha; quem quer o destino usa o botão Acessar.
 function showLinkInfo(index) {
@@ -1398,7 +1399,7 @@ async function init() {
       }
       ))];
       track('notifications_open',{alertas:alerts.length});
-      showDialog('Central de notificações','Alertas da gerência',`<p>${alerts.length} pontos de atenção na base demonstrativa.</p>${alerts.map(({item,collection})=>`<article class="content-card"><h3>${e(item.nome)}</h3><p>${e(item.responsavel)}</p><div class="card-bottom">${badge(item.status)}<button class="text-btn" data-record="${collection}:${e(item.id)}">Ver detalhes</button></div></article>`).join('')||'<p>Nenhum alerta.</p>'}`);
+      showDialog('Central de notificações','Alertas da gerência',`<p>${alerts.length?`${alerts.length} ${alerts.length===1?'ponto':'pontos'} de atenção em processos e entregas.`:'Nenhum ponto de atenção em processos e entregas.'}</p>${alerts.map(({item,collection})=>`<article class="content-card"><h3>${e(item.nome)}</h3><p>${e(item.responsavel)}</p><div class="card-bottom">${badge(item.status)}<button class="text-btn" data-record="${collection}:${e(item.id)}">Ver detalhes</button></div></article>`).join('')}`);
     }
     ;
     document.addEventListener('click',event=> {

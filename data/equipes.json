@@ -13,9 +13,7 @@
       "Revisão das DCRs",
       "Estudos contábeis e projetos"
     ],
-    "empresas": [
-      "Empresa A (exemplo)"
-    ],
+    "empresas": [],
     "responsaveis": [
       {
         "nome": "Ana Laura do Carmo Machado",
@@ -86,9 +84,7 @@
       "Informações de faturamento",
       "Estudos contábeis e projetos"
     ],
-    "empresas": [
-      "Empresa B (exemplo)"
-    ],
+    "empresas": [],
     "responsaveis": [
       {
         "nome": "Márcia Fernanda dos Santos Ferreira",
@@ -159,9 +155,7 @@
       "ECD para Outros negócios",
       "Estudos contábeis e projetos"
     ],
-    "empresas": [
-      "Empresa C (exemplo)"
-    ],
+    "empresas": [],
     "responsaveis": [
       {
         "nome": "Luana Maria dos Santos Leitão",
@@ -243,9 +237,7 @@
       "Revisão das Demonstrações financeiras",
       "Projetos e inovação"
     ],
-    "empresas": [
-      "Empresa D (exemplo)"
-    ],
+    "empresas": [],
     "responsaveis": [
       {
         "nome": "Jonathan Bruno Santos Bezerra",
@@ -346,9 +338,7 @@
       "Relacionamento com auditoria",
       "Aprovação dos reportes"
     ],
-    "empresas": [
-      "Todas as empresas (exemplo)"
-    ],
+    "empresas": [],
     "responsaveis": [
       {
         "nome": "Alexandra Furtado Freire Paes Landim",
@@ -367,4 +357,3 @@
     "liderId": "colaborador-alexandra-furtado-freire-paes-landim"
   }
 ]
-

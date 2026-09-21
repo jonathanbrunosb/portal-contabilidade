@@ -1,56 +1,5 @@
 {
-  "resumo": [
-    {
-      "label": "Processos monitorados",
-      "valor": "24"
-    },
-    {
-      "label": "Sistemas integrados",
-      "valor": "07"
-    },
-    {
-      "label": "Meta de fechamento",
-      "valor": "D+4"
-    }
-  ],
-  "kpis": [
-    {
-      "nome": "Fechamento",
-      "valor": "87%",
-      "status": "No prazo",
-      "progresso": 87,
-      "cor": "",
-      "icon": "calendar",
-      "metrica": "87% das atividades concluídas"
-    },
-    {
-      "nome": "Conciliações críticas",
-      "valor": "12",
-      "status": "Atenção",
-      "progresso": 60,
-      "cor": "yellow",
-      "icon": "shield",
-      "metrica": "12 de 20 contas críticas revisadas"
-    },
-    {
-      "nome": "Auditoria",
-      "valor": "91%",
-      "status": "Em andamento",
-      "progresso": 91,
-      "cor": "purple",
-      "icon": "file",
-      "metrica": "91% das evidências entregues"
-    },
-    {
-      "nome": "Entregas regulatórias",
-      "valor": "96%",
-      "status": "3 alertas",
-      "progresso": 96,
-      "cor": "teal",
-      "icon": "chart",
-      "metrica": "96% do plano executado"
-    }
-  ],
+  "kpis": [],
   "menu": [
     {
       "label": "Central de Conteúdo",
@@ -153,8 +102,6 @@
   ],
   "competencia": "2026-09",
   "dataReferencia": "2026-09-14",
-  "demonstracao": true,
-  "semanaLabel": "14 — 20 SETEMBRO",
   "navegacao": [
     {
       "label": "Início",

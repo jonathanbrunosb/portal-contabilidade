@@ -1,7 +1,7 @@
 [
   {
-    "id": "u1",
-    "matricula": "2026001",
+    "id": "colaborador-jonathan-bruno-santos-bezerra",
+    "matricula": null,
     "nome": "Jonathan Bruno Santos Bezerra",
     "cargo": "Executivo Corporativo de Contabilidade",
     "area": "Contabilidade IV",
@@ -16,34 +16,19 @@
     "areaId": "t4"
   },
   {
-    "id": "u2",
-    "matricula": "123456",
-    "nome": "Marina Oliveira",
-    "cargo": "Gerente Corporativa de Contabilidade",
-    "area": "Gerência",
-    "areaId": "gerencia",
-    "perfil": "Gerência",
-    "equipe": "Gerência",
-    "foto": "assets/users/default.svg",
+    "id": "colaborador-eduardo-dos-santos-rocha",
+    "matricula": null,
+    "nome": "Eduardo dos Santos Rocha",
+    "cargo": "Analista",
+    "area": "Contabilidade IV",
+    "perfil": "Colaborador",
+    "equipe": "Contabilidade IV",
+    "foto": "assets/users/eduardo-dos-santos-rocha.png",
     "permissoes": [
       "conteudo",
-      "gerencial",
-      "time"
-    ]
-  },
-  {
-    "id": "u3",
-    "matricula": "2026002",
-    "nome": "Ana Martins",
-    "cargo": "Analista Contábil",
-    "area": "Contabilidade I",
-    "perfil": "Colaborador",
-    "equipe": "Contabilidade I",
-    "foto": "assets/users/default.svg",
-    "permissoes": [
-      "conteudo"
+      "time",
+      "administracao"
     ],
-    "areaId": "t1"
+    "areaId": "t4"
   }
 ]
-

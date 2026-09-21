@@ -53,6 +53,17 @@
   --origem-externo-fundo:var(--roxo-fundo);
   /* Véu na base de uma foto, para o título branco ler bem sobre ela. */
   --veu-imagem:rgba(1,14,40,.82);
+  /* Carrossel: sombra que segue o recorte da imagem (notebook sem fundo) e
+     o fio entre o selo e a área. */
+  --sombra-imagem:drop-shadow(0 10px 22px rgba(1,14,40,.45));
+  --linha-clara:rgba(255,255,255,.45);
+  /* Carrossel: as listras finas do molde do Cronograma, o desfoque da imagem
+     que vira fundo, a sombra do canto de fora e o halo atrás do texto dos
+     moldes com fundo próprio. */
+  --listra-slide:rgba(255,255,255,.07);
+  --sombra-canto:rgba(1,14,40,.3);
+  --halo-texto:rgba(1,14,40,.62);
+  --desfoque-ambiente:blur(44px) saturate(1.6) brightness(.5);
   --ph-laranja:var(--acento-laranja);
   --ph-tarja:rgba(1,14,40,.55);
   /* Escala tipográfica curta: 12 / 13 / 14 / 16 / 18 / 22 / 30 px. Nada de
@@ -1319,7 +1330,8 @@ dialog h2 {
   font-size:var(--fs-base);
   line-height:1.75}
 
-#dialog-body p {
+/* Fora a prévia do slide do carrossel, que tem cor e espaço próprios. */
+#dialog-body p:not(.dqb p) {
   margin:10px 0;
   color:var(--texto-2)}
 
@@ -1493,6 +1505,94 @@ dialog h2 {
   display:grid;
   grid-template-columns:2fr 1fr;
   gap:12px}
+
+/* ===== Gestão do carrossel (21/09/2026) =====
+   Formulário do destaque com prévia do slide (diálogo largo, para a prévia
+   caber na proporção 3,85 do carrossel), a lista da aba "Carrossel" e o bloco
+   "Carrossel da capa" na página do comunicado. */
+dialog.dialogo-largo {
+  width:min(1100px,calc(100% - 32px))}
+
+.destaque-form fieldset {
+  margin:0 0 14px;
+  padding:12px 14px 4px;
+  border:1px solid var(--borda);
+  border-radius:var(--raio-md)}
+
+.destaque-form legend {
+  padding:0 6px;
+  color:var(--texto);
+  font-size:var(--fs-sm);
+  font-weight:var(--peso-forte)}
+
+.destaque-form legend small {
+  color:var(--texto-apoio);
+  font-weight:var(--peso-medio)}
+
+.admin-form-grid.tres {
+  grid-template-columns:repeat(3,minmax(0,1fr))}
+
+.destaque-previa {
+  margin-bottom:16px}
+
+.dqb-previa {
+  margin-top:6px}
+
+/* A prévia é redesenhada a cada tecla: sem a animação de entrada do texto,
+   senão ela piscaria o tempo todo. */
+.dqb-previa .dqb-texto > * {
+  opacity:1;
+  transform:none;
+  transition:none}
+.dq-envio {
+  display:flex;
+  align-items:center;
+  gap:8px}
+
+.dq-envio input[type=file] {
+  min-width:0;
+  font-size:var(--fs-xs)}
+
+.admin-aviso {
+  margin:0 0 12px;
+  padding:10px 12px;
+  border-radius:var(--raio-sm);
+  background:var(--ambar-fundo);
+  color:var(--texto-2);
+  font-size:var(--fs-sm)}
+
+.admin-destaque-meta {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:4px 10px;
+  margin:0;
+  color:var(--texto-apoio);
+  font-size:var(--fs-xs)}
+
+.admin-destaque-acoes {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:flex-end;
+  gap:6px 12px;
+  min-width:170px}
+
+.comunicado-admin p {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px;
+  color:var(--texto-2);
+  font-size:var(--fs-base)}
+
+[data-destacar] {
+  margin-top:10px}
+
+@media(max-width:720px) {
+  .admin-form-grid.tres {
+    grid-template-columns:minmax(0,1fr)}
+}
 
 .admin-subheading {
   justify-content:space-between;
@@ -2666,32 +2766,24 @@ th,td {
   min-width:0;
   margin-bottom:24px}
 
-/* Carrossel de destaques — formato do Conecta (o /esc do Portal de Servicos),
-   medido em 21/09/2026: faixa larga e baixa de 3,125 de proporcao, cantos de
-   10 px, deslizamento lateral de 0,5 s, setas redondas de 42 px a 15 px das
-   bordas e bolinhas de 9 px no rodape.
-
-   Nossos destaques sao noticia com foto, nao banner com dizeres pintados
-   dentro. Entao o slide e partido: imagem de um lado, texto do outro, sobre
-   um fundo tirado da propria imagem (`fundo`/`fundoFim` em destaques.json).
-   E a emenda entre os dois some num degrade, senao ficaria uma foto colada
-   num retangulo de cor. */
+/* Carrossel de destaques (21/09/2026) — molde do usuário, desenhado no Figma
+   em 2000×519 (projeto/comunicados): fundo em imagem ou degradê; até duas
+   imagens de um lado; do outro, selo da origem + área, título, subtítulo,
+   descrição e a ação. O texto é HTML, nunca pintado na imagem. Do formato do
+   Conecta ficaram os cantos de 10 px, o deslizamento lateral de 0,5 s, as
+   setas de 42 px a 15 px das bordas e as bolinhas de 9 px. */
 .dqb {
   position:relative;
-  /* Largura explicita: com `width:auto` o navegador resolvia a proporcao
-     encolhendo a LARGURA ate caber no teto de altura, e a faixa deixava de
-     ocupar a capa inteira. Com a largura definida, a proporcao so manda na
-     altura e o teto corta o excesso. */
   width:100%;
-  aspect-ratio:3.125;
-  /* O modelo tem 377 px de altura, num conteudo de 1148. O nosso vai a 1361
-     de largura e a proporcao sozinha levava a 435 — alto demais. O teto
-     mantem a altura do modelo e deixa a faixa ainda mais baixa nas telas
-     largas, que e o efeito desejado. */
-  max-height:372px;
+  aspect-ratio:2000 / 519;
+  /* Em telas médias a proporção sozinha deixaria a faixa baixa demais para
+     título, subtítulo e descrição (em 1024 px daria 250 px). */
+  min-height:300px;
   border-radius:10px;
   overflow:hidden;
-  background:var(--marinho-escuro)}
+  background:var(--marinho-escuro);
+  /* A zona da imagem do formato "imagem" sai da altura da faixa (cqh). */
+  container-type:size}
 
 .dqb-trilho {
   display:flex;
@@ -2701,106 +2793,233 @@ th,td {
 .dqb-slide {
   position:relative;
   flex:0 0 100%;
+  overflow:hidden;
   background:linear-gradient(100deg,var(--dqb-fundo) 0%,var(--dqb-fundo-fim) 100%)}
 
 .dqb-slide[data-lado="direita"] {
   background:linear-gradient(260deg,var(--dqb-fundo) 0%,var(--dqb-fundo-fim) 100%)}
 
-/* A imagem ocupa 62% da faixa, e nao a coluna de 44% que o texto deixa livre:
-   as ilustracoes sao 16:9 e, espremidas numa caixa de 1,38, perdiam 23% da
-   largura no `cover` — cortava o titulo desenhado nelas. Em 62% a caixa fica
-   em 1,94 e o corte passa para 8% em altura, onde ha folga. O texto entra por
-   cima da parte ja esmaecida. */
-.dqb-arte {
+/* Fundo desenhado (o degradê da arte, uma foto de campanha), por cima do
+   degradê de cores, que fica de reserva enquanto a imagem carrega. */
+.dqb-fundo {
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover}
+
+/* Zona das imagens: pouco mais da metade da faixa, do lado escolhido. No
+   molde, uma imagem é a cena do Figma e ocupa a zona toda; duas se sobrepõem —
+   a principal no alto, do lado de fora, e a segunda embaixo, do lado de
+   dentro. */
+.dqb-imagens {
   position:absolute;
   top:0;
   bottom:0;
   left:0;
-  width:62%;
-  overflow:hidden}
+  /* Acima das listras e do véu (o :after do slide). */
+  z-index:1;
+  width:53%}
 
-.dqb-slide[data-lado="direita"] .dqb-arte {
+.dqb-slide[data-lado="direita"] .dqb-imagens {
   left:auto;
   right:0}
 
-.dqb-arte img {
-  display:block;
-  width:100%;
-  height:100%;
-  /* `contain`, nao `cover`. A faixa e larga e baixa (2,27 na caixa da arte) e
-     as ilustracoes sao 16:9: no `cover` o corte chegava a 22% da altura e
-     comia o desenho. Com `contain` a ilustracao aparece inteira, encostada na
-     borda de fora; a sobra do outro lado e o proprio fundo, que a mascara ja
-     esmaece. */
+.dqb-img {
+  position:absolute;
   object-fit:contain;
-  object-position:left center}
+  filter:var(--sombra-imagem)}
 
-.dqb-slide[data-lado="direita"] .dqb-arte img {
-  object-position:right center}
+/* Molde: a cena do Figma ocupa a zona inteira — as margens já vêm nela. */
+.dqb-img-1:only-child {
+  inset:0;
+  width:100%;
+  height:100%}
 
-/* A emenda e uma mascara na propria foto, nao uma camada de cor por cima.
-   Cobrir com a cor deixava um corte vertical seco: a camada chegava a cor
-   cheia, mas ao lado dela quem pintava era o degrade do slide, ja noutro
-   tom. Apagando a foto, o que aparece atras e sempre o mesmo fundo. */
-.dqb-arte img {
-  -webkit-mask-image:linear-gradient(90deg,#000 28%,#0000 76%);
-  mask-image:linear-gradient(90deg,#000 28%,#0000 76%)}
+.dqb-img-1:not(:only-child) {
+  top:10%;
+  right:5%;
+  width:60%;
+  height:64%;
+  object-position:right top}
 
-.dqb-slide[data-lado="direita"] .dqb-arte img {
-  -webkit-mask-image:linear-gradient(270deg,#000 28%,#0000 76%);
-  mask-image:linear-gradient(270deg,#000 28%,#0000 76%)}
+.dqb-img-2 {
+  bottom:9%;
+  left:6%;
+  width:44%;
+  height:50%;
+  object-position:left bottom}
 
+/* Texto do lado oposto às imagens, com folga para a seta do lado de fora. */
 .dqb-texto {
   position:relative;
   z-index:1;
   display:flex;
   flex-direction:column;
   justify-content:center;
-  gap:9px;
-  width:52%;
+  gap:8px;
+  width:47%;
   height:100%;
-  margin-left:48%;
-  padding:26px 40px;
+  margin-left:53%;
+  padding:28px 72px 28px 16px;
   color:#fff}
 
 .dqb-slide[data-lado="direita"] .dqb-texto {
   margin-left:0;
-  margin-right:48%}
+  padding:28px 16px 28px 72px}
 
-.dqb-categoria {
+.dqb-slide.sem-imagens .dqb-texto {
+  width:auto;
+  max-width:900px;
   margin:0;
-  color:#ffffffd1;
-  font-size:var(--fs-xs);
-  font-weight:var(--peso-forte)}
+  padding:28px 72px}
+
+/* Slide sem fundo próprio: as listras finas do molde do Cronograma, para o
+   fundo não ficar chapado. Ficam sob a imagem e sob o texto. */
+.dqb-slide:not(.com-fundo):after {
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:repeating-linear-gradient(145deg,transparent 0 30px,var(--listra-slide) 30px 31px)}
+
+/* Formato "imagem" (padrão; pedido do usuário em 21/09/2026): a imagem na
+   altura toda, encostada na borda, se desfaz num fundo que é ela mesma
+   espelhada e desfocada — a borda da peça continua no fundo e cada slide
+   ganha a cor da própria imagem. Do lado do texto, um véu da cor do slide
+   garante o contraste. A zona tem a proporção 16:9 das peças da Comunicação
+   (a peça aparece inteira) até 56% da faixa; o texto fica com o resto. */
+.formato-imagem {
+  --zona:min(56cqw,100cqh * 16 / 9);
+  --veu:color-mix(in srgb,var(--dqb-fundo) 92%,transparent);
+  --veu-leve:color-mix(in srgb,var(--dqb-fundo) 35%,transparent);
+  --veu-fim:color-mix(in srgb,var(--dqb-fundo-fim) 75%,transparent)}
+
+.formato-imagem .dqb-imagens {
+  width:var(--zona);
+  -webkit-mask-image:linear-gradient(90deg,#000 76%,transparent);
+  mask-image:linear-gradient(90deg,#000 76%,transparent)}
+
+.formato-imagem[data-lado="direita"] .dqb-imagens {
+  -webkit-mask-image:linear-gradient(270deg,#000 76%,transparent);
+  mask-image:linear-gradient(270deg,#000 76%,transparent)}
+
+.formato-imagem .dqb-img-1 {
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  filter:none}
+
+.dqb-ambiente {
+  position:absolute;
+  top:0;
+  left:var(--zona);
+  width:var(--zona);
+  height:100%;
+  object-fit:cover;
+  filter:var(--desfoque-ambiente);
+  transform:scale(-1.3,1.3)}
+
+.formato-imagem[data-lado="direita"] .dqb-ambiente {
+  left:auto;
+  right:var(--zona)}
+
+/* Do lado do texto, só efeitos que escurecem — o contraste nunca cai abaixo
+   do da cor do slide (7:1 com o branco): o véu firma antes do texto começar,
+   a diagonal desce para a segunda cor do slide e o canto de fora se apaga. O
+   desfoque claro da imagem fica na emenda, onde a peça se desfaz. */
+.formato-imagem:not(.com-fundo):after {
+  background:repeating-linear-gradient(145deg,transparent 0 30px,var(--listra-slide) 30px 31px),
+    radial-gradient(55% 90% at 100% 100%,var(--sombra-canto),transparent 70%),
+    linear-gradient(160deg,transparent 30%,var(--veu-fim)),
+    linear-gradient(90deg,var(--veu-leve) calc(var(--zona) - 8cqw),var(--veu) calc(var(--zona) + 1cqw))}
+
+.formato-imagem[data-lado="direita"]:not(.com-fundo):after {
+  background:repeating-linear-gradient(145deg,transparent 0 30px,var(--listra-slide) 30px 31px),
+    radial-gradient(55% 90% at 0% 100%,var(--sombra-canto),transparent 70%),
+    linear-gradient(200deg,transparent 30%,var(--veu-fim)),
+    linear-gradient(270deg,var(--veu-leve) calc(var(--zona) - 8cqw),var(--veu) calc(var(--zona) + 1cqw))}
+
+/* Molde com fundo próprio (a arte do Figma): halo escuro e suave atrás do
+   texto. Sem ele, o fundo vivo do Cronograma deixava a área a 1,7:1 e o
+   título a 2,7:1. */
+.formato-molde.com-fundo:after {
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:radial-gradient(56% 115% at 74% 42%,var(--halo-texto),transparent 78%)}
+
+.formato-molde.com-fundo[data-lado="direita"]:after {
+  background:radial-gradient(56% 115% at 26% 42%,var(--halo-texto),transparent 78%)}
+
+/* A área, em letra pequena no alto do texto, é o que fica mais perto do claro
+   da arte: vai em branco, não no cinza-claro de apoio. */
+.com-fundo .dqb-rotulo {
+  color:#fff}
+
+.formato-imagem:not(.sem-imagens) .dqb-texto {
+  width:calc(100% - var(--zona));
+  margin-left:var(--zona);
+  padding-left:32px}
+
+.formato-imagem:not(.sem-imagens)[data-lado="direita"] .dqb-texto {
+  margin-left:0;
+  padding-right:32px}
+
+/* Selo da origem e, depois de um fio, a área — como no molde. */
+.dqb-rotulos {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+  margin:0 0 4px}
+
+.dqb-rotulo {
+  padding-left:8px;
+  border-left:1px solid var(--linha-clara);
+  color:var(--texto-claro);
+  font-size:var(--fs-xs)}
 
 .dqb-titulo {
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  overflow:hidden;
   margin:0;
-  font-size:var(--fs-2xl);
+  font-size:var(--fs-xl);
   font-weight:var(--peso-forte);
-  line-height:1.16;
-  display:-webkit-box;
-  -webkit-line-clamp:2;
-  -webkit-box-orient:vertical;
-  overflow:hidden}
+  line-height:1.2}
 
-.dqb-resumo {
+.dqb-subtitulo {
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  overflow:hidden;
   margin:0;
-  max-width:52ch;
-  color:#ffffffdb;
+  color:var(--texto-claro);
   font-size:var(--fs-md);
-  line-height:1.45;
-  display:-webkit-box;
-  -webkit-line-clamp:2;
-  -webkit-box-orient:vertical;
-  overflow:hidden}
+  line-height:1.4}
 
-/* Nao e botao: o slide inteiro abre o destaque. Serve de indicacao de que
-   ha para onde ir. */
+.dqb-descricao {
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:3;
+  overflow:hidden;
+  max-width:62ch;
+  margin:6px 0 0;
+  color:var(--texto-claro);
+  font-size:var(--fs-base);
+  line-height:1.5}
+
+/* Não é botão: o slide inteiro abre o destino. Serve de indicação de que há
+   para onde ir; destino externo leva o ícone de link externo. */
 .dqb-acao {
   display:inline-flex;
   align-items:center;
   gap:6px;
-  margin-top:3px;
+  margin-top:6px;
   color:#fff;
   font-size:var(--fs-base);
   font-weight:var(--peso-forte)}
@@ -2811,11 +3030,15 @@ th,td {
   transform:rotate(-90deg);
   transition:transform .25s}
 
+.dqb-acao .ext {
+  width:14px;
+  height:14px}
+
 .dqb:hover .ativo .dqb-acao-seta {
   transform:rotate(-90deg) translateY(3px)}
 
 /* O texto sobe e aparece quando o slide entra. Escalonado, para o olho
-   pousar primeiro no titulo. */
+   pousar primeiro no título. */
 .dqb-texto > * {
   opacity:0;
   transform:translateY(9px);
@@ -2825,23 +3048,31 @@ th,td {
   opacity:1;
   transform:none}
 
-.dqb-slide.ativo .dqb-categoria {
-  transition-delay:.12s}
+.dqb-slide.ativo .dqb-rotulos {
+  transition-delay:.1s}
 
 .dqb-slide.ativo .dqb-titulo {
-  transition-delay:.18s}
+  transition-delay:.16s}
 
-.dqb-slide.ativo .dqb-resumo {
-  transition-delay:.24s}
+.dqb-slide.ativo .dqb-subtitulo {
+  transition-delay:.22s}
+
+.dqb-slide.ativo .dqb-descricao {
+  transition-delay:.26s}
 
 .dqb-slide.ativo .dqb-acao {
   transition-delay:.3s}
 
 /* Alvo de clique esticado sobre o slide, no mesmo padrao dos cartoes:
    sem aninhar link dentro de link. */
+/* O slide inteiro é o alvo do clique (pedido do usuário em 21/09/2026). O
+   botão fica acima do texto (`z-index:1`), que antes o cobria e deixava só a
+   metade da imagem clicável; setas, pausa e bolinhas estão fora do trilho,
+   em `z-index:3`, e continuam por cima. */
 .dqb-abrir {
   position:absolute;
   inset:0;
+  z-index:2;
   border:0;
   padding:0;
   background:none;
@@ -3044,43 +3275,67 @@ th,td {
   grid-template-columns:1fr;
   gap:20px}
 
-/* Faixa larga nao cabe em tela estreita: a imagem vai para cima e o texto
+/* Faixa larga não cabe em tela estreita: as imagens vão para cima e o texto
    para baixo, no mesmo fundo. */
 .dqb {
-  aspect-ratio:auto}
+  aspect-ratio:auto;
+  min-height:0;
+  /* Sem altura fixa: só a largura vira medida (cqw), para o véu achar a base da imagem. */
+  container-type:inline-size}
 
-.dqb-arte,
-.dqb-slide[data-lado="direita"] .dqb-arte {
+.dqb-imagens,
+.dqb-slide[data-lado="direita"] .dqb-imagens {
   position:relative;
   left:auto;
   right:auto;
   width:100%;
   aspect-ratio:16/9}
 
+/* Formato "imagem": a peça em cima, na largura toda, desfazendo-se para
+   baixo; o desfoque e o véu passam para trás do texto. */
+.formato-imagem .dqb-imagens,
+.formato-imagem[data-lado="direita"] .dqb-imagens {
+  width:100%;
+  -webkit-mask-image:linear-gradient(180deg,#000 78%,transparent);
+  mask-image:linear-gradient(180deg,#000 78%,transparent)}
+
+.dqb-ambiente,
+.formato-imagem[data-lado="direita"] .dqb-ambiente {
+  inset:0;
+  width:100%;
+  transform:scale(1.3,-1.3)}
+
+.formato-imagem:not(.com-fundo):after,
+.formato-imagem[data-lado="direita"]:not(.com-fundo):after {
+  background:repeating-linear-gradient(145deg,transparent 0 30px,var(--listra-slide) 30px 31px),
+    radial-gradient(70% 45% at 100% 100%,var(--sombra-canto),transparent 70%),
+    linear-gradient(180deg,var(--veu-leve) calc(56.25cqw - 48px),var(--veu) calc(56.25cqw + 2px))}
+
+/* Molde com fundo próprio: o texto desce para baixo da cena, então o halo
+   vira uma faixa escura a partir da base da imagem. */
+.formato-molde.com-fundo:after,
+.formato-molde.com-fundo[data-lado="direita"]:after {
+  background:linear-gradient(180deg,transparent calc(56.25cqw - 40px),var(--halo-texto) calc(56.25cqw + 24px))}
+
+.formato-imagem:not(.sem-imagens) .dqb-texto,
+.formato-imagem:not(.sem-imagens)[data-lado="direita"] .dqb-texto {
+  width:100%;
+  margin:0;
+  padding:16px 18px 34px}
+
 .dqb-texto,
-.dqb-slide[data-lado="direita"] .dqb-texto {
+.dqb-slide[data-lado="direita"] .dqb-texto,
+.dqb-slide.sem-imagens .dqb-texto {
   width:100%;
   height:auto;
-  margin:0}
+  margin:0;
+  padding:16px 18px 34px}
 
-.dqb-arte img,
-.dqb-slide[data-lado="direita"] .dqb-arte img {
-  object-fit:cover;
-  object-position:center;
-  -webkit-mask-image:linear-gradient(180deg,#000 62%,#0000 100%);
-  mask-image:linear-gradient(180deg,#000 62%,#0000 100%)}
+.dqb-slide.sem-imagens .dqb-texto {
+  padding-top:28px}
 
-.dqb {
-  max-height:none}
-
-.dqb-texto {
-  padding:16px 18px 30px}
-
-.dqb-titulo {
-  font-size:var(--fs-xl)}
-
-.dqb-resumo {
-  font-size:var(--fs-base)}
+.dqb-descricao {
+  -webkit-line-clamp:4}
 
 .dqb-seta {
   width:40px;

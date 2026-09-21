@@ -83,15 +83,29 @@ def fundo_de(caminho):
     return cor, fim, h, s, l
 
 
+import sys
+
+# Modelo de 21/09/2026: o slide guarda `imagens` (lista) e pode ter um fundo
+# desenhado (`fundoImagem`). Este script so preenche `fundo`/`fundoFim` de quem
+# ainda nao tem cor — a cor escolhida a mao (a do molde do Figma, por exemplo)
+# nao e sobrescrita. `--refazer` recalcula tambem as que ja existem.
+refazer = '--refazer' in sys.argv
 p = 'data/destaques.json'
 itens = json.loads(io.open(p, encoding='utf-8').read().replace('\r\n', '\n'))
 for item in itens:
-    if item['imagem'].endswith('.svg'):
-        # Placa desenhada por nos: a cor ja e a institucional do assunto, e
-        # o leitor de pixel nem abre SVG.
-        print('%-24s placa SVG, mantem %s' % (item['id'], item['fundo']))
+    imagem = (item.get('imagens') or [None])[0]
+    if item.get('fundoImagem'):
+        print('%-24s fundo desenhado (%s), sem cor a calcular' % (item['id'], item['fundoImagem']))
         continue
-    cor, fim, h, s, l = fundo_de(item['imagem'])
+    if item.get('fundo') and not refazer:
+        print('%-24s mantem %s' % (item['id'], item['fundo']))
+        continue
+    if not imagem or imagem.endswith('.svg'):
+        # Sem imagem propria (herda a do destino) ou placa SVG: o leitor de
+        # pixel nao tem o que ler.
+        print('%-24s sem imagem legivel, mantem %s' % (item['id'], item.get('fundo')))
+        continue
+    cor, fim, h, s, l = fundo_de(imagem)
     item['fundo'] = hexa(cor)
     item['fundoFim'] = hexa(fim)
     print('%-20s %-8s %-8s  matiz %3d°  sat %.2f  lum %.2f  branco %.1f:1'

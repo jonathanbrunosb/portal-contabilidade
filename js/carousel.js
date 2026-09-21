@@ -1,45 +1,70 @@
-import { icon,escapeHTML as e,safeURL,comVersao } from './ui.js?v=20260921-13';
-// Carrossel de destaques da capa, no formato do Conecta
-// (portaldeservicos.equatorialenergia.com.br/esc), medido em 21/09/2026 a
-// pedido do usuário: faixa **larga e baixa** (proporção 3,125 — lá são
-// 2103×673), cantos de 10 px, troca por deslizamento horizontal de 0,5 s
-// `ease-in-out`, setas redondas de 42 px a 15 px das bordas e bolinhas de
-// 9 px centralizadas no rodapé.
+import { icon,escapeHTML as e,safeURL,comVersao,seloOrigem } from './ui.js?v=20260921-46';
+// Carrossel de destaques da capa.
 //
-// A diferença é o conteúdo: no Conecta os dizeres vêm pintados dentro do
-// banner. Os nossos destaques são notícia com foto, então cada slide é
-// partido — imagem de um lado, texto do outro — sobre um fundo tirado da
-// própria imagem (`fundo`/`fundoFim` em data/destaques.json). Sem isso o
-// texto ficaria solto num retângulo branco ao lado da foto.
+// Molde do slide (21/09/2026): o do usuário, desenhado no Figma em 2000×519
+// (projeto/comunicados) — fundo em imagem ou degradê; até duas imagens de um
+// lado; do outro, selo da origem + área, título, subtítulo, descrição e a ação.
+// O texto é HTML, nunca pintado na imagem, para ser lido por leitor de tela,
+// achado na busca e legível no celular. Os slides chegam prontos de
+// js/destaques.js (destaque + o que ele herda do destino).
 //
-// Troca a cada 7 s; pausa com mouse ou foco em cima, pelo botão de pausa
-// (WCAG 2.2.2) e não gira sozinho quando o sistema ou a preferência do portal
-// pedem menos movimento.
+// Do formato do Conecta ficaram os cantos de 10 px, o deslizamento lateral de
+// 0,5 s, as setas de 42 px e as bolinhas de 9 px.
+//
+// O slide inteiro é o alvo do clique: um link que estica sobre ele (abre em
+// outra aba quando o destino é externo). Troca a cada 7 s; pausa com mouse ou
+// foco em cima, pelo botão de pausa (WCAG 2.2.2) e não gira sozinho quando o
+// sistema ou a preferência do portal pedem menos movimento.
 const INTERVALO=7000;
+const img=(src,classe,alt='')=>`<img class="${classe}" src="${e(comVersao(safeURL(src))||'')}" alt="${e(alt)}" loading="lazy">`;
+// HTML de um slide; também serve à prévia do formulário de destaque.
+//
+// Formato "imagem" (o padrão; pedido do usuário em 21/09/2026): a imagem ocupa
+// a altura toda do slide e se desfaz no fundo, que é ela mesma desfocada — cada
+// slide ganha a cor da própria peça, sem ninguém escolher cor. Por cima, as
+// listras finas do molde do Cronograma e um véu da cor do slide do lado do
+// texto, que garante o contraste. Formato "molde": fundo próprio e a cena do
+// Figma inteira na zona das imagens (até duas imagens).
+export function slideHTML(item,i=0,total=1) {
+  const lado=item.lado==='direita'?'direita':'esquerda';
+  const estilo=`--dqb-fundo:${e(item.fundo||'#123a63')};--dqb-fundo-fim:${e(item.fundoFim||item.fundo||'#0b2743')}`;
+  const molde=item.formato==='molde';
+  const imagens=(item.imagens||[]).slice(0,molde?2:1);
+  const ambiente=!molde&&!item.fundoImagem&&imagens[0];
+  const classes=['dqb-slide',molde?'formato-molde':'formato-imagem',imagens.length?'':'sem-imagens',item.fundoImagem?'com-fundo':'',i?'':'ativo'].filter(Boolean).join(' ');
+  const alvo=item.href
+    ?`<a class="dqb-abrir" href="${e(item.href)}" data-index="${i}"${item.externo?' target="_blank" rel="noopener noreferrer"':` data-route="${e(item.href)}"`} tabindex="${i?'-1':'0'}" aria-label="${e(item.titulo)}${item.externo?' (abre em outra aba)':''}"></a>`
+    :`<button type="button" class="dqb-abrir" data-index="${i}" tabindex="${i?'-1':'0'}" aria-label="${e(item.titulo)}"></button>`;
+  const seta=icon(item.externo?'external':'chevron').replace('class="icon"',`class="icon ${item.externo?'ext':'dqb-acao-seta'}"`);
+  return `<article class="${classes}" style="${estilo}" data-lado="${lado}" role="group" aria-roledescription="destaque" aria-label="${i+1} de ${total}"${i?' aria-hidden="true"':''}>
+      ${ambiente?img(imagens[0],'dqb-ambiente'):''}
+      ${item.fundoImagem?img(item.fundoImagem,'dqb-fundo'):''}
+      ${imagens.length?`<div class="dqb-imagens">${imagens.map((src,k)=>img(src,`dqb-img dqb-img-${k+1}`,k?'':item.alt||'')).join('')}</div>`:''}
+      <div class="dqb-texto">
+        ${item.origem||item.rotulo?`<p class="dqb-rotulos">${seloOrigem(item.origem)}${item.rotulo?`<span class="dqb-rotulo">${e(item.rotulo)}</span>`:''}</p>`:''}
+        <p class="dqb-titulo">${e(item.titulo)}</p>
+        ${item.subtitulo?`<p class="dqb-subtitulo">${e(item.subtitulo)}</p>`:''}
+        ${item.descricao?`<p class="dqb-descricao">${e(item.descricao)}</p>`:''}
+        <span class="dqb-acao">${e(item.acao||'Abrir')}${seta}</span>
+      </div>
+      ${alvo}
+    </article>`;
+}
 export function initCarousel(root,items,onOpen) {
+  // Redesenhar (depois de salvar um destaque) desliga o carrossel anterior:
+  // sem isso, os ouvintes e o temporizador se acumulariam.
+  root._desligarCarrossel?.();
   if(!items.length) {
     root.hidden=true;
+    root.innerHTML='';
     return;
   }
-  const slide=(item,i)=> {
-    const lado=item.lado==='direita'?'direita':'esquerda';
-    const estilo=`--dqb-fundo:${e(item.fundo||'#123a63')};--dqb-fundo-fim:${e(item.fundoFim||'#0b2743')}`;
-    return `<article class="dqb-slide${i?'':' ativo'}" style="${estilo}" data-lado="${lado}" role="group" aria-roledescription="destaque" aria-label="${i+1} de ${items.length}"${i?' aria-hidden="true"':''}>
-      <div class="dqb-arte"><img src="${e(comVersao(safeURL(item.imagem))||'')}" alt="${e(item.alt||item.titulo)}"></div>
-      <div class="dqb-texto">
-        <p class="dqb-categoria">${e(item.categoria||'Destaque')}</p>
-        <p class="dqb-titulo">${e(item.titulo)}</p>
-        <p class="dqb-resumo">${e(item.resumo||'')}</p>
-        <span class="dqb-acao">${e(item.acao||'Abrir destaque')}${icon('chevron').replace('class="icon"','class="icon dqb-acao-seta"')}</span>
-      </div>
-      <button type="button" class="dqb-abrir" data-index="${i}" tabindex="${i?'-1':'0'}" aria-label="Abrir destaque: ${e(item.titulo)}"></button>
-    </article>`;
-  }
-  ;
+  root.hidden=false;
+  const controle=new AbortController(),{signal}=controle;
   const ponto=(item,i)=>`<button type="button" data-dot="${i}" aria-label="Destaque ${i+1}: ${e(item.titulo)}"${i?'':' aria-current="true"'}></button>`;
   const seta=(lado,rotulo,giro)=>`<button type="button" class="dqb-seta dqb-${lado}" data-dq="${lado==='ant'?'prev':'next'}" aria-label="${rotulo}">${icon('chevron').replace('class="icon"',`class="icon dqb-${giro}"`)}</button>`;
   root.innerHTML=`<div class="dqb">
-      <div class="dqb-trilho">${items.map(slide).join('')}</div>
+      <div class="dqb-trilho">${items.map((item,i)=>slideHTML(item,i,items.length)).join('')}</div>
       ${seta('ant','Destaque anterior','prev')}${seta('prox','Próximo destaque','next')}
       <div class="dqb-pontos" role="group" aria-label="Escolher destaque">${items.map(ponto).join('')}</div>
       <button type="button" class="dqb-pausa" data-dq="pause" aria-pressed="false" aria-label="Pausar destaques"><span class="dqb-pausa-icone" aria-hidden="true"></span></button>
@@ -52,8 +77,7 @@ export function initCarousel(root,items,onOpen) {
   const semMovimento=()=>matchMedia('(prefers-reduced-motion: reduce)').matches||document.body.classList.contains('no-motion');
   function mostrar(n) {
     atual=(n+items.length)%items.length;
-    // Um trilho so, deslocado em passos de 100%: e o que da o deslizamento
-    // lateral do Conecta, no lugar do esmaecimento que havia antes.
+    // Um trilho só, deslocado em passos de 100%: é o deslizamento lateral.
     trilho.style.transform=`translateX(-${atual*100}%)`;
     slides.forEach((slide,i)=> {
       const ativo=i===atual;
@@ -63,7 +87,7 @@ export function initCarousel(root,items,onOpen) {
     }
     );
     pontos.forEach((ponto,i)=>i===atual?ponto.setAttribute('aria-current','true'):ponto.removeAttribute('aria-current'));
-    // Quem usa leitor de tela nao ve as bolinhas: a posicao vai por aqui.
+    // Quem usa leitor de tela não vê as bolinhas: a posição vai por aqui.
     status.textContent=`Destaque ${atual+1} de ${items.length}: ${items[atual].titulo}`;
   }
   function agendar() {
@@ -71,7 +95,10 @@ export function initCarousel(root,items,onOpen) {
     if(!pausado&&!segurando&&!semMovimento()&&items.length>1)timer=setInterval(()=>mostrar(atual+1),INTERVALO);
   }
   root.addEventListener('click',event=> {
-    const abrir=event.target.closest('[data-index]');
+    // O link do slide segue sozinho (rota interna pelo `data-route`, externo
+    // em outra aba); aqui só se registra o clique e se trata o destino sem
+    // endereço (sistema com link a cadastrar).
+    const abrir=event.target.closest('.dqb-abrir');
     if(abrir) {
       onOpen(items[Number(abrir.dataset.index)]);
       return;
@@ -89,10 +116,16 @@ export function initCarousel(root,items,onOpen) {
     }
     agendar();
   }
+  , {
+    signal
+  }
   );
   ['mouseenter','focusin'].forEach(evento=>root.addEventListener(evento,()=> {
     segurando=true;
     agendar();
+  }
+  , {
+    signal
   }
   ));
   ['mouseleave','focusout'].forEach(evento=>root.addEventListener(evento,event=> {
@@ -100,8 +133,16 @@ export function initCarousel(root,items,onOpen) {
     segurando=false;
     agendar();
   }
+  , {
+    signal
+  }
   ));
-  // Com um destaque so, navegar nao faz sentido.
+  root._desligarCarrossel=()=> {
+    controle.abort();
+    clearInterval(timer);
+  }
+  ;
+  // Com um destaque só, navegar não faz sentido.
   if(items.length<2)root.querySelectorAll('.dqb-seta,.dqb-pontos,.dqb-pausa').forEach(el=>el.hidden=true);
   mostrar(0);
   agendar();

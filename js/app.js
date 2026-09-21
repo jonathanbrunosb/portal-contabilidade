@@ -3,7 +3,8 @@ import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } fro
 import { initializeNavigation,markCurrentSection,bindTabs,selectTab } from './navigation.js?v=20260921-46';
 import { comunicados,filtrarComunicados,faixaComunicado,paginaComunicado,colunasOrigem,itemDaColuna,hashComunicado,ligarMidias,ultimaAtualizacaoLabel } from './newsletter.js?v=20260921-46';
 import { renderTeamStructure } from './teams.js?v=20260921-46';
-import { initCarousel } from './carousel.js?v=20260921-13';
+import { initCarousel,slideHTML } from './carousel.js?v=20260921-46';
+import { TIPOS_ALVO,SITUACOES,LIMITE_NO_AR,situacaoDestaque,alvoDoDestaque,resolverDestaque,destaquesNoAr,destaqueDoAlvo } from './destaques.js?v=20260921-46';
 import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,comVersao,notify,ORIGENS,seloOrigem,opcoesOrigem } from './ui.js?v=20260921-46';
 import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js?v=20260921-46';
 let data,currentTab='comunicacao',currentAdminTab='equipes',currentUser,currentMenu=[],navSections=[];
@@ -589,14 +590,12 @@ const AVISO_TIPOS= {
   extra:'Extra',prazo:'Prazo',info:'Info'
 }
 ;
-function openDestaque(item) {
-  track('destaque_open',{destaque:item.titulo});
-  if(item.registro) {
-    const [collection,id]=item.registro.split(':');
-    showRecord(collection,id);
-  }
-  else if(item.sistema)openAccess(data.sistemas.find(s=>s.id===item.sistema));
-  else if(item.rota)navigate(routeItem(item.rota));
+// Clique num slide. O próprio link do slide leva ao destino (rota interna ou
+// outra aba); aqui fica o registro de uso e o destino sem endereço — um
+// sistema com o link ainda a cadastrar abre o aviso de configuração.
+function openDestaque(slide) {
+  track('destaque_open',{destaque:slide.titulo});
+  if(!slide.href&&slide.alvo?.tipo==='sistema')openAccess(data.sistemas.find(s=>s.id===slide.alvo.ref));
 }
 function openAviso(id) {
   const aviso=data.avisos.find(a=>a.id===id);
@@ -605,8 +604,7 @@ function openAviso(id) {
   showDialog(aviso.titulo,`Aviso · ${AVISO_TIPOS[aviso.tipo]||'Info'}`,`<p>${e(aviso.texto)}</p>${detailGrid({'Quando':aviso.janela||'—','Área responsável':aviso.area||'—','Origem':ORIGENS[aviso.origem]})}`);
 }
 function renderHome() {
-  const destaques=(data.destaques||[]).filter(vigente).sort((a,b)=>(a.ordem??99)-(b.ordem??99));
-  initCarousel($('#destaques'),destaques,openDestaque);
+  renderCarrossel();
   const ordemTipo= {
     extra:0,prazo:1,info:2
   }
@@ -618,6 +616,11 @@ function renderHome() {
     .filter(a=>a.url&&!vistos.has(a.nome)&&vistos.add(a.nome)).slice(0,8);
   $('#acesso-list').innerHTML=atalhos.map(a=>`<li><a href="${e(a.url)}" target="_blank" rel="noopener noreferrer" data-quick="${e(a.nome)}">${icon(a.icon||'link')}<span>${e(a.nome)}</span>${icon('external').replace('class="icon"','class="icon ext"')}</a></li>`).join('');
   renderColunasComunicacao();
+}
+// Carrossel da capa: os destaques no ar, na ordem, cada um resolvido com o
+// que herda do destino (js/destaques.js).
+function renderCarrossel() {
+  initCarousel($('#destaques'),destaquesNoAr(data),openDestaque);
 }
 // Capa: uma coluna de comunicados por origem (Contabilidade, Equatorial,
 // Externo), no formato de portal de notícias. Pedido do usuário em 21/09/2026.
@@ -1067,6 +1070,224 @@ function renderAdminAutomacoes() {
   $('#admin-view').innerHTML=`<div class="admin-toolbar"><button class="primary-btn" id="admin-new-automation">Nova automação +</button></div><div class="admin-team-list">${automacoesOrdenadas.map(a=>`<article class="admin-team-card"><div><span class="tag ${automationTagClass(a.familia)}">${e(a.tipo)}</span><h3>${e(a.titulo)}</h3><p>${e(a.descricao)}</p></div><div class="admin-team-meta"><strong>${a.ativo!==false?'Ativa':'Inativa'}</strong><span>ordem ${e(a.ordem??'-')}</span><button class="secondary-btn" data-admin-automation="${e(a.id)}">Administrar</button></div></article>`).join('')||'<p class="empty-state compact">Nenhuma automação cadastrada.</p>'}</div>`;
   $('#admin-new-automation').onclick=openCreateAutomation;
 }
+// ===== Carrossel: gestão dos destaques (21/09/2026) =====
+// Um registro por slide em data/destaques.json, apontando para um destino
+// (js/destaques.js). Três portas de entrada: a aba "Carrossel" da
+// Administração (visão geral, ordem, agenda), o bloco "Carrossel da capa" na
+// página de cada comunicado e o botão "Destacar no carrossel" nas fichas de
+// sistemas, portais, links externos e atalhos. Gravar exige o servidor interno.
+const dataISO=d=>d.toLocaleDateString('sv-SE');
+const somarDias=(iso,dias)=> {
+  const d=new Date(`${iso}T12:00:00`);
+  d.setDate(d.getDate()+dias);
+  return dataISO(d);
+}
+;
+const periodoDestaque=d=>[d.inicio&&dateLabel(d.inicio),d.fim&&dateLabel(d.fim)].filter(Boolean).join(' a ')||'sem período';
+const COR_SITUACAO= {
+  'no-ar':'green',agendado:'blue',pausado:'yellow',encerrado:''
+}
+;
+const ORDEM_SITUACAO=['no-ar','agendado','pausado','encerrado'];
+function botaoDestacar(tipo,ref) {
+  if(!podeAdministrar())return '';
+  const existente=destaqueDoAlvo(data,tipo,ref);
+  return `<button type="button" class="secondary-btn" data-destacar="${e(tipo)}|${e(ref)}">${existente?'Editar destaque no carrossel':'Destacar no carrossel'}</button>`;
+}
+// Destinos possíveis de cada tipo, para o <select> do formulário.
+function opcoesDoAlvo(tipo) {
+  if(tipo==='comunicado')return comunicados(data).map(({item,colecao})=>({valor:`${colecao}:${item.id}`,rotulo:item.titulo}));
+  if(tipo==='sistema')return data.sistemas.map(s=>({valor:s.id,rotulo:s.nome}));
+  if(tipo==='portal')return data.portais.map(p=>({valor:p.id,rotulo:p.nome})).sort((a,b)=>a.rotulo.localeCompare(b.rotulo,'pt-BR'));
+  if(tipo==='externo')return data.externos.map(p=>({valor:p.id,rotulo:p.nome})).sort((a,b)=>a.rotulo.localeCompare(b.rotulo,'pt-BR'));
+  if(tipo==='atalho')return data.config.links.filter(l=>!l.target).map(l=>({valor:l.nome,rotulo:l.nome}));
+  if(tipo==='pagina')return navSections.flatMap(s=>{
+    const paginas=paginasDe(s);
+    return paginas.length?paginas.map(p=>({valor:routeHash(p),rotulo:`${s.label} › ${p.label}`})):[{valor:routeHash(s),rotulo:s.label}];
+  }).filter(o=>!o.valor.startsWith('#administracao'));
+  return [];
+}
+function renderAdminCarrossel() {
+  const live=isLiveDataSource();
+  const lista=(data.destaques||[]).map(d=>({d,situacao:situacaoDestaque(d),slide:resolverDestaque(d,data)}))
+    .sort((a,b)=>(ORDEM_SITUACAO.indexOf(a.situacao)-ORDEM_SITUACAO.indexOf(b.situacao))||((a.d.ordem??99)-(b.d.ordem??99)));
+  const noAr=lista.filter(x=>x.situacao==='no-ar'&&x.slide).length;
+  const aviso=noAr>LIMITE_NO_AR?`<p class="admin-aviso">${noAr} destaques no ar. Com mais de ${LIMITE_NO_AR}, os últimos quase não são vistos: o primeiro slide concentra a maior parte dos cliques.</p>`:'';
+  const semServidor=live?'':'<p class="admin-aviso">Somente leitura: gravar destaques exige o servidor interno ligado (ver README, "Backend opcional"). A lista e a prévia funcionam sem ele.</p>';
+  const cartao=({d,situacao,slide})=>{
+    const mover=live&&(situacao==='no-ar'||situacao==='agendado')?`<button class="text-btn" data-mover-destaque="${e(d.id)}|-1" aria-label="Subir ${e(slide?.titulo||d.id)}">Subir</button><button class="text-btn" data-mover-destaque="${e(d.id)}|1" aria-label="Descer ${e(slide?.titulo||d.id)}">Descer</button>`:'';
+    return `<article class="admin-team-card admin-destaque"><div><p class="admin-destaque-meta"><span class="badge ${COR_SITUACAO[situacao]}">${e(SITUACOES[situacao])}</span><span>${e(TIPOS_ALVO[d.alvo?.tipo]||'Destino')}</span><span>posição ${e(d.ordem??'—')}</span><span>${e(periodoDestaque(d))}</span></p><h3>${e(slide?.titulo||d.titulo||d.id)}</h3><p>${slide?e(slide.subtitulo||slide.descricao||''):'<strong>Destino não encontrado ou não publicado</strong> — o slide não aparece.'}</p></div><div class="admin-destaque-acoes">${mover}<button class="secondary-btn" data-admin-destaque="${e(d.id)}">Editar</button></div></article>`;
+  };
+  $('#admin-view').innerHTML=`<div class="admin-toolbar"><button class="primary-btn" id="admin-novo-destaque">Novo destaque +</button></div>${semServidor}${aviso}<div class="admin-team-list">${lista.map(cartao).join('')||'<p class="empty-state compact">Nenhum destaque cadastrado.</p>'}</div>`;
+  $('#admin-novo-destaque').onclick=()=>openDestaqueForm(null);
+}
+// Formulário do destaque, com prévia ao vivo do slide. `alvoFixo` quando vem de
+// um comunicado ou de uma ficha: o destino já está escolhido.
+function openDestaqueForm(destaque,{alvoFixo=null}={}) {
+  const novo=!destaque;
+  const hojeISO=dataISO(new Date());
+  const maiorOrdem=(data.destaques||[]).reduce((m,d)=>Math.max(m,d.ordem||0),0);
+  const base=destaque||{id:newId('destaque'),alvo:alvoFixo||{tipo:'comunicado',ref:''},ativo:true,inicio:hojeISO,fim:somarDias(hojeISO,30),ordem:maiorOrdem+1,lado:'esquerda'};
+  const live=isLiveDataSource();
+  const v=campo=>e(base[campo]??'');
+  const campo=(id,rotulo,valor,extra='')=>`<label class="field">${rotulo}<input id="${id}" value="${valor}"${extra}></label>`;
+  showDialog(novo?'Novo destaque':'Editar destaque','Carrossel da capa',`<form id="destaque-form" class="destaque-form" novalidate>
+    <div class="destaque-previa" id="destaque-previa"></div>
+    <fieldset><legend>Destino</legend><div class="admin-form-grid">
+      <label class="field">Tipo<select id="dq-tipo"${alvoFixo?' disabled':''}>${Object.entries(TIPOS_ALVO).map(([valor,rotulo])=>`<option value="${valor}"${base.alvo?.tipo===valor?' selected':''}>${rotulo}</option>`).join('')}</select></label>
+      <div id="dq-ref-campo"></div></div></fieldset>
+    <fieldset><legend>Quando aparece</legend><div class="admin-form-grid tres">
+      ${campo('dq-inicio','Início',v('inicio'),' type="date"')}${campo('dq-fim','Fim',v('fim'),' type="date"')}${campo('dq-ordem','Posição',v('ordem'),' type="number" min="1"')}</div>
+      <label class="admin-validated"><input type="checkbox" id="dq-ativo"${base.ativo!==false?' checked':''}> Ativo: aparece dentro do período. Desmarque para pausar sem apagar.</label></fieldset>
+    <fieldset><legend>Aparência <small>— em branco, vem do destino</small></legend>
+      ${campo('dq-titulo','Título',v('titulo'))}${campo('dq-subtitulo','Subtítulo',v('subtitulo'))}
+      <label class="field">Descrição<textarea id="dq-descricao">${v('descricao')}</textarea></label>
+      <div class="admin-form-grid">${campo('dq-rotulo','Área (ao lado do selo)',v('rotulo'))}${campo('dq-acao','Texto da ação',v('acao'))}</div>
+      <div class="admin-form-grid"><label class="field">Formato<select id="dq-formato"><option value="imagem"${base.formato!=='molde'?' selected':''}>Imagem na altura toda, fundo tirado dela</option><option value="molde"${base.formato==='molde'?' selected':''}>Molde: arte montada sobre fundo próprio</option></select></label><label class="field">Lado das imagens<select id="dq-lado"><option value="esquerda"${base.lado!=='direita'?' selected':''}>Esquerda</option><option value="direita"${base.lado==='direita'?' selected':''}>Direita</option></select></label></div>
+      <div class="admin-form-grid">${campo('dq-img1','Imagem principal',e(base.imagens?.[0]||''),' placeholder="assets/destaques/…"')}${campo('dq-img2','Imagem secundária (só no molde)',e(base.imagens?.[1]||''),' placeholder="opcional"')}</div>
+      <div class="admin-form-grid">${campo('dq-fundo-img','Imagem de fundo',v('fundoImagem'),' placeholder="opcional"')}<label class="field">Enviar imagem para<span class="dq-envio"><select id="dq-envio-alvo"><option value="dq-img1">principal</option><option value="dq-img2">secundária</option><option value="dq-fundo-img">fundo</option></select><input type="file" id="dq-arquivo" accept="image/*"${live?'':' disabled'}></span></label></div>
+      <div class="admin-form-grid">${campo('dq-fundo','Cor inicial do fundo',v('fundo'),' placeholder="#0b56a8"')}${campo('dq-fundo-fim','Cor final do fundo',v('fundoFim'),' placeholder="#044d6a"')}</div>
+      ${campo('dq-alt','Descrição das imagens (texto alternativo)',v('alt'))}</fieldset>
+    <p class="admin-aviso" id="dq-erro" hidden></p>
+    <div class="admin-form-actions"><button type="submit" class="primary-btn"${live?'':' disabled'}>${novo?'Criar destaque':'Salvar alterações'}</button>${novo?'':'<button type="button" class="secondary-btn" id="dq-encerrar">Encerrar agora</button><button type="button" class="danger-btn" id="dq-excluir">Excluir</button>'}</div>
+    ${live?'':'<p class="muted">Salvar exige o servidor interno ligado (ver README, "Backend opcional"). A prévia funciona sem ele.</p>'}
+  </form>`);
+  const dialogo=$('#detail-dialog');
+  dialogo.classList.add('dialogo-largo');
+  dialogo.addEventListener('close',()=>dialogo.classList.remove('dialogo-largo'),{once:true});
+  const alvoAtual=()=>({tipo:$('#dq-tipo').value,ref:($('#dq-ref')?.value||'').trim()});
+  const campoRef=()=> {
+    const tipo=$('#dq-tipo').value;
+    const ref=base.alvo?.tipo===tipo?base.alvo.ref:'';
+    const trava=alvoFixo?' disabled':'';
+    $('#dq-ref-campo').innerHTML=tipo==='url'
+      ?`<label class="field">Endereço<input id="dq-ref" type="url" placeholder="https://…" value="${e(ref)}"${trava}></label>`
+      :`<label class="field">Destino<select id="dq-ref"${trava}><option value="">Escolha…</option>${opcoesDoAlvo(tipo).map(o=>`<option value="${e(o.valor)}"${o.valor===ref?' selected':''}>${e(o.rotulo)}</option>`).join('')}</select></label>`;
+    $('#dq-ref').oninput=$('#dq-ref').onchange=atualizar;
+  };
+  const texto=id=>$(id).value.trim();
+  // O destaque como ficaria salvo: campos vazios saem, para herdar do destino.
+  const lerFormulario=()=> {
+    const d={...base,alvo:alvoAtual(),ativo:$('#dq-ativo').checked,inicio:texto('#dq-inicio'),fim:texto('#dq-fim'),ordem:Number(texto('#dq-ordem'))||1,lado:$('#dq-lado').value,atualizadoPor:currentUser.nome,atualizadoEm:hojeISO};
+    const livres={titulo:'#dq-titulo',subtitulo:'#dq-subtitulo',descricao:'#dq-descricao',rotulo:'#dq-rotulo',acao:'#dq-acao',fundoImagem:'#dq-fundo-img',fundo:'#dq-fundo',fundoFim:'#dq-fundo-fim',alt:'#dq-alt'};
+    Object.entries(livres).forEach(([chave,sel])=>{const valor=texto(sel);if(valor)d[chave]=valor;else delete d[chave];});
+    const imagens=[texto('#dq-img1'),texto('#dq-img2')].filter(Boolean);
+    if(imagens.length)d.imagens=imagens;else delete d.imagens;
+    if($('#dq-formato').value==='molde')d.formato='molde';else delete d.formato;
+    ['inicio','fim'].forEach(chave=>{if(!d[chave])delete d[chave];});
+    return d;
+  };
+  // Placeholders mostram o que vem do destino; a prévia mostra o slide pronto.
+  function atualizar() {
+    const d=lerFormulario();
+    const herdado=alvoDoDestaque(d.alvo,data)||{};
+    [['#dq-titulo','titulo'],['#dq-subtitulo','subtitulo'],['#dq-descricao','descricao'],['#dq-rotulo','rotulo'],['#dq-acao','acao']].forEach(([sel,chave])=>{$(sel).placeholder=herdado[chave]||'';});
+    const slide=resolverDestaque(d,data);
+    $('#destaque-previa').innerHTML=slide
+      ?`<p class="meta-label">Prévia — ${e(SITUACOES[situacaoDestaque(d)])}</p><div class="dqb dqb-previa" inert><div class="dqb-trilho">${slideHTML(slide)}</div></div>`
+      :'<p class="empty-state compact">Escolha um destino (e, para página ou endereço livre, um título) para ver a prévia.</p>';
+  }
+  $('#dq-tipo').onchange=()=>{campoRef();atualizar();};
+  $('#destaque-form').addEventListener('input',atualizar);
+  campoRef();
+  atualizar();
+  $('#dq-arquivo').onchange=async()=> {
+    const arquivo=$('#dq-arquivo').files[0];
+    if(!arquivo)return;
+    try {
+      const caminho=await apiUploadPhoto(arquivo,{autor:currentUser.nome,pasta:'destaques'});
+      $(`#${$('#dq-envio-alvo').value}`).value=caminho;
+      atualizar();
+      notify('Imagem enviada.');
+    }
+    catch(error) {
+      notify(error.message);
+    }
+  }
+  ;
+  const gravar=async(corpo,mensagem)=> {
+    const existe=(data.destaques||[]).some(d=>d.id===corpo.id);
+    const salvo=await apiWrite('destaques',{id:existe?corpo.id:undefined,method:existe?'PUT':'POST',body:corpo,autor:currentUser.nome});
+    if(existe)data.destaques[data.destaques.findIndex(d=>d.id===corpo.id)]=salvo;else data.destaques.push(salvo);
+    dialogo.close();
+    aposMudarDestaques(mensagem);
+  }
+  ;
+  $('#destaque-form').onsubmit=async event=> {
+    event.preventDefault();
+    const d=lerFormulario();
+    const erro=$('#dq-erro');
+    const problema=!alvoDoDestaque(d.alvo,data)?'Escolha um destino válido (comunicado publicado, item existente, página do portal ou endereço https).'
+      :!resolverDestaque(d,data)?'Informe um título: este destino não tem título próprio.'
+      :d.inicio&&d.fim&&d.fim<d.inicio?'O fim não pode ser antes do início.':'';
+    erro.hidden=!problema;
+    erro.textContent=problema;
+    if(problema)return;
+    const noAr=(data.destaques||[]).filter(x=>x.id!==d.id&&situacaoDestaque(x)==='no-ar'&&resolverDestaque(x,data)).length+(situacaoDestaque(d)==='no-ar'?1:0);
+    if(noAr>LIMITE_NO_AR&&!confirm(`Ficarão ${noAr} destaques no ar. Com mais de ${LIMITE_NO_AR}, os últimos quase não são vistos. Salvar mesmo assim?`))return;
+    try {
+      await gravar(d,novo?'Destaque criado.':'Destaque atualizado.');
+    }
+    catch(error) {
+      notify(error.message);
+    }
+  }
+  ;
+  const encerrar=$('#dq-encerrar');
+  if(encerrar)encerrar.onclick=async()=> {
+    try {
+      // Fim ontem; se tinha começado hoje ou depois, o início recua junto,
+      // para o período não ficar invertido.
+      const ontem=somarDias(hojeISO,-1);
+      await gravar({...base,fim:ontem,inicio:base.inicio&&base.inicio>ontem?ontem:base.inicio,atualizadoPor:currentUser.nome,atualizadoEm:hojeISO},'Destaque encerrado.');
+    }
+    catch(error) {
+      notify(error.message);
+    }
+  }
+  ;
+  const excluir=$('#dq-excluir');
+  if(excluir)excluir.onclick=async()=> {
+    if(!confirm('Excluir este destaque? O destino (comunicado, sistema ou link) não é afetado.'))return;
+    try {
+      await apiWrite('destaques',{id:base.id,method:'DELETE',autor:currentUser.nome});
+      data.destaques=data.destaques.filter(d=>d.id!==base.id);
+      dialogo.close();
+      aposMudarDestaques('Destaque excluído.');
+    }
+    catch(error) {
+      notify(error.message);
+    }
+  }
+  ;
+}
+// Troca de posição com o vizinho (entre os que estão no ar ou agendados).
+async function moverDestaque(id,passo) {
+  const fila=(data.destaques||[]).filter(d=>['no-ar','agendado'].includes(situacaoDestaque(d))).sort((a,b)=>(a.ordem??99)-(b.ordem??99));
+  const i=fila.findIndex(d=>d.id===id),j=i+passo;
+  if(i<0||j<0||j>=fila.length)return;
+  // Renumera a fila inteira (1, 2, 3…) para não haver posições repetidas.
+  [fila[i],fila[j]]=[fila[j],fila[i]];
+  try {
+    for(const [n,d] of fila.entries()) {
+      if(d.ordem===n+1)continue;
+      const salvo=await apiWrite('destaques',{id:d.id,method:'PUT',body:{ordem:n+1},autor:currentUser.nome});
+      data.destaques[data.destaques.findIndex(x=>x.id===d.id)]=salvo;
+    }
+    aposMudarDestaques('Ordem atualizada.');
+  }
+  catch(error) {
+    notify(error.message);
+  }
+}
+// Depois de gravar: carrossel, aba da Administração e, se aberta, a página do
+// comunicado (que mostra a situação dele no carrossel).
+function aposMudarDestaques(mensagem) {
+  renderCarrossel();
+  if(currentAdminTab==='carrossel'&&!$('#administracao').hidden)renderAdmin();
+  if(currentTab==='comunicado'&&!$('#page-view').hidden)renderContent('comunicado');
+  notify(mensagem);
+}
 // Equipes and Automações are separate tabs (same .tabs component as Central
 // de Conteúdo) instead of one long stacked list — currentAdminTab is the
 // only piece of state that needs to survive a re-render (e.g. after a
@@ -1087,7 +1308,9 @@ function renderAdmin() {
   if(tokenSave)tokenSave.onclick=()=> { setAdminToken($('#admin-token').value.trim());notify('Token salvo neste navegador.');renderAdmin(); };
   selectTab('#admin-tabs',$(`#admin-tab-${currentAdminTab}`));
   $('#admin-view').setAttribute('aria-labelledby',`admin-tab-${currentAdminTab}`);
-  if(currentAdminTab==='automacoes')renderAdminAutomacoes();else renderAdminEquipes();
+  if(currentAdminTab==='automacoes')renderAdminAutomacoes();
+  else if(currentAdminTab==='carrossel')renderAdminCarrossel();
+  else renderAdminEquipes();
 }
 function showRecord(collection,id) {
   const item=data[collection]?.find(i=>i.id===id);
@@ -1421,6 +1644,21 @@ async function init() {
       if(adminTeam)openEditTeam(adminTeam.dataset.adminTeam);
       const adminAutomation=event.target.closest('[data-admin-automation]');
       if(adminAutomation)openEditAutomation(adminAutomation.dataset.adminAutomation);
+      // Carrossel: destacar a partir de um comunicado ou ficha, editar pela
+      // aba da Administração e reordenar.
+      const destacar=event.target.closest('[data-destacar]');
+      if(destacar) {
+        const [tipo,...partes]=destacar.dataset.destacar.split('|');
+        const ref=partes.join('|');
+        openDestaqueForm(destaqueDoAlvo(data,tipo,ref),{alvoFixo:{tipo,ref}});
+      }
+      const adminDestaque=event.target.closest('[data-admin-destaque]');
+      if(adminDestaque)openDestaqueForm((data.destaques||[]).find(d=>d.id===adminDestaque.dataset.adminDestaque)||null);
+      const moverDestaqueBtn=event.target.closest('[data-mover-destaque]');
+      if(moverDestaqueBtn) {
+        const [id,passo]=moverDestaqueBtn.dataset.moverDestaque.split('|');
+        moverDestaque(id,Number(passo));
+      }
       const docLink=event.target.closest('[data-doc-link]');
       if(docLink)track('document_open',{documento:docLink.dataset.docLink});
       const download=event.target.closest('a[download]');

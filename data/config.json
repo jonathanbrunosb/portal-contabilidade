@@ -270,6 +270,13 @@
           "target": "administracao",
           "view": "administracao",
           "adminTab": "automacoes"
+        },
+        {
+          "label": "Carrossel",
+          "icon": "image",
+          "target": "administracao",
+          "view": "administracao",
+          "adminTab": "carrossel"
         }
       ]
     }

@@ -1,98 +1,134 @@
 [
   {
     "id": "d1-projecthub",
-    "titulo": "ProjectHub: nova solução integra a gestão de projetos da Contabilidade",
-    "resumo": "Planejamento, prazos, riscos e indicadores dos projetos da área em uma única visão.",
-    "categoria": "Comunicado interno",
-    "acao": "Ler o comunicado",
-    "imagem": "assets/images/comunicados/projecthub-lancamento.webp",
-    "alt": "Tela de apresentação do ProjectHub com painéis de projetos, tarefas e indicadores",
-    "lado": "esquerda",
-    "fundo": "#0b56a8",
-    "fundoFim": "#044d6a",
-    "registro": "newsletter:n6-projecthub-lancamento",
+    "alvo": {
+      "tipo": "comunicado",
+      "ref": "newsletter:n6-projecthub-lancamento"
+    },
+    "ativo": true,
     "inicio": "2026-09-01",
     "fim": "2026-12-31",
-    "ordem": 1
+    "ordem": 1,
+    "lado": "esquerda",
+    "subtitulo": "Planejamento, prazos, riscos e indicadores dos projetos da área em uma única visão.",
+    "rotulo": "Comunicado interno",
+    "fundo": "#0b56a8",
+    "fundoFim": "#044d6a",
+    "atualizadoPor": "Eduardo dos Santos Rocha",
+    "atualizadoEm": "2026-09-21"
   },
   {
     "id": "d2-tarifas-para",
-    "titulo": "Aprovadas as novas tarifas da Equatorial Pará",
-    "resumo": "Reajuste tarifário anual aprovado pela ANEEL; veja os impactos para a Contabilidade.",
-    "categoria": "Notícias & Impactos",
-    "acao": "Ler o comunicado",
-    "imagem": "assets/images/noticias/tarifas-equatorial-para.png",
-    "alt": "Ilustração sobre o reajuste tarifário da Equatorial Pará",
-    "lado": "direita",
-    "fundo": "#156174",
-    "fundoFim": "#0c4a49",
-    "registro": "noticias:aneel-tarifas-equatorial-para-2026",
+    "alvo": {
+      "tipo": "comunicado",
+      "ref": "noticias:aneel-tarifas-equatorial-para-2026"
+    },
+    "ativo": true,
     "inicio": "2026-09-01",
     "fim": "2026-12-31",
-    "ordem": 2
+    "ordem": 2,
+    "lado": "direita",
+    "subtitulo": "Reajuste tarifário anual aprovado pela ANEEL; veja os impactos para a Contabilidade.",
+    "fundo": "#156174",
+    "fundoFim": "#0c4a49",
+    "atualizadoPor": "Eduardo dos Santos Rocha",
+    "atualizadoEm": "2026-09-21"
   },
   {
     "id": "d3-cronograma",
-    "titulo": "Acompanhe as atividades do fechamento no Cronograma",
-    "resumo": "Prazos, responsáveis e status de cada etapa do fechamento contábil.",
-    "categoria": "Sistemas da área",
-    "acao": "Abrir o sistema",
-    "imagem": "assets/sistemas/cronograma-de-fechamento.webp",
-    "alt": "Ilustração do sistema Cronograma de Fechamento",
-    "lado": "esquerda",
-    "fundo": "#1e5d8a",
-    "fundoFim": "#114a58",
-    "sistema": "s5",
+    "alvo": {
+      "tipo": "sistema",
+      "ref": "s5"
+    },
+    "ativo": true,
     "inicio": "2026-09-01",
     "fim": "2026-12-31",
-    "ordem": 3
+    "ordem": 3,
+    "lado": "esquerda",
+    "formato": "molde",
+    "titulo": "Cronograma de Fechamento",
+    "subtitulo": "Nova plataforma de controle de entregas. A evolução de planilha para web.",
+    "rotulo": "Executiva IV · Conciliação e Auditoria",
+    "fundoImagem": "assets/destaques/cronograma-de-fechamento-fundo.webp",
+    "fundo": "#2a1a5e",
+    "fundoFim": "#0b1030",
+    "imagens": [
+      "assets/destaques/cronograma-de-fechamento-cena.webp"
+    ],
+    "alt": "Antes e depois: o painel em Excel e a planilha de controle, riscados, e o novo painel web do Cronograma de Fechamento num notebook",
+    "atualizadoPor": "Eduardo dos Santos Rocha",
+    "atualizadoEm": "2026-09-21"
   },
   {
     "id": "d4-ifrs16",
-    "titulo": "IFRS 16 / CPC 06: contratos de arrendamento em um só lugar",
-    "resumo": "Gestão de contratos, passivos, ativo de direito de uso e relatórios.",
-    "categoria": "Sistemas da área",
-    "acao": "Abrir o sistema",
-    "imagem": "assets/sistemas/ifrs16-cpc06.webp",
-    "alt": "Ilustração do sistema IFRS 16 / CPC 06",
-    "lado": "direita",
-    "fundo": "#1c5e7d",
-    "fundoFim": "#0f4a50",
-    "sistema": "s1",
+    "alvo": {
+      "tipo": "sistema",
+      "ref": "s1"
+    },
+    "ativo": true,
     "inicio": "2026-09-01",
     "fim": "2026-12-31",
-    "ordem": 4
+    "ordem": 4,
+    "lado": "esquerda",
+    "formato": "molde",
+    "titulo": "IFRS 16 / CPC 06: contratos de arrendamento em um só lugar",
+    "subtitulo": "Ativo para uso",
+    "rotulo": "Executiva IV · Conciliação e Auditoria",
+    "fundo": "#004389",
+    "fundoFim": "#062f5c",
+    "imagens": [
+      "assets/destaques/ifrs-16-cena.webp"
+    ],
+    "alt": "Tela do sistema IFRS 16 / CPC 06 num notebook, com a lista de contratos de arrendamento",
+    "atualizadoPor": "Eduardo dos Santos Rocha",
+    "atualizadoEm": "2026-09-21"
   },
   {
     "id": "d5-auditoria",
-    "titulo": "Portal de Auditoria: solicitações e etapas do ciclo anual",
-    "resumo": "Acompanhe as solicitações e o relatório de desempenho por área.",
-    "categoria": "Sistemas da área",
-    "acao": "Abrir o sistema",
-    "imagem": "assets/sistemas/portal-de-auditoria.webp",
-    "alt": "Ilustração do Portal de Auditoria",
-    "lado": "esquerda",
-    "fundo": "#105e75",
-    "fundoFim": "#084a4a",
-    "sistema": "s6",
+    "alvo": {
+      "tipo": "sistema",
+      "ref": "s6"
+    },
+    "ativo": true,
     "inicio": "2026-09-01",
     "fim": "2026-12-31",
-    "ordem": 5
+    "ordem": 5,
+    "lado": "direita",
+    "formato": "molde",
+    "titulo": "Portal de Auditoria",
+    "subtitulo": "Em desenvolvimento",
+    "descricao": "Criação temporária de aplicação web para importar relatório do Portal EY e controlar as entregas, substituindo parcialmente o uso de planilhas de controle, permitindo consolidar empresas e visualizar indicadores estratégicos. Aguardando finalização do projeto \"Cronograma de Fechamento\" para reaproveitar ambiente e configurações.",
+    "rotulo": "Executiva IV · Conciliação e Auditoria",
+    "fundoImagem": "assets/destaques/portal-de-auditoria-fundo.webp",
+    "fundo": "#12495a",
+    "fundoFim": "#3d8f6a",
+    "imagens": [
+      "assets/destaques/portal-de-auditoria-cena.webp"
+    ],
+    "alt": "Painel e lista de solicitações do Portal de Auditoria",
+    "atualizadoPor": "Eduardo dos Santos Rocha",
+    "atualizadoEm": "2026-09-21"
   },
   {
     "id": "d6-controle-horas",
-    "titulo": "Controle de Horas: banco, folgas e compensações num lugar só",
-    "resumo": "Acompanhe o banco de horas, as folgas e as compensações por colaborador, com o histórico da equipe.",
-    "categoria": "Sistemas da área",
-    "acao": "Abrir o sistema",
-    "imagem": "assets/sistemas/controle-de-horas.webp",
-    "alt": "Tela do Controle de Horas com o banco de horas e o acompanhamento por colaborador",
-    "lado": "direita",
-    "fundo": "#1a5f75",
-    "fundoFim": "#0e4a4a",
-    "sistema": "s3",
+    "alvo": {
+      "tipo": "sistema",
+      "ref": "s3"
+    },
+    "ativo": true,
     "inicio": "2026-09-01",
     "fim": "2026-12-31",
-    "ordem": 6
+    "ordem": 6,
+    "lado": "direita",
+    "titulo": "Controle de Horas: banco, folgas e compensações num lugar só",
+    "subtitulo": "Acompanhe o banco de horas, as folgas e as compensações por colaborador, com o histórico da equipe.",
+    "fundo": "#1a5f75",
+    "fundoFim": "#0e4a4a",
+    "imagens": [
+      "assets/sistemas/controle-de-horas.webp"
+    ],
+    "alt": "Tela do Controle de Horas com o banco de horas e o acompanhamento por colaborador",
+    "atualizadoPor": "Eduardo dos Santos Rocha",
+    "atualizadoEm": "2026-09-21"
   }
 ]

@@ -24,7 +24,7 @@ const DATA_DIR = process.env.PORTAL_DATA_DIR || path.join(__dirname, '..', 'data
 const ASSETS_USERS_DIR = process.env.PORTAL_ASSETS_USERS_DIR || path.join(__dirname, '..', 'assets', 'users');
 // Pastas de destino aceitas no upload. Lista fechada: o nome vem da query, e
 // um valor livre ali viraria escrita em qualquer ponto do disco.
-const UPLOAD_DIRS = { users: 'users', sistemas: 'sistemas', automacoes: 'automacoes', documentos: 'documentos', atalhos: 'atalhos', portais: 'portais', externos: 'externos' };
+const UPLOAD_DIRS = { users: 'users', sistemas: 'sistemas', automacoes: 'automacoes', documentos: 'documentos', atalhos: 'atalhos', portais: 'portais', externos: 'externos', destaques: 'destaques' };
 const AUDIT_LOG = process.env.PORTAL_AUDIT_LOG || path.join(__dirname, 'audit.log');
 const ALLOWED_ORIGIN = process.env.PORTAL_ALLOWED_ORIGIN || '*';
 const ADMIN_TOKEN = process.env.PORTAL_ADMIN_TOKEN || '';

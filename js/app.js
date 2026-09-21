@@ -662,6 +662,54 @@ function openAviso(id) {
   track('aviso_open',{aviso:aviso.titulo});
   showDialog(aviso.titulo,`Aviso · ${AVISO_TIPOS[aviso.tipo]||'Info'}`,`<p>${e(aviso.texto)}</p>${detailGrid({'Quando':aviso.janela||'—','Área responsável':aviso.area||'—','Origem':ORIGENS[aviso.origem]})}`);
 }
+// ===== Agenda na capa =====
+// Compromisso de data/agenda.json marcado `naCapa` entra em Avisos como uma
+// linha de calendário (pedido do usuário em 21/09/2026): o dia, o horário e,
+// quando o convite traz, o link para entrar na reunião (quem organiza não
+// entra — pedido do usuário). Sai
+// sozinho quando termina. Horário de Brasília (UTC−3, sem horário de verão).
+const FUSO_BRASILIA='-03:00';
+const momento=(dia,hora)=>new Date(`${dia}T${hora||'00:00'}:00${FUSO_BRASILIA}`);
+const fimCompromisso=a=>momento(a.data,a.fim||'23:59');
+function compromissosNaCapa() {
+  const agora=new Date();
+  return (data.agenda||[]).filter(a=>a.naCapa&&a.data&&fimCompromisso(a)>=agora)
+    .sort((a,b)=>momento(a.data,a.inicio)-momento(b.data,b.inicio)).slice(0,2);
+}
+const diaDaSemana=dia=>new Date(`${dia}T12:00:00`).toLocaleDateString('pt-BR',{weekday:'long'});
+const horarioCompromisso=a=>a.inicio?`${a.inicio}${a.fim?` às ${a.fim}`:''}`:a.horario||'';
+function linhaCompromisso(a) {
+  const mes=new Date(`${a.data}T12:00:00`).toLocaleDateString('pt-BR',{month:'short'}).replace('.','');
+  const link=safeURL(a.link);
+  const detalhe=[`${diaDaSemana(a.data).split('-')[0]}, ${dateLabel(a.data)}`,horarioCompromisso(a)].filter(Boolean).map(e).join(' · ');
+  return `<li class="aviso-agenda"><span class="aviso-data" aria-hidden="true"><strong>${e(a.data.slice(-2))}</strong>${e(mes)}</span><button type="button" class="aviso-title" data-compromisso="${e(a.id)}">${e(a.nome)}</button><small>${detalhe}</small>${link?`<a class="aviso-entrar" href="${e(link)}" target="_blank" rel="noopener noreferrer" data-reuniao="${e(a.nome)}">${icon('video')}Entrar na reunião</a>`:''}</li>`;
+}
+// Arquivo .ics montado aqui mesmo, só com o que o portal mostra (sem a lista
+// de convidados do convite original): quem não recebeu o convite salva o
+// compromisso no Outlook.
+function icsCompromisso(a) {
+  const utc=d=>d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
+  const texto=t=>String(t||'').replace(/\\/g,'\\\\').replace(/[,;]/g,m=>`\\${m}`).replace(/\n/g,'\\n');
+  const link=safeURL(a.link);
+  return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Portal da Gerência de Contabilidade//PT-BR','METHOD:PUBLISH','BEGIN:VEVENT',
+    `UID:${a.id}@portal-contabilidade`,`DTSTAMP:${utc(new Date())}`,
+    `DTSTART:${utc(momento(a.data,a.inicio||'00:00'))}`,`DTEND:${utc(fimCompromisso(a))}`,
+    `SUMMARY:${texto(a.nome)}`,`DESCRIPTION:${texto([a.descricao,link&&`Reunião on-line: ${link}`].filter(Boolean).join('\n'))}`,
+    ...(a.local||link?[`LOCATION:${texto(a.local||link)}`]:[]),'END:VEVENT','END:VCALENDAR']
+    // RFC 5545: linha longa se dobra em pedaços, cada continuação começando
+    // com um espaço (60 caracteres deixa folga para os acentos em UTF-8).
+    .map(linha=>linha.match(/.{1,60}/g).join('\r\n ')).join('\r\n');
+}
+function openCompromisso(id) {
+  const a=(data.agenda||[]).find(item=>item.id===id);
+  if(!a)return;
+  track('compromisso_open',{compromisso:a.nome});
+  const link=safeURL(a.link);
+  const arquivo=URL.createObjectURL(new Blob([icsCompromisso(a)],{type:'text/calendar;charset=utf-8'}));
+  const nomeArquivo=`${a.id}.ics`;
+  showDialog(a.nome,'Agenda da gerência',`<p>${e(a.descricao||'')}</p>${detailGrid({'Data':`${diaDaSemana(a.data)}, ${dateLabel(a.data)}`,'Horário':`${horarioCompromisso(a)} (horário de Brasília)`,'Local':a.local||'Não informado no convite','Reunião on-line':link?'Link no botão abaixo':'O convite não traz link de reunião','Fonte':a.fonte||'—'})}<div class="doc-actions">${link?`<a class="primary-btn" href="${e(link)}" target="_blank" rel="noopener noreferrer" data-reuniao="${e(a.nome)}">${icon('video')}Entrar na reunião</a> `:''}<a class="${link?'secondary-btn':'primary-btn'}" href="${arquivo}" download="${e(nomeArquivo)}">${icon('calendar')}Salvar no calendário</a></div>`);
+  $('#detail-dialog').addEventListener('close',()=>URL.revokeObjectURL(arquivo),{once:true});
+}
 function renderHome() {
   renderCarrossel();
   const ordemTipo= {
@@ -669,7 +717,8 @@ function renderHome() {
   }
   ;
   const avisos=(data.avisos||[]).filter(vigente).sort((a,b)=>(ordemTipo[a.tipo]??3)-(ordemTipo[b.tipo]??3)).slice(0,3);
-  $('#avisos-list').innerHTML=avisos.map(a=>`<li><span class="aviso-tag ${e(a.tipo)}">${e(AVISO_TIPOS[a.tipo]||'Info')}</span><button type="button" class="aviso-title" data-aviso="${e(a.id)}">${e(a.titulo)}</button><small>${[a.janela,a.area].filter(Boolean).map(e).join(' · ')}${a.demonstrativo?' · Exemplo':''}</small></li>`).join('')||'<li class="empty-state">Nenhum aviso vigente.</li>';
+  const compromissos=compromissosNaCapa();
+  $('#avisos-list').innerHTML=compromissos.map(linhaCompromisso).join('')+avisos.map(a=>`<li><span class="aviso-tag ${e(a.tipo)}">${e(AVISO_TIPOS[a.tipo]||'Info')}</span><button type="button" class="aviso-title" data-aviso="${e(a.id)}">${e(a.titulo)}</button><small>${[a.janela,a.area].filter(Boolean).map(e).join(' · ')}</small></li>`).join('')||'<li class="empty-state">Nenhum aviso vigente.</li>';
   const vistos=new Set();
   const atalhos=[...data.config.links.filter(l=>!l.target).map(l=>({nome:l.nome,icon:l.icon,url:safeURL(l.link)})),...data.sistemas.filter(s=>s.status==='Ativo').map(s=>({nome:s.nome.split(' — ')[0],icon:s.icon||'grid',url:safeURL(s.link)}))]
     .filter(a=>a.url&&!vistos.has(a.nome)&&vistos.add(a.nome)).slice(0,8);
@@ -1727,6 +1776,10 @@ async function init() {
       }
       const aviso=event.target.closest('[data-aviso]');
       if(aviso)openAviso(aviso.dataset.aviso);
+      const compromisso=event.target.closest('[data-compromisso]');
+      if(compromisso)openCompromisso(compromisso.dataset.compromisso);
+      const reuniao=event.target.closest('[data-reuniao]');
+      if(reuniao)track('reuniao_open',{compromisso:reuniao.dataset.reuniao});
       const quick=event.target.closest('[data-quick]');
       if(quick)track('system_access',{sistema:quick.dataset.quick,configurado:true});
       const subnav=event.target.closest('[data-subnav]');

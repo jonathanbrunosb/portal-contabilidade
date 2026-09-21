@@ -3242,6 +3242,73 @@ th,td {
   color:var(--texto-apoio);
   font-size:var(--fs-sm)}
 
+/* Compromisso da agenda (21/09/2026): no lugar da tarja, uma folhinha de
+   calendário com o dia; à direita, "Entrar na reunião" quando há link. */
+.avisos li.aviso-agenda {
+  grid-template-columns:auto 1fr auto;
+  align-items:center}
+
+.aviso-data {
+  grid-row:span 2;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  width:44px;
+  padding:3px 0 4px;
+  border:1px solid var(--borda-media);
+  border-top:3px solid var(--azul);
+  border-radius:var(--raio-xs);
+  background:#fff;
+  color:var(--texto-apoio);
+  font-size:var(--fs-xs);
+  line-height:1.15;
+  text-transform:uppercase}
+
+.aviso-data strong {
+  color:var(--texto);
+  font-size:var(--fs-lg);
+  font-weight:var(--peso-forte)}
+
+.aviso-agenda .aviso-title {
+  align-self:end}
+
+.aviso-agenda small {
+  align-self:start}
+
+.aviso-entrar {
+  grid-column:3;
+  grid-row:1 / span 2;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  min-height:32px;
+  padding:6px 12px;
+  border-radius:var(--raio-sm);
+  background:var(--azul);
+  color:#fff;
+  font-size:var(--fs-sm);
+  font-weight:var(--peso-forte);
+  white-space:nowrap}
+
+.aviso-entrar:hover {
+  background:var(--azul-escuro)}
+
+.aviso-entrar .icon {
+  width:16px;
+  height:16px}
+
+@media(max-width:480px) {
+  .avisos li.aviso-agenda {
+  grid-template-columns:auto 1fr}
+
+.aviso-entrar {
+  grid-column:2;
+  grid-row:auto;
+  justify-self:start;
+  margin-top:6px}
+
+}
+
 .acesso {
   display:grid;
   grid-template-columns:1fr 1fr;

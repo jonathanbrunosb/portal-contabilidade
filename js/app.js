@@ -513,7 +513,9 @@ function renderSubnav(item) {
   $('.pg-subnav').setAttribute('aria-label',`Páginas de ${titulo}`);
   const janelaUnica=paginas.length>1&&paginas.every(pagina=>pagina.view&&pagina.view===paginas[0].view);
   subnavTargets=paginas;
-  $('#page-subnav').innerHTML=paginas.map((child,i)=>`<li><a href="${e(routeHash(child))}" data-subnav="${i}"${child===atual?' aria-current="page"':''}>${e(child.label)}</a></li>`).join('');
+  // As abas de origem da Comunicação levam a cor da origem (ver .pg-line).
+  const origemDaAba=child=>child.target==='central'&&child.tab?.startsWith('comunicacao-')?` data-origem="${e(child.tab.slice('comunicacao-'.length))}"`:'';
+  $('#page-subnav').innerHTML=paginas.map((child,i)=>`<li><a href="${e(routeHash(child))}" data-subnav="${i}"${origemDaAba(child)}${child===atual?' aria-current="page"':''}>${e(child.label)}</a></li>`).join('');
   $('.pg-subnav').hidden=paginas.length<2||janelaUnica;
   if($('.pg-subnav').hidden)return;
   requestAnimationFrame(()=> {
@@ -533,6 +535,8 @@ function moverLinha(alvo) {
     return;
   }
   // A linha está dentro da faixa rolável e rola junto com ela.
+  if(alvo.dataset.origem)linha.dataset.origem=alvo.dataset.origem;
+  else delete linha.dataset.origem;
   linha.style.opacity='1';
   linha.style.width=`${alvo.offsetWidth}px`;
   linha.style.transform=`translateX(${alvo.offsetLeft}px)`;

@@ -90,6 +90,14 @@
   --sombra-sutil:0 0 2px #071f491f,0 2px 4px #071f4924;
   --sombra-media:0 6px 16px #071f491f;
   --sombra-alta:0 12px 28px #071f4926;
+  /* Movimento: só para mostrar mudança de estado. Saída desacelerada
+     (ease-out-quart), sem quique; 0,2 s no estado, 0,6 s na imagem. */
+  --ease-saida:cubic-bezier(.25,1,.5,1);
+  --dur-estado:.2s;
+  --dur-imagem:.6s;
+  /* Respiro interno do painel das páginas de seção; o nome da seção na faixa
+     de abas usa o mesmo valor para começar na coluna do conteúdo. */
+  --respiro-painel:18px;
   --fonte:"Segoe UI",Arial,Helvetica,sans-serif;
   font-family:var(--fonte);
   color:var(--texto);
@@ -521,15 +529,41 @@ main {
   box-shadow:var(--sombra-sutil);
   overflow:hidden;
   cursor:pointer;
-  transition:border-color .2s,box-shadow .2s}
+  transition:border-color var(--dur-estado) var(--ease-saida),box-shadow var(--dur-estado) var(--ease-saida)}
 
+/* Realce (21/09/2026): a borda toma a cor da origem, a sombra sobe, a imagem
+   aproxima devagar e o título ganha o sublinhado — o mesmo vocabulário das
+   colunas da capa. Ao clicar, a sombra volta ao repouso. */
 .comunicado-faixa:hover {
-  border-color:var(--borda-ativa);
+  border-color:color-mix(in srgb,var(--cor-origem,var(--azul)) 45%,var(--borda));
   box-shadow:var(--sombra-media)}
+
+.comunicado-faixa:active {
+  box-shadow:var(--sombra-sutil)}
 
 .comunicado-faixa:focus-within {
   border-color:var(--azul);
   box-shadow:var(--sombra-media)}
+
+/* O anel de foco contorna a faixa inteira, que é o alvo do clique, e não só o
+   texto do título. */
+@supports selector(:has(*)) {
+  .comunicado-faixa:has(.comunicado-faixa-link:focus-visible) {
+    outline:3px solid var(--foco);
+    outline-offset:3px}
+
+  .comunicado-faixa-link:focus-visible {
+    outline:none}
+}
+
+.comunicado-faixa-midia img,.coluna-miniatura img,.coluna-destaque-midia img {
+  transition:transform var(--dur-imagem) var(--ease-saida)}
+
+.comunicado-faixa:hover .comunicado-faixa-midia img,.coluna-item:hover .coluna-miniatura img,.coluna-destaque:hover .coluna-destaque-midia img {
+  transform:scale(1.04)}
+
+.no-motion .comunicado-faixa:hover .comunicado-faixa-midia img,.no-motion .coluna-item:hover .coluna-miniatura img,.no-motion .coluna-destaque:hover .coluna-destaque-midia img {
+  transform:none}
 
 /* Imagem ou quadro na cor da origem. Serve à faixa, à capa e às miniaturas. */
 .midia-comunicado {
@@ -591,9 +625,13 @@ main {
   font-weight:var(--peso-forte);
   line-height:1.3}
 
+/* O sublinhado já existe, transparente, e só ganha cor no realce: aparece
+   suave em vez de piscar. */
 .comunicado-faixa-link {
   color:var(--texto);
-  text-decoration:none}
+  text-decoration:underline 1px transparent;
+  text-underline-offset:.18em;
+  transition:color var(--dur-estado) var(--ease-saida),text-decoration-color var(--dur-estado) var(--ease-saida)}
 
 .comunicado-faixa-link::after {
   content:"";
@@ -603,7 +641,7 @@ main {
 
 .comunicado-faixa:hover .comunicado-faixa-link {
   color:var(--azul);
-  text-decoration:underline}
+  text-decoration-color:currentColor}
 
 .comunicado-faixa-subtitulo {
   display:-webkit-box;
@@ -625,12 +663,20 @@ main {
   font-size:var(--fs-base);
   line-height:1.55}
 
+/* "Ler comunicado completo": um fio que corre da esquerda para a direita sob
+   o texto no realce. `align-self` para o fio medir o texto, não a coluna. */
 .comunicado-faixa-mais {
+  align-self:flex-start;
   margin-top:auto;
-  padding-top:4px;
+  padding:4px 0 2px;
   color:var(--azul);
   font-size:var(--fs-base);
-  font-weight:var(--peso-medio)}
+  font-weight:var(--peso-medio);
+  background:linear-gradient(currentColor,currentColor) 0 100%/0 1px no-repeat;
+  transition:background-size var(--dur-imagem) var(--ease-saida)}
+
+.comunicado-faixa:hover .comunicado-faixa-mais {
+  background-size:100% 1px}
 
 /* Página do comunicado — matéria de jornal (pedido do usuário em 21/09/2026,
    3ª versão). O texto ocupa a largura toda, justificado e com hifenização, e
@@ -3435,6 +3481,11 @@ th,td {
   .dqb-trilho,.dqb-texto > *,.dqb-acao-seta,.pg-line,.dqb-pontos button:before {
   transition:none}
 
+/* Sem a aproximação da imagem: a borda, a sombra e o sublinhado já marcam o
+   realce sem movimento. */
+.comunicado-faixa:hover .comunicado-faixa-midia img,.coluna-item:hover .coluna-miniatura img,.coluna-destaque:hover .coluna-destaque-midia img {
+  transform:none}
+
 .dqb-texto > * {
   opacity:1;
   transform:none}
@@ -3549,7 +3600,7 @@ svg.ext {
 }
 
 /* ===== Página de seção: só a faixa de subpáginas (efeito do CFC: faixa cinza,
-   itens em caixa alta, linha azul de 3 px que desliza até o item sob o mouse) ===== */
+   itens em caixa alta, realce de 3 px que desliza até o item sob o mouse) ===== */
 .pg-subnav {
   display:flex;
   align-items:stretch;
@@ -3568,12 +3619,14 @@ svg.ext {
 
 /* Nome da seção à esquerda das abas (referência: microsoft.com/pt-br). Fica
    grudado na borda enquanto a faixa rola, para não sumir em tela estreita. */
+/* Recuo = borda (1 px) + respiro do painel de conteúdo abaixo: o nome da seção
+   começa na mesma coluna que a busca e a lista, em qualquer largura. */
 .pg-secao {
   display:flex;
   flex:0 0 auto;
   align-items:center;
   margin:0;
-  padding:15px 0;
+  padding:15px 0 15px calc(var(--respiro-painel) + 1px);
   background:var(--faixa-clara);
   color:var(--texto);
   font-size:var(--fs-sm);
@@ -3598,7 +3651,11 @@ svg.ext {
   margin:0;
   padding:0}
 
+/* As abas ficam acima do realce que desliza (.pg-line), senão o véu dele
+   passaria por cima do texto. */
 .pg-subnav a {
+  position:relative;
+  z-index:1;
   display:block;
   padding:15px;
   color:var(--azul-profundo);
@@ -3607,30 +3664,61 @@ svg.ext {
   text-transform:uppercase;
   letter-spacing:.02em;
   white-space:nowrap;
-  transition:color .2s}
+  transition:color var(--dur-estado) var(--ease-saida)}
 
+/* Azul da marca, não o --azul-ativo: sobre o véu do realce ele caía para
+   4,1:1; este fica em 6,2:1. */
 .pg-subnav a:hover,.pg-subnav a:focus-visible,.pg-subnav a[aria-current="page"] {
-  color:var(--azul-ativo)}
+  color:var(--azul-marca)}
+
+/* Abas de origem (Comunicação): o texto e o realce tomam a cor da origem, a
+   mesma do selo de cada comunicado da lista. */
+.pg-subnav a[data-origem]:hover,.pg-subnav a[data-origem]:focus-visible,.pg-subnav a[data-origem][aria-current="page"] {
+  color:var(--cor-origem)}
+
+.pg-subnav a:active {
+  background:color-mix(in srgb,var(--cor-origem,var(--azul-marca)) 8%,transparent)}
 
 .pg-subnav a:focus-visible {
   outline-offset:-3px}
 
+/* Realce que desliza até a aba sob o mouse ou o foco (efeito do CFC): o fio de
+   3 px no alto e, abaixo dele, um véu da mesma cor que some para baixo. A cor
+   vem de `color`, que o JS troca pela da origem da aba; `currentColor` nos
+   dois pseudo-elementos faz fio e véu mudarem de cor enquanto deslizam. */
 .pg-line {
   position:absolute;
   top:0;
+  bottom:0;
   left:0;
   width:0;
-  height:3px;
-  background:var(--azul-profundo);
+  color:var(--cor-origem,var(--azul-marca));
   opacity:0;
   pointer-events:none;
-  transition:transform .25s ease-out,width .25s ease-out,opacity .2s}
+  transition:transform .3s var(--ease-saida),width .3s var(--ease-saida),opacity var(--dur-estado),color .3s var(--ease-saida)}
+
+.pg-line::before,.pg-line::after {
+  content:"";
+  position:absolute;
+  top:0;
+  right:0;
+  left:0;
+  background:currentColor}
+
+.pg-line::before {
+  height:3px}
+
+.pg-line::after {
+  bottom:0;
+  opacity:.09;
+  -webkit-mask-image:linear-gradient(to bottom,#000,transparent);
+  mask-image:linear-gradient(to bottom,#000,transparent)}
 
 .pg-subnav[hidden] {
   display:none}
 
 #page-view #content-view {
-  padding:18px}
+  padding:var(--respiro-painel)}
 
 /* ===== Capa: Comunicação em três colunas, uma por origem (21/09/2026) =====
    Formato de portal de notícias, na referência que o usuário enviou (capa da
@@ -3733,7 +3821,7 @@ svg.ext {
   line-height:1.35}
 
 .coluna-destaque:hover .coluna-destaque-titulo {
-  text-decoration:underline}
+  text-decoration-color:currentColor}
 
 .coluna-lista {
   list-style:none;
@@ -3794,9 +3882,14 @@ svg.ext {
   font-size:var(--fs-sm);
   line-height:1.45}
 
+.coluna-item-titulo,.coluna-destaque-titulo {
+  text-decoration:underline 1px transparent;
+  text-underline-offset:.18em;
+  transition:color var(--dur-estado) var(--ease-saida),text-decoration-color var(--dur-estado) var(--ease-saida)}
+
 .coluna-item:hover .coluna-item-titulo {
   color:var(--azul);
-  text-decoration:underline}
+  text-decoration-color:currentColor}
 
 .coluna-mais {
   display:inline-block;
@@ -3846,8 +3939,8 @@ svg.ext {
 }
 
 @media(max-width:720px) {
-  #page-view #content-view {
-  padding:14px}
+  :root {
+  --respiro-painel:14px}
 
 }
 

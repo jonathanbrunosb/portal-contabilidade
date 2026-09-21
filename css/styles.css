@@ -3886,24 +3886,21 @@ svg.ext {
   width:44px;
   height:44px}
 
-/* Só aparece para quem administra o portal. */
+/* Só aparece para quem administra o portal: um lápis no canto de cima, que
+   não cobre a arte (21/09/2026; antes, uma faixa "Trocar imagem" na base). */
 .pcard-trocar {
   position:absolute;
-  left:6px;
+  top:6px;
   right:6px;
-  bottom:6px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  min-height:28px;
-  padding:5px 8px;
+  display:grid;
+  place-items:center;
+  width:28px;
+  height:28px;
+  padding:0;
   border:1px solid var(--borda);
-  border-radius:var(--raio-sm);
+  border-radius:50%;
   background:#fff;
   color:var(--texto-2);
-  font-size:var(--fs-xs);
-  font-weight:var(--peso-medio);
   box-shadow:var(--sombra-sutil)}
 
 .pcard-trocar:hover {
@@ -3911,9 +3908,8 @@ svg.ext {
   color:var(--azul)}
 
 .pcard-trocar .icon {
-  width:15px;
-  height:15px;
-  flex-shrink:0}
+  width:14px;
+  height:14px}
 
 .pcard-corpo {
   padding:11px 14px 0;

@@ -147,6 +147,12 @@
       "icon": "grid",
       "itens": [
         {
+          "label": "Todos",
+          "icon": "grid",
+          "target": "central",
+          "tab": "portais-todos"
+        },
+        {
           "label": "Contabilidade",
           "icon": "grid",
           "target": "central",
@@ -171,6 +177,12 @@
           "tab": "portais-gente"
         },
         {
+          "label": "Power BI",
+          "icon": "chart",
+          "target": "central",
+          "tab": "portais-powerbi"
+        },
+        {
           "label": "Externos",
           "icon": "globe",
           "target": "central",
@@ -182,6 +194,12 @@
       "label": "Sistemas e automações",
       "icon": "flow",
       "itens": [
+        {
+          "label": "Todos",
+          "icon": "flow",
+          "target": "central",
+          "tab": "automacoes-todos"
+        },
         {
           "label": "Contabilidade",
           "icon": "flow",

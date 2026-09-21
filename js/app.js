@@ -16,7 +16,7 @@ const TARGET_ACCESS= {
 }
 ;
 // Comunicação: uma aba por origem (+ "Todos") e a página de cada comunicado.
-const CENTRAL_TABS=['comunicacao','comunicacao-contabilidade','comunicacao-equatorial','comunicacao-externo','comunicado','sistemas','portais-equatorial','portais-servicos','portais-gente','portais-externos','documentos','automacoes','atalhos-equatorial','automacoes-externos'];
+const CENTRAL_TABS=['comunicacao','comunicacao-contabilidade','comunicacao-equatorial','comunicacao-externo','comunicado','portais-todos','sistemas','portais-equatorial','portais-servicos','portais-gente','portais-powerbi','portais-externos','documentos','automacoes-todos','automacoes','atalhos-equatorial','automacoes-externos'];
 // Páginas ainda sem conteúdo definido (o usuário vai desenhar).
 const PAGINAS_EM_DEFINICAO=[];
 const SECTION_ACCESS= {
@@ -79,8 +79,11 @@ function cardPortal(o) {
   const media = url
     ? `<img class="pcard-img" src="${e(comVersao(url))}" alt="" loading="lazy">`
     : `<span class="pcard-simbolo">${icon(o.icone || 'grid')}</span>`;
+  // Para quem administra: um lápis no canto da imagem, que não cobre a arte
+  // (pedido do usuário em 21/09/2026; antes era uma faixa "Trocar imagem").
+  const acaoImagem = url ? 'Trocar imagem' : 'Definir imagem';
   const trocar = o.alvoImagem && podeAdministrar()
-    ? `<button class="pcard-trocar" data-trocar-imagem="${e(o.alvoImagem)}">${icon('image')}<span>${url ? 'Trocar imagem' : 'Definir imagem'}</span></button>`
+    ? `<button class="pcard-trocar" data-trocar-imagem="${e(o.alvoImagem)}" aria-label="${acaoImagem} de ${e(o.titulo)}" title="${acaoImagem}">${icon('pencil')}</button>`
     : '';
   const info = o.registro
     ? `<button class="pcard-info" data-record="${e(o.registro)}" aria-label="Informações sobre ${e(o.titulo)}">${icon('info')}</button>`
@@ -104,10 +107,13 @@ function cardPortal(o) {
 const acaoAcessar = (url, nome, marca = 'data-quick') => `<a class="primary-btn pcard-acessar" href="${e(url)}" target="_blank" rel="noopener noreferrer" ${marca}="${e(nome)}">Acessar${icon('external').replace('class="icon"','class="icon ext"')}</a>`;
 const acaoBaixar = (url, nome) => `<a class="primary-btn pcard-acessar" href="${e(url)}" download data-doc-title="${e(nome)}">${icon('download')}Baixar</a>`;
 const ACAO_PENDENTE = '<span class="meta-label pcard-pendente">Acesso em configuração</span>';
-function systemCard(item) {
+// `selo` põe o selo da origem no cartão — só nas abas "Todos", que misturam
+// origens; nas demais a aba já diz de onde é.
+const seloDe=(colecao,item,opcoes)=>opcoes?.selo?origemDe(colecao,item):'';
+function systemCard(item,opcoes) {
   const url = safeURL(item.link);
   return cardPortal( {
-    imagem:item.imagem,icone:item.icon,titulo:item.nome,descricao:item.descricao,
+    imagem:item.imagem,icone:item.icon,titulo:item.nome,descricao:item.descricao,origem:seloDe('sistemas',item,opcoes),
     rotulo:item.responsavel,statusHTML:badge(item.status),
     acao:url?acaoAcessar(url,item.nome):`<button class="primary-btn pcard-acessar" data-system="${e(item.id)}">Acessar</button>`,
     registro:`sistemas:${item.id}`,alvoImagem:`sistemas:${item.id}`
@@ -115,11 +121,11 @@ function systemCard(item) {
   );
 }
 // Atalho corporativo (config.json › links) no mesmo cartão das demais grades.
-function linkCard(item,index) {
+function linkCard(item,index,opcoes) {
   if(item.target)return '';
   const url=safeURL(item.link);
   return cardPortal( {
-    imagem:item.imagem,icone:item.icon||'link',titulo:item.nome,descricao:item.descricao,
+    imagem:item.imagem,icone:item.icon||'link',titulo:item.nome,descricao:item.descricao,origem:seloDe('links',item,opcoes),
     rotulo:item.responsavel,statusHTML:badge(url?'Ativo':'Link não configurado'),
     acao:url?acaoAcessar(url,item.nome):`<button class="primary-btn pcard-acessar" data-access-link="${e(index)}">Acessar</button>`,
     registro:`links:${index}`
@@ -131,12 +137,12 @@ function linkCard(item,index) {
 // rodapé — num repositório de links, saber para onde se vai antes de clicar
 // vale mais do que um selo de status.
 const dominioDe=url=>{try{return new URL(url).host.replace(/^www\./,'');}catch{return '';}};
-function portalCard(colecao) {
+function portalCard(colecao,opcoes) {
   return item=> {
     const url=safeURL(item.link);
     const host=url?dominioDe(url):'';
     return cardPortal( {
-      imagem:item.imagem,icone:item.icon||'link',titulo:item.nome,descricao:item.descricao,
+      imagem:item.imagem,icone:item.icon||'link',titulo:item.nome,descricao:item.descricao,origem:seloDe(colecao,item,opcoes),
       rotulo:item.grupo,statusHTML:host?`<span class="meta-label pcard-fonte">${e(host)}</span>`:'<span></span>',
       acao:url?acaoAcessar(url,item.nome):ACAO_PENDENTE,
       registro:`${colecao}:${item.id}`,alvoImagem:`${colecao}:${item.id}`
@@ -155,17 +161,51 @@ const gruposDe=lista=>[...new Set(lista.map(item=>item.grupo).filter(Boolean))];
 function telaDeLinks( {colecao,destino,prefixo,rotuloBusca,placeholder,rodape,vazio,singular,plural} ) {
   const lista=(data[colecao]||[]).filter(item=>!destino||!item.destino||item.destino===destino);
   const ordem=gruposDe(lista);
-  const filtros=[{id:`${prefixo}-grupo`,rotulo:'Grupo',todos:'Todos os grupos',opcoes:ordem}];
+  // Com um grupo só (a aba Power BI, por exemplo), o filtro não teria o que filtrar.
+  const filtros=ordem.length>1?[{id:`${prefixo}-grupo`,rotulo:'Grupo',todos:'Todos os grupos',opcoes:ordem}]:[];
   const busca={id:`${prefixo}-busca`,rotulo:rotuloBusca,placeholder};
   $('#content-view').innerHTML=`${barraFiltro({busca,filtros})}<div class="pcard-grid" id="${prefixo}-cards"></div><div class="content-footer"><span id="${prefixo}-count" role="status" aria-live="polite"></span><span>${e(rodape)}</span></div>`;
   ligarBarraFiltro({busca,filtros,aoMudar:()=> {
-    const query=normalize($(`#${prefixo}-busca`).value),grupo=$(`#${prefixo}-grupo`).value;
+    const query=normalize($(`#${prefixo}-busca`).value),grupo=$(`#${prefixo}-grupo`)?.value||'';
     // Ordem alfabética do título, e não por grupo (pedido do usuário em
     // 20/09): o grupo continua no rótulo do cartão e no filtro, mas quem
     // procura um nome varre a lista de A a Z sem saber em que gaveta ele está.
     const visiveis=lista.filter(item=>(!grupo||item.grupo===grupo)&&normalize(`${item.nome} ${item.descricao||''} ${item.grupo||''} ${item.link||''}`).includes(query))
       .sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
     $(`#${prefixo}-cards`).innerHTML=visiveis.map(portalCard(colecao)).join('')||`<p class="empty-state">${e(vazio)}</p>`;
+    $(`#${prefixo}-count`).textContent=contagem(visiveis.length,singular,plural);
+  }
+  }
+  );
+}
+// Aba "Todos" de Portais e Links e de Sistemas e automações (pedido do usuário
+// em 21/09/2026): as grades das abas irmãs juntas, em ordem alfabética. A tela
+// mistura origens, então cada cartão leva o selo e entra o filtro Origem.
+// Cada registro traz o título, a origem, o texto da busca e o próprio cartão.
+const registroTodos=(colecao,item,titulo,texto,cartao)=>({titulo,origem:origemDe(colecao,item),texto:normalize(texto),cartao});
+function registrosPortaisTodos() {
+  return [
+    ...data.sistemas.map(item=>registroTodos('sistemas',item,item.nome,`${item.nome} ${item.descricao||''} ${item.responsavel||''}`,()=>systemCard(item,{selo:true}))),
+    ...data.portais.map(item=>registroTodos('portais',item,item.nome,`${item.nome} ${item.descricao||''} ${item.grupo||''} ${item.link||''}`,()=>portalCard('portais',{selo:true})(item))),
+    ...data.externos.filter(item=>item.destino==='portais-externos').map(item=>registroTodos('externos',item,item.nome,`${item.nome} ${item.descricao||''} ${item.grupo||''} ${item.link||''}`,()=>portalCard('externos',{selo:true})(item)))
+  ];
+}
+function registrosAutomacoesTodos() {
+  return [
+    ...activeAutomations().map(item=>registroTodos('automacoes',item,item.titulo,`${item.titulo} ${item.descricao||''} ${item.tipo||''}`,()=>automationCard(item,{selo:true}))),
+    ...data.config.links.filter(item=>!item.target).map(item=>registroTodos('links',item,item.nome,`${item.nome} ${item.descricao||''}`,()=>linkCard(item,data.config.links.indexOf(item),{selo:true}))),
+    ...data.externos.filter(item=>item.destino==='automacoes-externos').map(item=>registroTodos('externos',item,item.nome,`${item.nome} ${item.descricao||''} ${item.grupo||''} ${item.link||''}`,()=>portalCard('externos',{selo:true})(item)))
+  ];
+}
+function telaTodos({prefixo,registros,rotuloBusca,rodape,singular,plural}) {
+  const filtros=filtroOrigem(`${prefixo}-origem`,registros);
+  const busca={id:`${prefixo}-busca`,rotulo:rotuloBusca,placeholder:'Nome, descrição, grupo ou endereço…'};
+  $('#content-view').innerHTML=`${barraFiltro({busca,filtros})}<div class="pcard-grid" id="${prefixo}-cards"></div><div class="content-footer"><span id="${prefixo}-count" role="status" aria-live="polite"></span><span>${e(rodape)}</span></div>`;
+  ligarBarraFiltro({busca,filtros,aoMudar:()=> {
+    const query=normalize($(`#${prefixo}-busca`).value),origem=$(`#${prefixo}-origem`)?.value||'';
+    const visiveis=registros.filter(r=>(!origem||r.origem===origem)&&r.texto.includes(query))
+      .sort((a,b)=>a.titulo.localeCompare(b.titulo,'pt-BR'));
+    $(`#${prefixo}-cards`).innerHTML=visiveis.map(r=>r.cartao()).join('')||'<p class="empty-state">Nada corresponde aos filtros.</p>';
     $(`#${prefixo}-count`).textContent=contagem(visiveis.length,singular,plural);
   }
   }
@@ -289,10 +329,10 @@ const ICONE_FAMILIA= {
   sap:'grid',python:'file',web:'globe'
 }
 ;
-function automationCard(item) {
+function automationCard(item,opcoes) {
   const url=safeURL(item.url),arquivo=safeURL(item.arquivo);
   return cardPortal( {
-    imagem:item.imagem,icone:ICONE_FAMILIA[item.familia]||'flow',titulo:item.titulo,descricao:item.descricao,
+    imagem:item.imagem,icone:ICONE_FAMILIA[item.familia]||'flow',titulo:item.titulo,descricao:item.descricao,origem:seloDe('automacoes',item,opcoes),
     rotulo:item.tipo,statusHTML:`<span class="badge ${automationStatusColor(item.statusDesenvolvimento)}">${e(item.statusDesenvolvimento)}</span>`,
     acao:url?acaoAcessar(url,item.titulo):arquivo?acaoBaixar(arquivo,item.titulo):ACAO_PENDENTE,
     registro:`automacoes:${item.id}`,alvoImagem:`automacoes:${item.id}`
@@ -360,6 +400,25 @@ function renderContent(tab) {
     }
     );
   }
+  if(tab==='portais-todos')telaTodos( {
+    prefixo:'ptd',registros:registrosPortaisTodos(),rotuloBusca:'Pesquisar em Portais e Links',
+    rodape:'Todos os portais, sistemas e links, de A a Z. As abas acima recortam por origem e por assunto.',
+    singular:'acesso',plural:'acessos'
+  }
+  );
+  if(tab==='automacoes-todos')telaTodos( {
+    prefixo:'atd',registros:registrosAutomacoesTodos(),rotuloBusca:'Pesquisar em Sistemas e automações',
+    rodape:'Todas as automações, atalhos corporativos e ferramentas externas, de A a Z.',
+    singular:'item',plural:'itens'
+  }
+  );
+  if(tab==='portais-powerbi')telaDeLinks( {
+    colecao:'portais',destino:'portais-powerbi',prefixo:'pbi',rotuloBusca:'Pesquisar painel do Power BI',
+    placeholder:'Nome, descrição ou endereço…',
+    rodape:'Painéis do Power BI. Para abrir, o relatório precisa estar compartilhado com a sua conta — a ficha do “i” diz como.',
+    vazio:'Nenhum painel corresponde à busca.',singular:'painel',plural:'painéis'
+  }
+  );
   if(tab==='portais-equatorial')telaDeLinks( {
     colecao:'portais',destino:'portais-equatorial',prefixo:'por',rotuloBusca:'Pesquisar portal do Grupo Equatorial',
     placeholder:'Nome, descrição, grupo ou endereço…',

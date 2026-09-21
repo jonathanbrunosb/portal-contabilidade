@@ -193,7 +193,7 @@
     "id": "bi-gastos-gerenciaveis",
     "origem": "equatorial",
     "nome": "BI - Gastos Gerenciáveis",
-    "destino": "portais-equatorial",
+    "destino": "portais-powerbi",
     "descricao": "Painel de acompanhamento dos gastos gerenciáveis: realizado contra orçado, por centro de custo e natureza. Base da análise mensal da Controladoria.",
     "icon": "chart",
     "grupo": "Power BI",

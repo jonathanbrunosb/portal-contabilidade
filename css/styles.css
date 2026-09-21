@@ -717,6 +717,12 @@ main {
 .comunicado-figura {
   margin:0 0 18px}
 
+.comunicado-figura a {
+  display:block}
+
+.comunicado-figura a:hover img {
+  border-color:var(--azul)}
+
 /* Cartaz vertical não vira uma coluna de 1.300 px: a peça cabe na altura da
    tela e a figura encolhe junto (a largura acompanha a imagem). */
 .comunicado-figura img {
@@ -770,6 +776,32 @@ main {
   color:var(--texto-apoio);
   font-size:var(--fs-sm);
   line-height:1.5}
+
+/* Negrito do original ("**trecho**" no texto). */
+.comunicado-texto strong {
+  font-weight:var(--peso-forte)}
+
+/* Perfil ("[figura N]" com tipo retrato + o parágrafo seguinte): a foto fica
+   pequena, à esquerda, e o texto a contorna, como no e-mail de origem. O bloco
+   contém a foto (flow-root): o perfil seguinte nunca sobe para o lado dela. */
+.comunicado-perfil {
+  display:flow-root;
+  margin:0 0 18px}
+
+.comunicado-perfil p {
+  margin-bottom:0}
+
+.comunicado-retrato {
+  float:left;
+  width:clamp(96px, 24%, 168px);
+  margin:4px 22px 8px 0}
+
+.comunicado-retrato img {
+  display:block;
+  width:100%;
+  height:auto;
+  border:1px solid var(--borda);
+  border-radius:var(--raio-md)}
 
 /* A partir de 761 px as imagens flutuam. A capa fica com até 49% da largura
    (menos, se for um cartaz vertical); as figuras, com 49% — infográfico
@@ -2501,7 +2533,7 @@ th,td {
   background:
     linear-gradient(100deg,#071f49f2 0%,#071f49d9 38%,#0b376aa6 62%,#075c8070 85%,#075c8047 100%),
     linear-gradient(90deg,var(--marinho-escuro) 0 2px,color-mix(in srgb,var(--marinho-escuro) 55%,transparent) 18%,transparent 45%) right 0 top 0/var(--ph-foto-largura) 100% no-repeat,
-    url("../assets/images/banner/portal-gerencia-contabilidade.webp?v=20260921-46") right 0 top 30%/auto 420px no-repeat;
+    url("../assets/images/banner/portal-gerencia-contabilidade.webp?v=20260921-47") right 0 top 30%/auto 420px no-repeat;
   background-color:var(--marinho-escuro)}
 
 .ph-row {

@@ -305,6 +305,24 @@ Comunicação. Antes, a Comunicação começava em 780 px (1366×657), 824 px
 - Faixa de título "Comunicação" e "Ver todos os comunicados" removidas; o h2
   continua para leitor de tela (`.sr-only`).
 
+## Comunicados tirados dos e-mails — 21/09/2026 (noite)
+
+Dois e-mails de `projeto/comunicados-emails/`, os dois com origem
+Contabilidade (a Movimentação por decisão do usuário):
+
+- **IFRS 16 — novas melhorias** (`newsletter.json`,
+  `n7-ifrs16-abertura-rit-nova-cara`, 21/09): texto do e-mail com os três
+  negritos, a peça anexa (1672×941) no topo, que abre inteira ao clicar, e
+  "Acessar IFRS 16 / CPC 06" pelo `sistemaId`. Vira o destaque da coluna
+  Contabilidade na capa.
+- **Movimentação da Diretoria de Controladoria** (`noticias.json`,
+  `interno-movimentacao-controladoria-2026-05`, 14/05): 9 perfis, cada um
+  com a foto recortada do e-mail (168 px em 1366 e 1024; 96 px em 375), 36
+  negritos, banner "Carreira Equatorial" no topo e recorte 16:9 na lista.
+  Pela data, entra no fim da lista.
+- Playwright em 1366, 1024 e 375: nenhuma marca `**` à mostra, nenhuma imagem
+  quebrada, sem rolagem lateral, console limpo.
+
 ## Limites e checklist para homologação corporativa
 
 Não houve navegação nos sistemas reais, pois seus endereços não foram fornecidos. Downloads foram validados pelo destino HTTP e atributo de download; o fluxo de salvamento do navegador não foi homologado separadamente. Pausa por hover, preferência de movimento, navegação completa por teclado, zoom de 200% e políticas específicas de Chrome/Edge devem integrar a homologação corporativa. A implementação desses comportamentos está no código, mas não se declara aqui uma certificação de acessibilidade.

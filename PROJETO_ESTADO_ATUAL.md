@@ -3,9 +3,9 @@
 > **Documento vivo — fonte única de estado.** Pode ser atualizado ou sobrescrito livremente sempre que o projeto evoluir. Histórico e rollback ficam no **git**. Itens concluídos vão para `PROJETO_ESTADO_RESOLVIDOS.md`. O detalhe de design (decisões travadas do redesign, medidas, receitas) continua em `.claude/redesign/00-estado-e-proximos-passos.md` e `.claude/redesign/03-sistema-visual.md`. **Regras de trabalho e de commit:** `.claude/CLAUDE.md`.
 >
 > **Snapshot técnico** — Data: **2026-09-21 (noite)**
-> **Git:** branch `ajustes-frontend-dudu`, **17 commits à frente de `6b6273c`**, um por assunto (seção 2); o último é o deste checkpoint ("Documentar o dia 21/09 e adotar commit por assunto"). **Nada enviado** (`git push` só quando o usuário pedir). `main` não recebeu nada.
+> **Git:** branch `ajustes-frontend-dudu`, **18 commits à frente de `6b6273c`**, um por assunto (seção 2); depois do checkpoint ("Documentar o dia 21/09 e adotar commit por assunto") veio o dos comunicados tirados dos e-mails (IFRS 16 e Movimentação da Controladoria). **Nada enviado** (`git push` só quando o usuário pedir). `main` não recebeu nada.
 > **App/Stack:** HTML + CSS + JavaScript puro (ES modules), sem build, sem CDN. Conteúdo em `data/*.json`. Servidor estático Python na porta **5500** (`.claude/launch.json`, nome `portal`). Backend **opcional** `server/server.js` (Node, porta 8787), ligado por `window.PORTAL_API_ENABLED = true`.
-> **Working tree:** limpo depois do commit do checkpoint. Cache-buster: `?v=20260921-46`.
+> **Working tree:** limpo depois do commit do checkpoint. Cache-buster: `?v=20260921-47`.
 > **Máquina:** `projeto/` (material interno) e as skills de terceiros estão no disco, fora do Git (`.gitignore`).
 
 ---
@@ -40,7 +40,7 @@
 ## 1. Decisões arquiteturais
 
 ### 1.1 Origem do conteúdo
-- **Campo `origem`** (`contabilidade` | `equatorial` | `externo`) em todo conteúdo publicado — **porque** o usuário precisa segregar por quem produz. **Critério: quem escreveu, não o tema.**
+- **Campo `origem`** (`contabilidade` | `equatorial` | `externo`) em todo conteúdo publicado — **porque** o usuário precisa segregar por quem produz. **Critério: quem escreveu, não o tema.** Exceção do usuário (21/09): comunicado da Diretoria de Controladoria sobre a própria área (a Movimentação de 14/05) é Contabilidade.
 - Paleta do usuário: Contabilidade verde-água `#0D6B64`, Equatorial `#004AAD`, Externo roxo `#6A4BC9` (tokens `--origem-*`, AA). Selo cheio; a categoria perdeu a cor.
 - `origemDe(colecao,item)` + `ORIGEM_PADRAO` em `js/app.js`.
 
@@ -144,7 +144,7 @@
 ## 6. Próximos passos imediatos
 
 1. **Resolver a hospedagem antes de qualquer merge na `main`** — `pages.yml` publica site aberto; a branch tem conteúdo interno.
-2. **Enviar a branch** (`git push`) quando o usuário pedir — 17 commits locais.
+2. **Enviar a branch** (`git push`) quando o usuário pedir — 18 commits locais.
 3. **Código da Administração**: o usuário recupera o código na sessão de 16/09 (commit `9d9736c`) ou define um novo com `.claude/tools/trocar-codigo-admin.py`.
 4. **Conteúdo dos moldes do carrossel** (`data/destaques.json`): fundo licenciado para o IFRS 16 (hoje a arte da tela de entrada); texto certo do Cronograma; Auditoria "Em desenvolvimento" ou "Ativo"; "Executiva IV" ou "Contabilidade IV"; descrição própria do Controle de Horas.
 5. **Link da reunião** da RR (25/09) em `data/agenda.json › link`.

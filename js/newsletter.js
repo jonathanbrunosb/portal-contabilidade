@@ -1,4 +1,4 @@
-import { escapeHTML as e,icon,dateLabel,detailGrid,safeURL,comVersao,normalize,ORIGENS,seloOrigem } from './ui.js?v=20260921-46';
+import { escapeHTML as e,icon,dateLabel,detailGrid,safeURL,comVersao,normalize,ORIGENS,seloOrigem } from './ui.js?v=20260921-47';
 // Comunicação (decisão do usuário em 21/09/2026): a Newsletter Contábil e
 // Notícias & Impactos viraram uma lista só de comunicados, repartida por origem
 // nas abas da seção (Todos, Contabilidade, Equatorial, Externo). Cada
@@ -62,7 +62,7 @@ export function ligarMidias(root) {
     once:true
   }
   ));
-  root.querySelectorAll('.comunicado-figura img,.comunicado-figura-texto img').forEach(img=>img.addEventListener('error',()=>img.closest('figure').remove(), {
+  root.querySelectorAll('.comunicado-figura img,.comunicado-figura-texto img,.comunicado-retrato img').forEach(img=>img.addEventListener('error',()=>img.closest('figure').remove(), {
     once:true
   }
   ));
@@ -70,10 +70,14 @@ export function ligarMidias(root) {
 const metaDe=item=>`<p class="comunicado-meta">${seloOrigem(item.origem)}<span>${e(item.categoria||'')}</span><time datetime="${e(item.dataPublicacao)}">${e(dateLabel(item.dataPublicacao))}</time></p>`;
 // Marcação leve do texto do comunicado (21/09/2026): uma linha "## Título" abre
 // um intertítulo e uma linha "[figura N]" põe ali a N-ª imagem de `figuras`
-// ({imagem, alt, legenda}). Na faixa da lista e na busca, as marcas somem.
+// ({imagem, alt, legenda}); "**trecho**" é o negrito do original. Na faixa da
+// lista e na busca, as marcas somem.
 const MARCA_FIGURA=/^\[figura (\d+)\]$/i;
+const NEGRITO=/\*\*(.+?)\*\*/g;
 const linhasDe=item=>(item.conteudoCompleto||'').split('\n').map(linha=>linha.trim()).filter(Boolean);
-const textoCorrido=item=>linhasDe(item).filter(linha=>!MARCA_FIGURA.test(linha)).map(linha=>linha.replace(/^##\s+/,'')).join(' ');
+const textoCorrido=item=>linhasDe(item).filter(linha=>!MARCA_FIGURA.test(linha)).map(linha=>linha.replace(/^##\s+/,'').replace(NEGRITO,'$1')).join(' ');
+// Escapa primeiro e só depois troca as marcas: o texto nunca vira HTML.
+const comNegrito=linha=>e(linha).replace(NEGRITO,'<strong>$1</strong>');
 // Como no jornal (pedido do usuário em 21/09/2026): a figura flutua e o texto
 // a contorna. A capa flutua à direita; as figuras do texto alternam, a 1ª à
 // esquerda, a 2ª à direita… Clicar abre a imagem inteira em outra aba —
@@ -84,14 +88,37 @@ function figuraHTML(figura,n) {
   const lado=n%2?'direita':'esquerda';
   return `<figure class="comunicado-figura-texto flutua-${lado}"><a href="${e(comVersao(src))}" target="_blank" rel="noopener noreferrer" title="Abrir a imagem inteira em outra aba"><img src="${e(comVersao(src))}" alt="${e(figura.alt||'')}" loading="lazy"></a>${figura.legenda?`<figcaption>${e(figura.legenda)}</figcaption>`:''}</figure>`;
 }
+// Foto de pessoa (figura com `tipo: "retrato"`): pequena, à esquerda, presa ao
+// parágrafo seguinte, como nos comunicados de movimentação do Grupo — cada
+// perfil começa com a sua foto, e o próximo não sobe para o lado dela.
+function perfilHTML(figura,paragrafo) {
+  const src=safeURL(figura.imagem);
+  const foto=src?`<figure class="comunicado-retrato"><img src="${e(comVersao(src))}" alt="${e(figura.alt||'')}" loading="lazy"></figure>`:'';
+  return `<div class="comunicado-perfil">${foto}${paragrafo?`<p>${comNegrito(paragrafo)}</p>`:''}</div>`;
+}
 function corpoComunicado(item) {
-  return linhasDe(item).map(linha=> {
-    const marca=linha.match(MARCA_FIGURA);
-    if(marca)return figuraHTML((item.figuras||[])[Number(marca[1])-1],Number(marca[1])-1);
-    if(linha.startsWith('## '))return `<h3 class="comunicado-intertitulo">${e(linha.slice(3))}</h3>`;
-    return `<p>${e(linha)}</p>`;
+  const linhas=linhasDe(item),saida=[];
+  for(let i=0;i<linhas.length;i++) {
+    const linha=linhas[i],marca=linha.match(MARCA_FIGURA);
+    if(marca) {
+      const figura=(item.figuras||[])[Number(marca[1])-1];
+      if(figura?.tipo==='retrato') {
+        const seguinte=linhas[i+1];
+        const junta=seguinte&&!MARCA_FIGURA.test(seguinte)&&!seguinte.startsWith('## ');
+        saida.push(perfilHTML(figura,junta?seguinte:''));
+        if(junta)i++;
+        continue;
+      }
+      saida.push(figuraHTML(figura,Number(marca[1])-1));
+      continue;
+    }
+    if(linha.startsWith('## ')) {
+      saida.push(`<h3 class="comunicado-intertitulo">${e(linha.slice(3))}</h3>`);
+      continue;
+    }
+    saida.push(`<p>${comNegrito(linha)}</p>`);
   }
-  ).join('');
+  return saida.join('');
 }
 // Faixa da lista: imagem à esquerda; origem, categoria e data; título;
 // subtítulo; e o texto até onde couber. A faixa inteira leva à página do
@@ -133,7 +160,9 @@ export function paginaComunicado({item,colecao},{sistema=null}={}) {
   // à direita): o texto ocupa a largura toda, justificado, e as imagens flutuam
   // dentro dele. Abaixo da matéria, as ações e, lado a lado, a ficha e "Mais
   // comunicados" (este entra pelo app.js, que tem a lista).
-  const figura=src?`<figure class="comunicado-figura"><img src="${e(comVersao(src))}" alt="${e(item.imagemAlt||'')}"></figure>`:'';
+  // A peça original (cartaz, infográfico) costuma ter letra miúda: como nas
+  // figuras do texto, clicar abre a imagem inteira em outra aba.
+  const figura=src?`<figure class="comunicado-figura"><a href="${e(comVersao(src))}" target="_blank" rel="noopener noreferrer" title="Abrir a imagem inteira em outra aba"><img src="${e(comVersao(src))}" alt="${e(item.imagemAlt||'')}"></a></figure>`:'';
   return `<article class="comunicado-pagina${src?' com-figura':''}" data-origem="${e(item.origem||'')}" aria-labelledby="comunicado-titulo"><a class="text-btn comunicado-voltar" href="${e(voltar)}" data-route="${e(voltar)}">Voltar para a lista</a><header>${metaDe(item)}<h2 id="comunicado-titulo">${e(item.titulo)}</h2>${item.resumo?`<p class="comunicado-lead">${e(item.resumo)}</p>`:''}</header><div class="comunicado-materia">${figura}<div class="comunicado-texto">${paragrafos}</div>${renderIndicadoresNoticia(item)}</div><footer class="comunicado-rodape">${acoes?`<div class="comunicado-acoes">${acoes}</div>`:''}<div class="comunicado-rodape-grade"><section class="comunicado-ficha" aria-labelledby="comunicado-ficha-titulo"><h3 class="comunicado-ficha-titulo" id="comunicado-ficha-titulo">Ficha do comunicado</h3>${ficha}</section></div></footer></article>`;
 }
 // Capa: uma coluna por origem, no formato de portal de notícias — título da

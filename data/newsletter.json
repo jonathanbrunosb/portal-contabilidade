@@ -33,5 +33,51 @@
         "data": "2026-09-17"
       }
     ]
+  },
+  {
+    "id": "n7-ifrs16-abertura-rit-nova-cara",
+    "origem": "contabilidade",
+    "categoria": "Tecnologia",
+    "titulo": "Sistema de Arrendamentos IFRS 16: novas melhorias disponíveis",
+    "resumo": "O time da Contabilidade segue evoluindo a solução de arrendamentos, com melhorias que ampliam a usabilidade, a qualidade da informação e a experiência de acesso à ferramenta.",
+    "conteudoCompleto": "Dando continuidade à evolução do Sistema de Arrendamentos – IFRS 16 / CPC 06 (R2), desenvolvido pelo time da Contabilidade, informamos a disponibilização de duas novas melhorias:\n• **Abertura RIT:** nova funcionalidade para consulta das obrigações de arrendamento por vencimento, com segregação entre curto e longo prazo, detalhamento do cronograma financeiro e exportação para Excel.\n• **Nova cara do sistema:** reformulação da tela de login, proporcionando uma experiência de acesso mais moderna, intuitiva e alinhada à identidade corporativa.\nAs novidades reforçam nosso compromisso com a melhoria contínua da ferramenta, a centralização das informações e a eficiência dos processos contábeis.\nConfira no material as novidades implementadas!\nAtenciosamente,\n**Time de Contabilidade**",
+    "dataPublicacao": "2026-09-21",
+    "dataVigencia": null,
+    "fonte": "Time de Contabilidade — e-mail de Jonathan Bruno de 21/09/2026, \"Sistema de Arrendamentos IFRS 16 | Novas melhorias disponíveis\"",
+    "link": null,
+    "documento": null,
+    "imagem": "assets/images/comunicados/ifrs16-melhorias-2026-09.webp",
+    "imagemAlt": "Peça \"Sistema de Arrendamentos IFRS 16 / CPC 06 (R2) — Novidades da solução\": à esquerda, a nova funcionalidade Abertura RIT, com a tabela das obrigações de arrendamento por vencimento e a conciliação; à direita, a nova cara do sistema, com a tela de login redesenhada; no rodapé, mais clareza nas informações, melhor experiência de uso e evolução contínua da ferramenta.",
+    "statusSistema": "Ativo",
+    "sistemaId": "s1",
+    "empresasImpactadas": [
+      "Gerência de Contabilidade"
+    ],
+    "areaResponsavel": "Gerência de Contabilidade",
+    "responsavel": "Jonathan Bruno",
+    "nivelImpacto": "Moderado",
+    "palavrasChave": [
+      "IFRS 16",
+      "CPC 06",
+      "arrendamento",
+      "Abertura RIT",
+      "obrigações por vencimento",
+      "curto e longo prazo",
+      "cronograma financeiro",
+      "Excel",
+      "tela de login"
+    ],
+    "status": "Publicado",
+    "aprovadoPor": "Eduardo dos Santos Rocha",
+    "dataAprovacao": "2026-09-21",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Eduardo dos Santos Rocha",
+        "data": "2026-09-21"
+      }
+    ]
   }
 ]

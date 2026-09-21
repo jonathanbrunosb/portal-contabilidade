@@ -194,7 +194,8 @@ no menu ou na capa.
 - **Origem do conteúdo (decisão de 21/09/2026):** todo item publicado em
   `data/*.json` tem `origem` — `contabilidade` (criado e gerido pela Gerência),
   `equatorial` (do Grupo, para a empresa toda) ou `externo` (de fora do Grupo).
-  **O critério é quem escreveu, não o tema.** Item novo sem `origem` é
+  **O critério é quem escreveu, não o tema** (exceção do usuário: comunicado
+  da Diretoria de Controladoria sobre a própria área é Contabilidade). Item novo sem `origem` é
   cadastro incompleto. Na tela: abas por origem em Comunicação (pedido do
   usuário); filtro "Origem" em Documentos → Todos e na busca global; selo
   cheio `.selo-origem` onde a tela mistura origens; linha "Origem" em toda

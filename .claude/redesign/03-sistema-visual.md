@@ -513,7 +513,10 @@ o que fica dentro.
 **O critério é quem escreveu o conteúdo, não o tema** (decisão do usuário em
 21/09/2026). A análise da equipe sobre a IFRS 18 é Contabilidade; a notícia
 reproduzida da ANEEL é Externo; a deliberação do Grupo é Equatorial. O tema
-continua em `categoria`/`grupo`.
+continua em `categoria`/`grupo`. **Exceção pedida pelo usuário (21/09/2026):**
+comunicado da Diretoria de Controladoria sobre a estrutura da própria área —
+a Movimentação de 14/05/2026, enviada pela Comunicação do Grupo — é
+Contabilidade; a `fonte` continua dizendo quem enviou.
 
 - **Onde o selo aparece:** onde a tela **mistura** origens: faixas da
   Comunicação (aba "Todos" e também nas de origem, como etiqueta do tipo) e
@@ -606,6 +609,24 @@ coluna de 800 px, e texto e imagens em colunas separadas — deixavam tela vazia
 No `conteudoCompleto`, `## Título` vira `.comunicado-intertitulo` (`--fs-lg`,
 peso forte) e `[figura N]` põe `.comunicado-figura-texto` — imagem com borda e
 `--raio-md`, que abre inteira em outra aba ao clicar, e legenda em `--fs-sm`.
+A imagem do topo (`.comunicado-figura`) também abre inteira ao clicar: a peça
+original costuma ter letra miúda (a do IFRS 16 tem uma tabela).
+
+**Comunicado tirado de e-mail (21/09/2026, noite — "preservar sempre a fonte
+original").** O texto é a **transcrição** do e-mail, com os erros de digitação
+do original; saem só as saudações ("Prezados(as), boa tarde!"). A peça e as
+fotos são as do próprio e-mail, e a ficha diz de onde veio (`fonte`: remetente,
+data, assunto e quem assina). Duas marcas a mais no texto:
+
+- `**trecho**` é o **negrito** do original (`<strong>`, peso forte). O texto é
+  escapado antes da troca, então nunca vira HTML; na faixa e na busca as marcas
+  somem.
+- Figura com `"tipo":"retrato"` é a **foto de uma pessoa**: em vez da figura de
+  49%, vira `.comunicado-perfil` — a foto à esquerda
+  (`clamp(96px,24%,168px)`) e o parágrafo seguinte contornando, dentro de um
+  bloco `flow-root`. Cada perfil começa com a sua foto e o próximo parágrafo
+  não sobe para o lado dela, como no e-mail de movimentação do Grupo. A foto
+  não abre em outra aba (não há o que ampliar).
 
 **Realce dos comunicados e das abas (21/09/2026, noite, pedido do usuário).**
 Um vocabulário só para "este item está sob o mouse ou o foco", com os tokens

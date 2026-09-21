@@ -138,9 +138,11 @@ export function paginaComunicado({item,colecao},{sistema=null}={}) {
 }
 // Capa: uma coluna por origem, no formato de portal de notícias — título da
 // coluna na cor da origem, um destaque com o título sobre a imagem e, abaixo,
-// uma lista com miniatura e título. O destaque é o mais recente com imagem (ou
-// o mais recente, se nenhum tiver).
-const LISTA_POR_COLUNA=4;
+// uma lista com miniatura e título. Cada coluna mostra sempre os 4 mais
+// recentes da origem (pedido do usuário em 21/09/2026: antes era o destaque
+// mais outros 4, e o conjunto mudava conforme quem tinha imagem). O destaque é
+// o mais recente dos 4 que tiver imagem; os outros seguem em ordem de data.
+const POR_COLUNA=4;
 function destaqueDaColuna({item,colecao}) {
   const destino=hashComunicado(colecao,item.id);
   return `<a class="coluna-destaque" href="${e(destino)}" data-route="${e(destino)}">${midia(item,'midia-comunicado coluna-destaque-midia')}<span class="coluna-destaque-titulo">${e(item.titulo)}</span></a>`;
@@ -154,9 +156,9 @@ export function itemDaColuna({item,colecao}) {
 }
 export function colunasOrigem(lista) {
   return Object.entries(ORIGENS).map(([origem,rotulo])=> {
-    const itens=lista.filter(({item})=>item.origem===origem);
+    const itens=lista.filter(({item})=>item.origem===origem).slice(0,POR_COLUNA);
     const destaque=itens.find(({item})=>safeURL(item.imagem))||itens[0];
-    const demais=itens.filter(c=>c!==destaque).slice(0,LISTA_POR_COLUNA);
+    const demais=itens.filter(c=>c!==destaque);
     const mais=`#central/comunicacao-${origem}`;
     const corpo=destaque
       ?`${destaqueDaColuna(destaque)}${demais.length?`<ul class="coluna-lista">${demais.map(itemDaColuna).join('')}</ul>`:''}<a class="coluna-mais" href="${mais}" data-route="${mais}">Veja mais em ${rotulo}</a>`

@@ -111,28 +111,12 @@
       "responsavel": "Administração do portal"
     },
     {
-      "nome": "Cronograma de Fechamento",
-      "icon": "briefcase",
-      "link": "https://eqtl-cronograma-fechamento.pufach.easypanel.host/",
-      "descricao": "Cronograma de fechamento contábil da Gerência.",
-      "imagem": "assets/atalhos/cronograma-fechamento.svg",
-      "responsavel": "Administração do portal"
-    },
-    {
       "nome": "SharePoint",
       "origem": "equatorial",
       "icon": "globe",
       "link": null,
       "descricao": "Acesso corporativo. Cadastre o endereço validado pela organização.",
       "imagem": "assets/atalhos/sharepoint.svg",
-      "responsavel": "Administração do portal"
-    },
-    {
-      "nome": "Auditoria",
-      "icon": "shield",
-      "link": "https://duducarinhoso.github.io/eqtl_controle_planejamento/#/p/planejamento/s/a51370da-2adb-4ee9-8cfa-52396949ae92",
-      "descricao": "Controle de planejamento da auditoria.",
-      "imagem": "assets/atalhos/auditoria.svg",
       "responsavel": "Administração do portal"
     },
     {
@@ -151,16 +135,6 @@
       "link": "https://www.onesourcetax.com/",
       "descricao": "Suíte fiscal da Thomson Reuters usada na apuração e nas obrigações tributárias. O acesso entra pelo SSO corporativo.",
       "imagem": "assets/atalhos/onesource.svg",
-      "responsavel": "Administração do portal"
-    },
-    {
-      "nome": "Outros",
-      "icon": "link",
-      "link": null,
-      "target": "central",
-      "tab": "sistemas",
-      "descricao": "Veja a lista completa de sistemas da área.",
-      "imagem": null,
       "responsavel": "Administração do portal"
     }
   ],

@@ -538,11 +538,7 @@ CARTOES = {
     'atalhos': {
         'sap': marca('SAP', 'sap', 'NWBC · Produção'),
         'sap-hana-qa': marca('SAP', 'sap', 'HANA · Ambiente QA'),
-        'cronograma-fechamento': showcase('Cronograma de Fechamento', 'cronograma-logo.png',
-                                          'Cronograma de Fechamento'),
         'sharepoint': marca('Microsoft SharePoint', 'sharepoint', 'SharePoint'),
-        'auditoria': showcase('Portal da Contabilidade, controle de auditoria',
-                              'auditoria-logo.png', 'Portal da Contabilidade'),
         'snowflake': marca('Snowflake', 'snowflake'),
         'onesource': assinatura('ONESOURCE, da Thomson Reuters', 'onesource', 'Thomson Reuters'),
     },

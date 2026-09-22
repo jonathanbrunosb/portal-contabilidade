@@ -6,6 +6,12 @@
 
 ## 2026-09-22
 
+### BMP e RIT (ANEEL) em Portais e Links › Externos
+- **Era:** o usuário pediu o `http://bmp2.aneel.gov.br/UploadRit.aspx` nos Externos, com o nome "BMP e RIT - Envio e Consulta", e deixou a página aberta no Chrome para mapear a identidade da arte.
+- **Solução:** registro `bmp-rit` em `data/externos.json` (`destino: portais-externos`, grupo "Setor elétrico", observação sobre o acesso do agente e o XML do RIT). Arte no modo tela, composta por `.claude/tools/arte_bmp.py` (registrada como `pronto` no `arte-marcas.py`): barra verde do governo, cabeçalho azul em listras de 2 px, faixa do menu com as abas chanfradas, faixa do título "RIT" e o quadro "Orientação".
+- **Detalhes técnicos:** a página foi lida numa aba nova do Chrome do usuário (a sessão dele); as cores vieram dos pixels das imagens de fundo do site (`fundoCabecalho.jpg`, `fundoMenu.png`, `m_niv01_bg.png`, `fundoCabecalhoTitulo.png`) lidos por canvas no navegador — nada foi baixado — e a tipografia do CSS (Verdana). A identificação de quem estava logado ficou de fora. Rodar o gerador mudou três artes que não eram do assunto (Pillow); elas voltaram ao commitado.
+- **Verificação:** TESTES.md, "BMP e RIT nos Externos — 22/09/2026".
+
 ### Links do ECD e do ECF no gov.br
 - **Era:** os cartões SPED — ECD e SPED — ECF (Documentos & Normas › Obrigações acessórias) apontavam para o portal antigo do SPED (`sped.rfb.gov.br/projeto/show/273` e `/269`); o usuário mandou os endereços novos.
 - **Solução:** `data/documentos.json` (`sped-ecd`, `sped-ecf`): `link` para `https://www.gov.br/sped/pt-br/assuntos/escrituracoes-digitais/ecd` e `/ecf`, `verificadoEm` 2026-09-22 e a descrição refeita pelo que a página nova traz (regulamentação, comunicados, manuais e documentos técnicos, perguntas frequentes e o validador). A arte (Receita Federal, rótulo "SPED · ECD/ECF") continua valendo.

@@ -29,6 +29,7 @@ from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import arte_arrendamento  # noqa: E402  (tela do IFRS 16, composta a parte)
+import arte_bmp  # noqa: E402  (tela do BMP/RIT da ANEEL, composta a parte)
 
 MARCAS = 'assets/marcas'
 TELAS = 'projeto/marcas-telas'   # insumo do gerador; nao vai para o site
@@ -618,6 +619,8 @@ CARTOES = {
         'datylon-graficos': marca('Datylon', 'datylon'),
         'coolors-paletas': marca('Coolors', 'coolors'),
         'ilovepdf': marca('iLovePDF', 'ilovepdf'),
+        # Tela do sistema, lida no Chrome do usuário em 22/09/2026 (arte_bmp.py).
+        'bmp-rit': {'alt': 'BMP e RIT, sistema da ANEEL', 'pronto': arte_bmp.cartao},
     },
 }
 

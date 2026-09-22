@@ -203,7 +203,7 @@ como estado temporário, nunca como entrega.
 ## Passo 5 — Conferir
 
 ```bash
-start http://localhost:5500/projeto/artes/contato.html   # as 61, no tamanho real do cartão
+start http://localhost:5500/projeto/artes/contato.html   # todas, no tamanho real do cartão
 start http://localhost:5500/projeto/artes/telas.html     # as do modo tela, ampliadas
 ```
 
@@ -235,7 +235,8 @@ imagem não desenhou.
 | Conteúdo **cortado** na borda | `object-fit: cover` corta até 10% de cada lado | nada essencial fora de **60 px nas laterais e 44 px em cima e embaixo** do quadro 440×400 |
 | Identidade **não aparece** no site | você abriu em janela estreita | 1600 px |
 | Site da área **não abre** nesta máquina (`*.contabilidade-eqtl.com`) | o firewall da rede (FortiGuard) bloqueia o domínio como "Unrated" e re-assina o certificado — Edge headless, curl e o painel do app recebem erro ou a página de bloqueio | não clique em "Proceed": leia pelo Chrome do usuário (Claude in Chrome) ou peça a página salva (Ctrl+S) — ela traz o CSS e as imagens em `<nome>_files/` e abre offline no Edge. Foi o caminho do IFRS 16 em 21/09 |
-| Tela **composta demais** para os campos do spec | painel dividido por curva, várias camadas (IFRS 16, login de 21/09) | escreva a composição num módulo à parte e registre `{'alt': ..., 'pronto': funcao}` em `CARTOES` — ver `arte_arrendamento.py` |
+| Tela **composta demais** para os campos do spec | painel dividido por curva, várias camadas (IFRS 16, login de 21/09); sistema antigo feito de faixas e abas (BMP e RIT da ANEEL, 22/09 — `arte_bmp.py`, cores lidas dos pixels das imagens de fundo do site pelo navegador, sem baixar nada) | escreva a composição num módulo à parte e registre `{'alt': ..., 'pronto': funcao}` em `CARTOES` — ver `arte_arrendamento.py` |
+| Rodar o gerador **muda artes que ninguém tocou** | a recodificação dos PNGs embutidos varia com a versão do Pillow (22/09: Paytrack, Portal do Empregado e Qulture saíram diferentes) — e as demais voltam só com outra quebra de linha | depois de rodar, `git checkout --` nas artes que não são do assunto; commite só a arte nova |
 
 ---
 

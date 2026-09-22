@@ -361,6 +361,19 @@ identificado:
 - **375 px**: a caixa ocupa a largura do campo (16–359 px), sem rolagem
   lateral; console limpo em todos os passos.
 
+## BMP e RIT nos Externos — 22/09/2026
+
+- **Cartão** "BMP e RIT - Envio e Consulta" em Portais e Links › Externos (7
+  cartões), rótulo "Setor elétrico", domínio `bmp2.aneel.gov.br` no rodapé;
+  Acessar abre `http://bmp2.aneel.gov.br/UploadRit.aspx`. Ficha do "i" com a
+  descrição e a observação (acesso do agente, XML, Irregular/Inadimplente).
+- **Arte** (`assets/externos/bmp-rit.svg`, `arte_bmp.py`): a tela do sistema —
+  barra do governo, cabeçalho listrado "BMP / Balancete Mensal Padronizado",
+  abas de canto chanfrado e a faixa "RIT / Relatório de Informações
+  Trimestrais"; carrega em 1366 e 375 px. A identificação de quem estava logado
+  no Chrome do usuário não entrou.
+- Busca do cabeçalho: "rit" sugere o cartão; console limpo.
+
 ## Limites e checklist para homologação corporativa
 
 Não houve navegação nos sistemas reais, pois seus endereços não foram fornecidos. Downloads foram validados pelo destino HTTP e atributo de download; o fluxo de salvamento do navegador não foi homologado separadamente. Pausa por hover, preferência de movimento, navegação completa por teclado, zoom de 200% e políticas específicas de Chrome/Edge devem integrar a homologação corporativa. A implementação desses comportamentos está no código, mas não se declara aqui uma certificação de acessibilidade.

@@ -69,6 +69,18 @@
     "destino": "portais-externos"
   },
   {
+    "id": "bmp-rit",
+    "origem": "externo",
+    "nome": "BMP e RIT - Envio e Consulta",
+    "descricao": "Sistema da ANEEL para enviar e consultar o Balancete Mensal Padronizado (BMP) e o Relatório de Informações Trimestrais (RIT) dos agentes do setor elétrico.",
+    "icon": "chart",
+    "grupo": "Setor elétrico",
+    "link": "http://bmp2.aneel.gov.br/UploadRit.aspx",
+    "imagem": "assets/externos/bmp-rit.svg",
+    "observacao": "Exige o acesso do agente cadastrado na ANEEL. O RIT vai em arquivo XML e pode ser reenviado; enviado fora do prazo fica como \"Irregular\", e competência sem envio, como \"Inadimplente\".",
+    "destino": "portais-externos"
+  },
+  {
     "id": "ilovepdf",
     "origem": "externo",
     "nome": "iLovePDF",

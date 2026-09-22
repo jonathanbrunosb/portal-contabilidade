@@ -6,6 +6,11 @@
 
 ## 2026-09-22
 
+### Links do ECD e do ECF no gov.br
+- **Era:** os cartões SPED — ECD e SPED — ECF (Documentos & Normas › Obrigações acessórias) apontavam para o portal antigo do SPED (`sped.rfb.gov.br/projeto/show/273` e `/269`); o usuário mandou os endereços novos.
+- **Solução:** `data/documentos.json` (`sped-ecd`, `sped-ecf`): `link` para `https://www.gov.br/sped/pt-br/assuntos/escrituracoes-digitais/ecd` e `/ecf`, `verificadoEm` 2026-09-22 e a descrição refeita pelo que a página nova traz (regulamentação, comunicados, manuais e documentos técnicos, perguntas frequentes e o validador). A arte (Receita Federal, rótulo "SPED · ECD/ECF") continua valendo.
+- **Verificação:** as duas páginas abertas no navegador do app; no portal, os dois cartões e a sugestão da busca ("ecd") levam aos endereços novos.
+
 ### Busca do cabeçalho com sugestões
 - **Era:** o usuário disse que a busca do topo "não está funcionando" e pediu a lista de sugestões abaixo do campo ao digitar. Ela funcionava, mas mostrava os resultados numa seção abaixo do carrossel (a 537 px de uma janela de 657 — fora da tela), navegava para a capa a cada letra e comparava o JSON inteiro de cada registro ("link" achava 59 itens pelo nome do campo). Os cartões de resultado só abriam a ficha, não o destino.
 - **Solução:** caixa de sugestões abaixo do campo (padrão combobox da WAI-ARIA), agrupada pela seção do menu, com o trecho encontrado marcado; Enter sem escolha abre a página `#busca/<termo>` com os filtros "Onde" e "Origem". Escolher leva ao destino (página, comunicado, link em outra aba ou ficha). O índice passou a incluir as páginas do portal, os documentos e as pessoas das equipes, só com os campos que uma pessoa usaria.

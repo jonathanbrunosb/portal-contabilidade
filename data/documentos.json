@@ -48,22 +48,22 @@
     "origem": "externo",
     "grupo": "Obrigações acessórias",
     "titulo": "SPED — Escrituração Contábil Digital (ECD)",
-    "descricao": "Página do projeto ECD no SPED: manuais, leiautes, programa validador e publicações.",
+    "descricao": "Página da ECD no SPED (gov.br): regulamentação, comunicados, manuais e documentos técnicos, perguntas frequentes e o validador.",
     "imagem": "assets/documentos/sped-ecd.svg",
     "fonte": "Receita Federal — SPED",
-    "link": "http://sped.rfb.gov.br/projeto/show/273",
-    "verificadoEm": "2026-09-19"
+    "link": "https://www.gov.br/sped/pt-br/assuntos/escrituracoes-digitais/ecd",
+    "verificadoEm": "2026-09-22"
   },
   {
     "id": "sped-ecf",
     "origem": "externo",
     "grupo": "Obrigações acessórias",
     "titulo": "SPED — Escrituração Contábil Fiscal (ECF)",
-    "descricao": "Página do projeto ECF no SPED: manuais, leiautes, programa e publicações.",
+    "descricao": "Página da ECF no SPED (gov.br): regulamentação, comunicados, manuais e documentos técnicos, perguntas frequentes e o validador.",
     "imagem": "assets/documentos/sped-ecf.svg",
     "fonte": "Receita Federal — SPED",
-    "link": "http://sped.rfb.gov.br/projeto/show/269",
-    "verificadoEm": "2026-09-19"
+    "link": "https://www.gov.br/sped/pt-br/assuntos/escrituracoes-digitais/ecf",
+    "verificadoEm": "2026-09-22"
   },
   {
     "id": "lei-6404",

@@ -6,6 +6,8 @@
 
 ## 2026-09-22
 
+> Tudo commitado **por assunto** na branch `ajustes-frontend-dudu` (`4c8a552`..`8ac9f49`, 8 commits) + o commit do checkpoint, sem push. A pergunta "onde editar a capa" foi respondida e está em `PROJETO_ESTADO_ATUAL.md` § 1.5; as tarefas que o usuário deixou para depois estão lá nos itens 10–13.
+
 ### Três comunicados do MigraSAP (Equatorial)
 - **Era:** o usuário pôs em `projeto/comunicados-emails/` três e-mails do MigraSAP (10/09 replanejamento do Go Live; 17/09 Sociedade Parceira; 18/09 Tipo de Movimento) para virarem comunicados da Equatorial.
 - **Solução:** `eqtl-migrasap-replanejamento-go-live`, `eqtl-migrasap-sociedade-parceira` e `eqtl-migrasap-tipo-de-movimento` em `data/noticias.json` (categoria SAP): texto transcrito da peça (erros do original mantidos, sem a saudação), negritos e intertítulos do original, telas do SAP recortadas como figuras, `fonte` com e-mail, data, assunto e quem assina, e o e-mail do projeto embutido no rodapé da peça (`links`, regra do dia).
@@ -54,7 +56,7 @@
 
 ## 2026-09-21
 
-> O trabalho deste dia foi commitado **por assunto** na branch `ajustes-frontend-dudu` (`59832ff`..`8e7b0ef` + o commit do checkpoint), sem push.
+> O trabalho deste dia foi commitado **por assunto** na branch `ajustes-frontend-dudu` (`59832ff`..`8e7b0ef` + o checkpoint `da4c663`; depois, `e6b74bf`, `fc2c40a` e `116ef01`), sem push.
 
 ### Capa da Movimentação com a Gerente e os executivos
 - **Era:** a capa da Movimentação era o banner "Carreira Equatorial"; o usuário pediu a Alexandra Furtado como capa, no canto esquerdo, e os 4 executivos da Contabilidade em quadros ao lado.

@@ -2,8 +2,8 @@
 
 > **Documento vivo — fonte única de estado.** Pode ser atualizado ou sobrescrito livremente sempre que o projeto evoluir. Histórico e rollback ficam no **git**. Itens concluídos vão para `PROJETO_ESTADO_RESOLVIDOS.md`. O detalhe de design (decisões travadas do redesign, medidas, receitas) continua em `.claude/redesign/00-estado-e-proximos-passos.md` e `.claude/redesign/03-sistema-visual.md`. **Regras de trabalho e de commit:** `.claude/CLAUDE.md`.
 >
-> **Snapshot técnico** — Data: **2026-09-21 (noite)**
-> **Git:** branch `ajustes-frontend-dudu`, **21 commits à frente de `6b6273c`**, um por assunto (seção 2); depois do checkpoint ("Documentar o dia 21/09 e adotar commit por assunto") vieram o dos comunicados tirados dos e-mails (IFRS 16 e Movimentação da Controladoria) e os dois da capa da Movimentação com as fotos (a larga e a miniatura 8:7); em 22/09, a busca do cabeçalho com sugestões. **Nada enviado** (`git push` só quando o usuário pedir). `main` não recebeu nada.
+> **Snapshot técnico** — Data: **2026-09-22**
+> **Git:** branch `ajustes-frontend-dudu`, **25 commits à frente de `6b6273c`**, um por assunto (seção 2); depois do checkpoint ("Documentar o dia 21/09 e adotar commit por assunto") vieram o dos comunicados tirados dos e-mails (IFRS 16 e Movimentação da Controladoria) e os dois da capa da Movimentação com as fotos (a larga e a miniatura 8:7); em 22/09, a busca do cabeçalho com sugestões, os links do ECD e do ECF, os cartões do BMP e RIT e do Claude nos Externos e este registro das tarefas deixadas para depois. **Nada enviado** (`git push` só quando o usuário pedir). `main` não recebeu nada.
 > **App/Stack:** HTML + CSS + JavaScript puro (ES modules), sem build, sem CDN. Conteúdo em `data/*.json`. Servidor estático Python na porta **5500** (`.claude/launch.json`, nome `portal`). Backend **opcional** `server/server.js` (Node, porta 8787), ligado por `window.PORTAL_API_ENABLED = true`.
 > **Working tree:** limpo depois do commit do checkpoint. Cache-buster: `?v=20260922-1`.
 > **Máquina:** `projeto/` (material interno) e as skills de terceiros estão no disco, fora do Git (`.gitignore`).
@@ -144,7 +144,7 @@
 ## 6. Próximos passos imediatos
 
 1. **Resolver a hospedagem antes de qualquer merge na `main`** — `pages.yml` publica site aberto; a branch tem conteúdo interno.
-2. **Enviar a branch** (`git push`) quando o usuário pedir — 21 commits locais.
+2. **Enviar a branch** (`git push`) quando o usuário pedir — 25 commits locais.
 3. **Código da Administração**: o usuário recupera o código na sessão de 16/09 (commit `9d9736c`) ou define um novo com `.claude/tools/trocar-codigo-admin.py`.
 4. **Conteúdo dos moldes do carrossel** (`data/destaques.json`): fundo licenciado para o IFRS 16 (hoje a arte da tela de entrada); texto certo do Cronograma; Auditoria "Em desenvolvimento" ou "Ativo"; "Executiva IV" ou "Contabilidade IV"; descrição própria do Controle de Horas.
 5. **Link da reunião** da RR (25/09) em `data/agenda.json › link`.
@@ -152,7 +152,22 @@
 7. **Reduzir o carrossel a 5 no ar** — hoje 6; candidato: Controle de Horas.
 8. **Notícia da ANEEL**: trocar `responsavel`/`aprovadoPor` "Marina Oliveira" (fictícia) e `areaResponsavel` "Normas e Reporte".
 9. **Avisos com prazo** (se o usuário quiser): SIPAT 21–25/09 e Data Services legado até 30/09.
-10. Opcional: `/impeccable init` (o projeto não tem `PRODUCT.md`) e atualizar o Impeccable (v3.9.1 → v4.3.1, `npx impeccable update`).
+10. **Permissão "gerencial" para Eduardo e Jonathan** — mapeado em 22/09, **o usuário vai fazer depois** (pediu para não mexer ainda).
+    - *Por quê:* o Painel Editorial (menu Gestão) exige a capacidade `gerencial`; os dois perfis de `data/usuarios.json` têm `permissoes: ["conteudo","time","administracao"]` e, por isso, **não veem** Gestão nem o Painel Editorial — justamente quem administra o portal.
+    - *Onde:* `data/usuarios.json` › "Jonathan Bruno Santos Bezerra" e "Eduardo dos Santos Rocha" › `permissoes`: acrescentar `"gerencial"`. Nenhuma mudança de código (`hasAccess()` em `js/auth.js` lê a lista; `TARGET_ACCESS`/`SECTION_ACCESS` em `js/app.js` já ligam Gestão a `gerencial`).
+    - *O que muda na tela:* aparece o menu **Gestão** (Painel da Gerência, Processos críticos, Agenda & Entregas, Painel Editorial), o item "Alertas da gerência" no menu do usuário, e a busca passa a achar processos e entregas. Os painéis de gestão mostram "Nenhum … cadastrado ainda" enquanto `kpis`, `processos.json`, `agenda.json` e `entregas.json` estiverem vazios.
+    - *Para editar pelo painel:* servidor ligado (`INICIAR_API.cmd`) e a página com `window.PORTAL_API_ENABLED = true` — pela cópia de teste da seção 7, nunca no `index.html` publicado. Sem servidor, o painel abre só para leitura.
+    - *Decidir junto:* se mais alguém recebe `gerencial`; e se vale separar quem escreve de quem aprova (capacidade `editorial-aprovar`, citada no README, "Limitações conhecidas").
+    - *Pronto quando:* identificado como Eduardo (e como Jonathan), o menu Gestão aparece e o Painel Editorial lista os comunicados; registrar em TESTES.md.
+11. **Tela para cadastrar Avisos** — mapeado em 22/09, **o usuário vai fazer depois**.
+    - *Por quê:* Avisos da capa só se editam à mão em `data/avisos.json` (hoje vazio — a capa mostra só a RR, que vem de `data/agenda.json` com `"naCapa": true`).
+    - *Campos do aviso* (README, "Destaques e avisos da capa"): `id`, `tipo` (`extra` | `prazo` | `info`), `titulo`, `texto`, `janela` (quando), `area`, `origem`, `inicio` e `fim` (AAAA-MM-DD). A capa mostra até 3 vigentes, Extra primeiro, depois até 2 compromissos da agenda.
+    - *Proposta:* uma aba **Avisos** na Administração, no molde da aba Carrossel — lista com a situação (No ar, Agendado, Encerrado, Pausado), Novo aviso, Editar, Pausar/Excluir; formulário com os campos acima e a prévia da linha como ela sai na capa (tarja do tipo + título + janela/área).
+    - *Onde mexer:* `index.html` (botão `admin-tab-avisos` em `#admin-tabs`); `js/app.js` (`renderAdmin()` com o caso `avisos`, formulário no molde de `openDestaqueForm()`, gravação com `apiWrite('avisos', …)` e `renderHome()` depois de salvar); `data/config.json › navegacao` (item "Avisos" em Administração com `adminTab: "avisos"`); `css/styles.css` só se a lista precisar de algo além do que a aba Carrossel já usa. O `server/server.js` **já aceita** a coleção `avisos` (`LIST_COLLECTIONS`) — não precisa mexer no servidor.
+    - *Decidir junto:* se a mesma aba também cadastra os compromissos da agenda que vão para a capa (`naCapa`), e se um aviso pode ter link.
+    - *Pronto quando:* com o servidor ligado, um aviso criado pela tela aparece na capa dentro do período e some depois do `fim`; sem servidor, a aba abre só para leitura, com aviso; TESTES.md atualizado.
+12. **Busca: termos curtos no meio da palavra** (achado em 22/09 ao conferir o BMP e RIT; decidir antes de mexer). "rit" também traz "Escrituração" (SPED) e "restrito" (EQTL Previ), porque o termo casa em qualquer ponto da palavra. Opção: em `js/busca.js › pontuar()`, exigir início de palavra para termos de até 3 letras quando o casamento não for no título. Custo: "sap" deixaria de achar comunicados que só dizem "MigraSAP" no texto (continuam os que têm no título).
+13. Opcional: `/impeccable init` (o projeto não tem `PRODUCT.md`) e atualizar o Impeccable (v3.9.1 → v4.3.1, `npx impeccable update`).
 
 ---
 

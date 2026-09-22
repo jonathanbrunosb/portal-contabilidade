@@ -6,6 +6,10 @@
 
 ## 2026-09-22
 
+### Tarefas deixadas para depois, mapeadas
+- **Era:** o usuário quis deixar para depois a permissão "gerencial" dele e do Jonathan (para ver o Painel Editorial) e uma tela de cadastro de Avisos, "mapeado com os detalhes".
+- **Solução:** as duas viraram os itens 10 e 11 de "Próximos passos imediatos" em `PROJETO_ESTADO_ATUAL.md`, com o porquê, onde mexer, o que muda, o que decidir junto e o critério de pronto; o item 12 registra a questão dos termos curtos na busca.
+
 ### Claude em Portais e Links › Externos
 - **Era:** o usuário pediu o `https://claude.ai/` nos Externos.
 - **Solução:** registro `claude` em `data/externos.json` (grupo "Inteligência artificial", descrição e observação no padrão do ChatGPT e do Gemini). Arte no modo marca, como os vizinhos: a logo oficial sobre o fundo da tela de entrada.

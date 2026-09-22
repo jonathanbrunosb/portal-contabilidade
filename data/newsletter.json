@@ -186,5 +186,39 @@
         "data": "2026-09-17"
       }
     ]
+  },
+  {
+    "id": "n7-arrendamentos-ifrs16-atualizacao",
+    "categoria": "COMUNICADO INTERNO",
+    "titulo": "Sistema de Arrendamentos IFRS 16 / CPC 06 (R2): novidades da solução",
+    "resumo": "Nova janela de Abertura RIT para visualização das obrigações por vencimento e login redesenhado trazem mais clareza, melhor experiência de uso e evolução contínua da ferramenta.",
+    "conteudoCompleto": "O time da Contabilidade segue evoluindo o Sistema de Arrendamentos IFRS 16 / CPC 06 (R2), com melhorias que ampliam a usabilidade, a qualidade da informação e a experiência de acesso à ferramenta.\nNova funcionalidade — Abertura RIT: nova janela para visualização da abertura das obrigações de arrendamento por vencimento, trazendo maior apoio à análise e ao reporte das informações, com detalhamento por instituição/credora, cronograma de amortização de principal e juros de longo prazo e conciliação do saldo contábil.\nNova cara do sistema: login redesenhado, interface mais moderna e experiência visual mais intuitiva, reforçando a identidade corporativa da solução.\nEssas evoluções seguem a mesma diretriz das demais soluções da área: mais clareza nas informações, melhor experiência de uso e evolução contínua da ferramenta.",
+    "dataPublicacao": "2026-09-22",
+    "dataVigencia": null,
+    "fonte": "Gerência de Contabilidade",
+    "link": "https://arrendamento.contabilidade-eqtl.com/",
+    "documento": null,
+    "imagem": "assets/images/comunicados/arrendamentos-ifrs16-atualizacao.webp",
+    "imagemAlt": "Comunicado das novidades do Sistema de Arrendamentos IFRS 16 / CPC 06 (R2): nova funcionalidade de Abertura RIT e login redesenhado",
+    "statusSistema": "Ativo",
+    "sistemaId": "s1",
+    "empresasImpactadas": [
+      "Gerência de Contabilidade"
+    ],
+    "areaResponsavel": "Contabilidade IV",
+    "responsavel": "Jonathan Bruno",
+    "nivelImpacto": "Moderado",
+    "status": "Publicado",
+    "aprovadoPor": "Jonathan Bruno",
+    "dataAprovacao": "2026-09-22",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Jonathan Bruno",
+        "data": "2026-09-22"
+      }
+    ]
   }
 ]

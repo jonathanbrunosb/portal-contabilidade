@@ -1,4 +1,4 @@
-import { escapeHTML as e,icon,dateLabel,detailGrid,safeURL,comVersao,normalize,ORIGENS,seloOrigem } from './ui.js?v=20260922-2';
+import { escapeHTML as e,icon,dateLabel,detailGrid,safeURL,comVersao,normalize,ORIGENS,seloOrigem } from './ui.js?v=20260922-3';
 // Comunicação (decisão do usuário em 21/09/2026): a Newsletter Contábil e
 // Notícias & Impactos viraram uma lista só de comunicados, repartida por origem
 // nas abas da seção (Todos, Contabilidade, Equatorial, Externo). Cada
@@ -76,6 +76,18 @@ export function ligarMidias(root) {
     once:true
   }
   ));
+  // Cartaz longo (22/09/2026): a peça do e-mail mais de 1,8 vez mais alta que
+  // larga encolhe até a altura da tela e vira uma coluna estreita; a página
+  // ganha `cartaz-alto` e as figuras do texto passam a ocupar o espaço ao
+  // lado dela no ponto em que o texto as chama (ver o CSS).
+  root.querySelectorAll('.comunicado-figura img').forEach(img=> {
+    const marcar=()=> {
+      if(img.naturalHeight>img.naturalWidth*1.8)img.closest('.comunicado-pagina')?.classList.add('cartaz-alto');
+    };
+    if(img.complete)marcar();
+    else img.addEventListener('load',marcar,{once:true});
+  }
+  );
 }
 const metaDe=item=>`<p class="comunicado-meta">${seloOrigem(item.origem)}<span>${e(item.categoria||'')}</span><time datetime="${e(item.dataPublicacao)}">${e(dateLabel(item.dataPublicacao))}</time></p>`;
 // Marcação leve do texto do comunicado (21/09/2026): uma linha "## Título" abre

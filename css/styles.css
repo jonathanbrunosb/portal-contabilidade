@@ -896,6 +896,22 @@ main {
     font-size:var(--fs-lg)}
 }
 
+/* Cartaz longo (22/09/2026, `cartaz-alto` posto pelo ligarMidias): a peça
+   vira uma coluna estreita à direita, da altura da tela. As figuras do texto
+   não flutuam nem descem para depois dela: ficam no ponto em que o texto as
+   chama, no espaço ao lado da peça (flow-root), com o texto antes e depois. */
+.comunicado-pagina.cartaz-alto .comunicado-figura-texto {
+  float:none;
+  clear:none;
+  display:flow-root;
+  width:fit-content;
+  max-width:100%;
+  margin:6px 0 18px}
+
+.comunicado-pagina.cartaz-alto .comunicado-figura-texto img {
+  width:auto;
+  max-width:100%}
+
 @media(max-width:760px) {
   .comunicado-figura img {
     max-height:70vh}
@@ -2565,7 +2581,7 @@ th,td {
   background:
     linear-gradient(100deg,#071f49f2 0%,#071f49d9 38%,#0b376aa6 62%,#075c8070 85%,#075c8047 100%),
     linear-gradient(90deg,var(--marinho-escuro) 0 2px,color-mix(in srgb,var(--marinho-escuro) 55%,transparent) 18%,transparent 45%) right 0 top 0/var(--ph-foto-largura) 100% no-repeat,
-    url("../assets/images/banner/portal-gerencia-contabilidade.webp?v=20260922-2") right 0 top 30%/auto 420px no-repeat;
+    url("../assets/images/banner/portal-gerencia-contabilidade.webp?v=20260922-3") right 0 top 30%/auto 420px no-repeat;
   background-color:var(--marinho-escuro)}
 
 .ph-row {

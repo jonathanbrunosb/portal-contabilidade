@@ -3,9 +3,9 @@
 > **Documento vivo — fonte única de estado.** Pode ser atualizado ou sobrescrito livremente sempre que o projeto evoluir. Histórico e rollback ficam no **git**. Itens concluídos vão para `PROJETO_ESTADO_RESOLVIDOS.md`. O detalhe de design (decisões travadas do redesign, medidas, receitas) continua em `.claude/redesign/00-estado-e-proximos-passos.md` e `.claude/redesign/03-sistema-visual.md`. **Regras de trabalho e de commit:** `.claude/CLAUDE.md`.
 >
 > **Snapshot técnico** — Data: **2026-09-22**
-> **Git:** branch `ajustes-frontend-dudu`, **25 commits à frente de `6b6273c`**, um por assunto (seção 2); depois do checkpoint ("Documentar o dia 21/09 e adotar commit por assunto") vieram o dos comunicados tirados dos e-mails (IFRS 16 e Movimentação da Controladoria) e os dois da capa da Movimentação com as fotos (a larga e a miniatura 8:7); em 22/09, a busca do cabeçalho com sugestões, os links do ECD e do ECF, os cartões do BMP e RIT e do Claude nos Externos e este registro das tarefas deixadas para depois. **Nada enviado** (`git push` só quando o usuário pedir). `main` não recebeu nada.
+> **Git:** branch `ajustes-frontend-dudu`, **28 commits à frente de `6b6273c`**, um por assunto (seção 2); depois do checkpoint ("Documentar o dia 21/09 e adotar commit por assunto") vieram o dos comunicados tirados dos e-mails (IFRS 16 e Movimentação da Controladoria) e os dois da capa da Movimentação com as fotos (a larga e a miniatura 8:7); em 22/09, a busca do cabeçalho com sugestões, os links do ECD e do ECF, os cartões do BMP e RIT e do Claude nos Externos o registro das tarefas deixadas para depois, a remoção do boletim de Goiás, a regra dos links das imagens dos e-mails e os três comunicados do MigraSAP. **Nada enviado** (`git push` só quando o usuário pedir). `main` não recebeu nada.
 > **App/Stack:** HTML + CSS + JavaScript puro (ES modules), sem build, sem CDN. Conteúdo em `data/*.json`. Servidor estático Python na porta **5500** (`.claude/launch.json`, nome `portal`). Backend **opcional** `server/server.js` (Node, porta 8787), ligado por `window.PORTAL_API_ENABLED = true`.
-> **Working tree:** limpo depois do commit do checkpoint. Cache-buster: `?v=20260922-2`.
+> **Working tree:** limpo depois do commit do checkpoint. Cache-buster: `?v=20260922-3`.
 > **Máquina:** `projeto/` (material interno) e as skills de terceiros estão no disco, fora do Git (`.gitignore`).
 
 ---
@@ -144,7 +144,7 @@
 ## 6. Próximos passos imediatos
 
 1. **Resolver a hospedagem antes de qualquer merge na `main`** — `pages.yml` publica site aberto; a branch tem conteúdo interno.
-2. **Enviar a branch** (`git push`) quando o usuário pedir — 25 commits locais.
+2. **Enviar a branch** (`git push`) quando o usuário pedir — 28 commits locais.
 3. **Código da Administração**: o usuário recupera o código na sessão de 16/09 (commit `9d9736c`) ou define um novo com `.claude/tools/trocar-codigo-admin.py`.
 4. **Conteúdo dos moldes do carrossel** (`data/destaques.json`): fundo licenciado para o IFRS 16 (hoje a arte da tela de entrada); texto certo do Cronograma; Auditoria "Em desenvolvimento" ou "Ativo"; "Executiva IV" ou "Contabilidade IV"; descrição própria do Controle de Horas.
 5. **Link da reunião** da RR (25/09) em `data/agenda.json › link`.

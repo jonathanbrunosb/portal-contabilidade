@@ -6,6 +6,12 @@
 
 ## 2026-09-22
 
+### Três comunicados do MigraSAP (Equatorial)
+- **Era:** o usuário pôs em `projeto/comunicados-emails/` três e-mails do MigraSAP (10/09 replanejamento do Go Live; 17/09 Sociedade Parceira; 18/09 Tipo de Movimento) para virarem comunicados da Equatorial.
+- **Solução:** `eqtl-migrasap-replanejamento-go-live`, `eqtl-migrasap-sociedade-parceira` e `eqtl-migrasap-tipo-de-movimento` em `data/noticias.json` (categoria SAP): texto transcrito da peça (erros do original mantidos, sem a saudação), negritos e intertítulos do original, telas do SAP recortadas como figuras, `fonte` com e-mail, data, assunto e quem assina, e o e-mail do projeto embutido no rodapé da peça (`links`, regra do dia).
+- **Detalhes técnicos:** as peças (um JPG por e-mail, em `cdn.simplificaci.com.br`) foram baixadas com autorização para `projeto/comunicados-emails/<data>-migrasap-*/peca.jpg`; os pixels de rastreamento não. Imagens em `assets/images/comunicados/migrasap-*` (peça, `-capa` e `-tela-lancamento`/`-tela-documento`); a capa do Replanejamento continua a faixa azul do título até completar o 16:9 (a peça tem 794 px e depois da faixa vinha o "Prezados(as),"). Peça longa ganhou o layout `cartaz-alto` (ver 03-sistema-visual § 10). A linha "Dúvidas… Fale conosco" do rodapé saiu do texto: o botão e o trecho na peça levam ao e-mail, e justificada ela abria buracos. Cache-buster 20260922-3.
+- **Verificação:** TESTES.md, "Três comunicados do MigraSAP — 22/09/2026".
+
 ### Links das imagens dos e-mails embutidos nos comunicados
 - **Era:** o usuário pediu que, em comunicado tirado de e-mail, o link que a imagem traz fique embutido na imagem do comunicado e também disponível na Comunicação — nos novos, nos já feitos, e daqui em diante.
 - **Solução:** campo `links` (`{rotulo, url, area, figura}`) com a área de cada trecho em fração da imagem; na página, `imagemComLinks()` põe um `<a>` por trecho sobre a peça (ou faz da imagem inteira o link, com a lupa para ampliar) e cada link vira botão nas ações, sem repetir a fonte nem o sistema. Aceita `mailto:` (ícone `mail` novo em `ui.js`). Aplicado aos já publicados: MigraSAP Verdade ou Mentira (botão e QR Code → quiz; e-mail), Agentes da Inovação (e-mail) e IFRS 16 (a peça inteira → sistema). Segurança digital e Movimentação não tinham link.

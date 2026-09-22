@@ -406,6 +406,26 @@ também disponível na Comunicação. Conferido com Playwright em 1366 px:
   link direto do IFRS 16 e marca como rastreador as do MigraSAP, do Engaja+ e
   dos boletins de Goiás. Console limpo.
 
+## Três comunicados do MigraSAP — 22/09/2026
+
+E-mails da Comunicação Grupo Equatorial de 10, 17 e 18/09 (peças baixadas com
+autorização do usuário), origem Equatorial. Conferido com Playwright em 1366 e
+375 px:
+
+- **Aba Equatorial** com 6, em ordem de data: Tipo de Movimento (18/09),
+  Segurança digital e Sociedade Parceira (17/09), Agentes da Inovação,
+  Replanejamento (10/09) e Verdade ou Mentira. Na capa, o destaque da coluna
+  Equatorial é o Tipo de Movimento.
+- **Replanejamento do Go Live**: texto sem figuras; o e-mail do rodapé da peça
+  é um trecho clicável (289×28 em 1366) e um botão.
+- **Sociedade Parceira** e **Tipo de Movimento**: 3 intertítulos cada, 2 telas
+  do SAP como figuras com legenda, nenhum `**` à mostra. Peça longa
+  (`cartaz-alto`): as telas ficam logo depois do parágrafo que as chama, ao
+  lado da peça (em 1366, 649 px de largura a partir da margem do texto).
+- Botão "Dúvidas: proj.migrasap@…" nos três; sem rolagem lateral; console
+  limpo. O trecho do e-mail na peça longa encolhe com ela (103×10 em 1366) —
+  o botão logo abaixo leva ao mesmo endereço.
+
 ## Limites e checklist para homologação corporativa
 
 Não houve navegação nos sistemas reais, pois seus endereços não foram fornecidos. Downloads foram validados pelo destino HTTP e atributo de download; o fluxo de salvamento do navegador não foi homologado separadamente. Pausa por hover, preferência de movimento, navegação completa por teclado, zoom de 200% e políticas específicas de Chrome/Edge devem integrar a homologação corporativa. A implementação desses comportamentos está no código, mas não se declara aqui uma certificação de acessibilidade.

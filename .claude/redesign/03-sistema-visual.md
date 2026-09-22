@@ -662,6 +662,14 @@ data, assunto e quem assina). Duas marcas a mais no texto:
     peça ou de um link direto. `.claude/tools/msgread.py` lista as imagens com
     link de cada e-mail e marca as de rastreador; o que está só desenhado na
     peça (e-mail, QR Code, "clique aqui") se acha lendo a imagem.
+- **Cartaz longo** (22/09/2026): peça mais de 1,8 vez mais alta que larga
+  (os e-mails do MigraSAP de 17 e 18/09) encolhe até a altura da tela e vira
+  uma coluna estreita à direita. O `ligarMidias()` marca a página com
+  `cartaz-alto` e as figuras do texto deixam de flutuar: ficam no ponto em
+  que o texto as chama, no espaço ao lado da peça (`display:flow-root`,
+  `width:fit-content`). Com o `clear:both` de sempre, elas desciam para
+  depois da peça e a primeira tela do SAP aparecia depois do intertítulo
+  seguinte.
 
 **Realce dos comunicados e das abas (21/09/2026, noite, pedido do usuário).**
 Um vocabulário só para "este item está sob o mouse ou o foco", com os tokens

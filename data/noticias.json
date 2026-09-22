@@ -436,5 +436,200 @@
         "data": "2026-09-21"
       }
     ]
+  },
+  {
+    "id": "eqtl-migrasap-replanejamento-go-live",
+    "origem": "equatorial",
+    "categoria": "SAP",
+    "titulo": "Atualização do cronograma do Projeto MigraSAP",
+    "resumo": "O Go Live do SAP S/4HANA passou de 12 de outubro para 15 de novembro de 2026, para assegurar a qualidade e a segurança da transição para o novo ambiente.",
+    "conteudoCompleto": "Após uma análise criteriosa do cenário atual do projeto, comunicamos uma importante atualização referente ao **cronograma do MigraSAP** e a data prevista para entrada em produção - **Go Live do SAP S/4HANA**.\nEm razão da necessidade de readequação do planejamento das atividades, foi aprovado o **replanejamento do projeto**, resultando na **alteração da data originalmente prevista para o Go Live**, de 12 de outubro de 2026 para **15 de novembro de 2026**.\nA decisão foi tomada com o objetivo de **assegurar a qualidade e a segurança transição para o novo ambiente**, considerando a necessidade de execução de ajustes relevantes no ambiente produtivo do SAP ECC, especialmente migração da base de dados para a nova infraestrutura em nuvem.\nEssas adequações são fundamentais para garantir a continuidade operacional, a estabilidade dos processos de negócio e a mitigação de riscos durante o transição entre os sistemas.\nAgradecemos a compreensão de todos(as) envolvidos(as) e reforçamos nosso compromisso com uma transição bem executada e com o menor impacto operações do Grupo Equatorial.\nEstamos inteiramente à disposição para quaisquer dúvidas ou esclarecimentos.\nAtenciosamente,\n**Projeto MigraSAP**.",
+    "dataPublicacao": "2026-09-10",
+    "dataVigencia": null,
+    "fonte": "Comunicação Grupo Equatorial — e-mail de 10/09/2026, \"MigraSAP | Replanejamento no Cronograma do Projeto\", assinado por Projeto MigraSAP",
+    "link": null,
+    "documento": null,
+    "imagem": "assets/images/comunicados/migrasap-replanejamento-2026.webp",
+    "imagemCapa": "assets/images/comunicados/migrasap-replanejamento-2026-capa.webp",
+    "imagemAlt": "Peça do MigraSAP \"Atualização do cronograma do Projeto MigraSAP\", com um calendário no alto: o Go Live do SAP S/4HANA passa de 12 de outubro para 15 de novembro de 2026.",
+    "links": [
+      {
+        "rotulo": "Dúvidas: proj.migrasap@equatorialenergia.com.br",
+        "url": "mailto:proj.migrasap@equatorialenergia.com.br",
+        "area": [
+          0.044,
+          0.948,
+          0.536,
+          0.037
+        ]
+      }
+    ],
+    "nivelImpacto": "Relevante",
+    "empresasImpactadas": [
+      "Grupo Equatorial"
+    ],
+    "areaResponsavel": "Projeto MigraSAP",
+    "responsavel": "Eduardo dos Santos Rocha",
+    "palavrasChave": [
+      "MigraSAP",
+      "SAP S/4HANA",
+      "Go Live",
+      "cronograma",
+      "replanejamento",
+      "SAP ECC",
+      "nuvem"
+    ],
+    "ativo": true,
+    "status": "Publicado",
+    "aprovadoPor": "Eduardo dos Santos Rocha",
+    "dataAprovacao": "2026-09-22",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Eduardo dos Santos Rocha",
+        "data": "2026-09-22"
+      }
+    ]
+  },
+  {
+    "id": "eqtl-migrasap-sociedade-parceira",
+    "origem": "equatorial",
+    "categoria": "SAP",
+    "titulo": "Importância do preenchimento correto da Sociedade Parceira",
+    "resumo": "Com o SAP Group Reporting, o campo Sociedade Parceira é o que identifica as operações entre empresas do Grupo na consolidação; contas de partes relacionadas terão bloqueio sistêmico sem ele.",
+    "conteudoCompleto": "Como parte da preparação para a implementação do **SAP Group Reporting**, reforçamos uma prática fundamental para garantir a qualidade das informações financeiras do Grupo: **o correto preenchimento do campo “Sociedade Parceira” nos lançamentos contábeis no SAP**.\nA Sociedade Parceira permite identificar corretamente as operações realizadas entre empresas do Grupo e é uma informação essencial para que essas transações sejam reconhecidas e tratadas adequadamente durante o processo de consolidação.\n## Porque o preenchimento correto é tão importante?\nAo informar corretamente a Sociedade Parceira, contribuímos diretamente para:\n• **identificar** adequadamente as **operações intercompany**;\n• viabilizar a **correta execução das eliminações** no SAP Group Reporting;\n• **reduzir divergências e inconsistências** durante a consolidação;\n• **minimizar ajustes, reclassificações e retrabalhos** no fechamento contábil;\n• **aumentar a confiabilidade, a rastreabilidade e a qualidade** das informações financeiras do Grupo.\n## O que muda na prática:\nPara determinadas contas contábeis que recebem lançamentos manuais e possuem natureza exclusivamente relacionada a partes relacionadas, será implementado um **bloqueio sistêmico no SAP**. Nesses casos, o lançamento somente poderá ser contabilizado após o preenchimento da **Sociedade Parceira**.\nPara as demais contas, mesmo quando não houver bloqueio, é fundamental adotar a seguinte boa prática:\n**Sempre que uma transação envolver outra empresa do Grupo, preencha corretamente o campo “Sociedade Parceira”.**\nA seleção deverá refletir a empresa do Grupo que representa a contraparte da operação, conforme demonstrado no SAP:\n[figura 1]\nO resultado esperado é que os documentos sejam contabilizados com a Sociedade Parceira corretamente registrada, permitindo sua identificação durante a consolidação:\n[figura 2]\n## Atenção no momento do lançamento\nA ausência ou o preenchimento incorreto da Sociedade Parceira impedirá a identificação automática das operações intercompany, comprometendo o processo de consolidação, gerando divergências e demandando a realização de ajustes posteriores.\n• Por isso, **antes de concluir um lançamento entre empresas do Grupo, confira se a Sociedade Parceira foi informada corretamente.**\n• **Um preenchimento correto na origem significa mais qualidade na consolidação, menos retrabalho no fechamento e informações financeiras mais confiáveis para todo o Grupo.**\nContamos com o apoio e o comprometimento de todos para incorporar essa prática à rotina operacional e contribuir para o sucesso da implementação do **SAP Group Reporting.**\nEm caso de dúvidas, entre em contato com as equipes de Consolidação e Contabilidade Corporativa ou com o time do Projeto SAP Group Reporting.\nAtenciosamente,\n**Consolidação e Contabilidade Corporativa**\n**Projeto MigraSAP – Group Reporting**",
+    "dataPublicacao": "2026-09-17",
+    "dataVigencia": null,
+    "fonte": "Comunicação Grupo Equatorial — e-mail de 17/09/2026, \"MigraSAP | Atenção ao preenchimento da Sociedade Parceira no SAP\", assinado por Consolidação e Contabilidade Corporativa e Projeto MigraSAP – Group Reporting",
+    "link": null,
+    "documento": null,
+    "imagem": "assets/images/comunicados/migrasap-sociedade-parceira.webp",
+    "imagemCapa": "assets/images/comunicados/migrasap-sociedade-parceira-capa.webp",
+    "imagemAlt": "Peça do MigraSAP \"Importância do Preenchimento Correto da Sociedade Parceira\", com prédios ligados por uma rede no alto e, no corpo, as orientações e duas telas do SAP.",
+    "links": [
+      {
+        "rotulo": "Dúvidas: proj.migrasap@equatorialenergia.com.br",
+        "url": "mailto:proj.migrasap@equatorialenergia.com.br",
+        "area": [
+          0.042,
+          0.983,
+          0.507,
+          0.0135
+        ]
+      }
+    ],
+    "figuras": [
+      {
+        "imagem": "assets/images/comunicados/migrasap-sociedade-parceira-tela-lancamento.webp",
+        "alt": "Tela do SAP \"Entrar documento de conta do Razão\", com a coluna Sociedade parceira das linhas do lançamento e, ao lado, a lista das empresas do Grupo para escolher.",
+        "legenda": "No lançamento, a Sociedade parceira de cada linha é escolhida na lista das empresas do Grupo."
+      },
+      {
+        "imagem": "assets/images/comunicados/migrasap-sociedade-parceira-tela-documento.webp",
+        "alt": "Tela do SAP \"Exibir documento: Visão de entrada\", com a coluna SocParceir preenchida em todas as linhas do documento.",
+        "legenda": "Documento contabilizado com a Sociedade parceira (coluna SocParceir) em cada linha."
+      }
+    ],
+    "nivelImpacto": "Relevante",
+    "empresasImpactadas": [
+      "Grupo Equatorial"
+    ],
+    "areaResponsavel": "Consolidação e Contabilidade Corporativa",
+    "responsavel": "Eduardo dos Santos Rocha",
+    "palavrasChave": [
+      "MigraSAP",
+      "SAP",
+      "Sociedade Parceira",
+      "SAP Group Reporting",
+      "intercompany",
+      "consolidação",
+      "eliminações",
+      "partes relacionadas",
+      "bloqueio sistêmico"
+    ],
+    "ativo": true,
+    "status": "Publicado",
+    "aprovadoPor": "Eduardo dos Santos Rocha",
+    "dataAprovacao": "2026-09-22",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Eduardo dos Santos Rocha",
+        "data": "2026-09-22"
+      }
+    ]
+  },
+  {
+    "id": "eqtl-migrasap-tipo-de-movimento",
+    "origem": "equatorial",
+    "categoria": "SAP",
+    "titulo": "Importância da utilização correta de Tipo de Movimento",
+    "resumo": "Algumas contas contábeis passam a exigir o Tipo de Movimento no SAP; nas demais, escolher o tipo certo mantém a rastreabilidade e a qualidade das informações de reporte.",
+    "conteudoCompleto": "Reforçamos a importância do **correto preenchimento do campo “Tipo de Movimento” nos lançamentos contábeis realizados no SAP**.\nEmbora seja um campo específico do lançamento, sua utilização correta tem papel fundamental na identificação da natureza das movimentações contábeis e patrimoniais, contribuindo diretamente para a **qualidade, rastreabilidade e consistência das informações financeiras** utilizadas nos processos contábeis, gerenciais e de reporte.\n## Porque o Tipo de Movimento é importante?\nO preenchimento adequado desse campo permite identificar corretamente a natureza de cada movimentação e contribui para:\n• garantir maior **integridade e rastreabilidade** das informações financeiras;\n• facilitar a identificação e a análise das **movimentações patrimoniais**;\n• apoiar a **correta execução dos processos contábeis** e de reporte;\n• **reduzir ajustes, correções e retrabalhos** durante os fechamentos;\n• facilitar a **análise de variações** entre períodos;\n• aumentar a **confiabilidade das informações** utilizadas para fins gerenciais, societários e regulatórios.\n## O que muda na prática:\nCom o objetivo de fortalecer a qualidade das informações registradas no SAP, serão adotados **controles sistêmicos para determinadas contas contábeis**, tornando obrigatório o preenchimento do **Tipo de Movimento** em situações específicas.\nNesses casos, o sistema poderá impedir a contabilização do lançamento enquanto a informação não estiver corretamente preenchida.\nPara as demais situações, mesmo quando não houver bloqueio sistêmico, é fundamental adotar a seguinte boa prática:\n**Sempre que aplicável, selecione o Tipo de Movimento que represente corretamente a natureza da operação registrada.**\nNo momento do lançamento, o SAP disponibiliza as opções de Tipo de Movimento para seleção, conforme demonstrado abaixo:\n[figura 1]\nApós a contabilização, é importante verificar se o documento apresenta o campo devidamente preenchido:\n[figura 2]\n## Atenção antes de concluir o lançamento\nA ausência ou a utilização incorreta do Tipo de Movimento gerará inconsistências nos processos de reporte, consolidação e elaboração das demonstrações contábeis e notas explicativas, além de demandar ajustes posteriores e retrabalho para regularização das informações.\n• Por isso, **antes de concluir um lançamento contábil, verifique se o Tipo de Movimento foi informado corretamente, sempre que aplicável.**\n• **Uma informação correta na origem representa mais qualidade nos dados, maior eficiência nos fechamentos e mais confiabilidade para os processos contábeis da Companhia.**\nContamos com o apoio e o comprometimento de todos para incorporar essa prática à rotina operacional e contribuir para o fortalecimento da governança e da qualidade das informações financeiras.\nEm caso de dúvidas, entre em contato com a equipe de Consolidação e/ou a equipe de Contabilidade Corporativa.\nAtenciosamente,\n**Consolidação e Contabilidade Corporativa**\n**Projeto MigraSAP**",
+    "dataPublicacao": "2026-09-18",
+    "dataVigencia": null,
+    "fonte": "Comunicação Grupo Equatorial — e-mail de 18/09/2026, \"MigraSAP | Importância da Utilização Correta de Tipo de Movimento\", assinado por Consolidação e Contabilidade Corporativa e Projeto MigraSAP",
+    "link": null,
+    "documento": null,
+    "imagem": "assets/images/comunicados/migrasap-tipo-de-movimento.webp",
+    "imagemCapa": "assets/images/comunicados/migrasap-tipo-de-movimento-capa.webp",
+    "imagemAlt": "Peça do MigraSAP \"Importância da Utilização Correta de Tipo de Movimento\", com um documento ligado a ícones de compras, banco e gráficos no alto e, no corpo, as orientações e duas telas do SAP.",
+    "links": [
+      {
+        "rotulo": "Dúvidas: proj.migrasap@equatorialenergia.com.br",
+        "url": "mailto:proj.migrasap@equatorialenergia.com.br",
+        "area": [
+          0.042,
+          0.984,
+          0.507,
+          0.0136
+        ]
+      }
+    ],
+    "figuras": [
+      {
+        "imagem": "assets/images/comunicados/migrasap-tipo-de-movimento-tela-lancamento.webp",
+        "alt": "Tela do SAP \"Entrar documento de conta do Razão\", com a coluna TpMov das linhas e, ao lado, a lista \"Tipo de movimento\" com os códigos para escolher.",
+        "legenda": "No lançamento, o Tipo de movimento de cada linha é escolhido na lista de códigos do SAP."
+      },
+      {
+        "imagem": "assets/images/comunicados/migrasap-tipo-de-movimento-tela-documento.webp",
+        "alt": "Tela do SAP \"Exibir documento: Visão de entrada\", com a coluna TpMov preenchida nas duas linhas do documento.",
+        "legenda": "Documento contabilizado com o Tipo de movimento (coluna TpMov) preenchido."
+      }
+    ],
+    "nivelImpacto": "Relevante",
+    "empresasImpactadas": [
+      "Grupo Equatorial"
+    ],
+    "areaResponsavel": "Consolidação e Contabilidade Corporativa",
+    "responsavel": "Eduardo dos Santos Rocha",
+    "palavrasChave": [
+      "MigraSAP",
+      "SAP",
+      "Tipo de Movimento",
+      "TpMov",
+      "controles sistêmicos",
+      "reporte",
+      "consolidação",
+      "notas explicativas"
+    ],
+    "ativo": true,
+    "status": "Publicado",
+    "aprovadoPor": "Eduardo dos Santos Rocha",
+    "dataAprovacao": "2026-09-22",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Eduardo dos Santos Rocha",
+        "data": "2026-09-22"
+      }
+    ]
   }
 ]

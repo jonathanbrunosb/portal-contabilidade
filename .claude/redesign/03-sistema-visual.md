@@ -642,6 +642,26 @@ data, assunto e quem assina). Duas marcas a mais no texto:
   Movimentação (pedido do usuário, 21/09): a mesma composição, com as fotos
   perdendo as laterais — Alexandra estreita (0,5) e os quatro quadros em
   retrato — para as cinco pessoas caberem inteiras no quadro de 128×112.
+- **Links das imagens (regra do usuário, 22/09/2026, vale daqui em diante):**
+  todo link que a imagem do e-mail traz — a imagem inteira envolvida por um
+  `<a>`, um "clique aqui", um botão, um QR Code, um endereço de e-mail escrito
+  na peça — entra em `links` (`{rotulo, url, area, figura}`) e fica
+  **embutido na imagem** e **disponível na Comunicação**:
+  - `area` = `[x, y, largura, altura]` em fração da imagem; o trecho vira um
+    `<a class="comunicado-area">` por cima da peça (`.comunicado-imagem-mapa`).
+    Passar o mouse na peça contorna os trechos em azul a 55%; sobre um deles,
+    véu `--azul` a 14% e contorno de 2 px. `[0,0,1,1]` = a imagem inteira: o
+    clique leva ao destino e a lupa do canto (`.comunicado-ampliar`, 34 px)
+    abre a peça ampliada.
+  - Sem `figura`, vale para a imagem do topo; `figura: N` põe o trecho na N-ª
+    de `figuras`.
+  - Todo link também vira **botão nas ações da página** (e-mail com o ícone
+    `mail`), sem repetir a fonte nem o acesso ao sistema.
+  - Aceita `https://`, `http://` e `mailto:`. **Link de rastreador do e-mail
+    nunca entra** nem é aberto: o destino sai do QR Code (OpenCV), do texto da
+    peça ou de um link direto. `.claude/tools/msgread.py` lista as imagens com
+    link de cada e-mail e marca as de rastreador; o que está só desenhado na
+    peça (e-mail, QR Code, "clique aqui") se acha lendo a imagem.
 
 **Realce dos comunicados e das abas (21/09/2026, noite, pedido do usuário).**
 Um vocabulário só para "este item está sob o mouse ou o foco", com os tokens

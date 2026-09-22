@@ -734,6 +734,58 @@ main {
 .comunicado-figura a:hover img {
   border-color:var(--azul)}
 
+/* Links embutidos na peça (22/09/2026): o trecho da imagem que era link no
+   e-mail ("clique aqui", QR Code, endereço de e-mail) é um <a> por cima dela.
+   Passar o mouse na peça contorna os trechos; sobre um deles, o véu azul
+   mostra onde se vai clicar. */
+.comunicado-imagem-mapa {
+  position:relative}
+
+.comunicado-imagem-mapa .comunicado-area {
+  position:absolute;
+  display:block;
+  border-radius:var(--raio-sm);
+  transition:background-color var(--dur-estado) var(--ease-saida),box-shadow var(--dur-estado) var(--ease-saida)}
+
+.comunicado-imagem-mapa:hover .comunicado-area {
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--azul) 55%,transparent)}
+
+.comunicado-imagem-mapa .comunicado-area:hover {
+  background:color-mix(in srgb,var(--azul) 14%,transparent);
+  box-shadow:0 0 0 2px var(--azul)}
+
+.comunicado-imagem-mapa .comunicado-area:focus-visible {
+  outline:3px solid var(--foco);
+  outline-offset:2px}
+
+/* Quando a imagem inteira é um link, a lupa do canto abre a peça ampliada. */
+.comunicado-imagem-mapa .comunicado-ampliar {
+  position:absolute;
+  right:8px;
+  bottom:8px;
+  display:grid;
+  place-items:center;
+  width:34px;
+  height:34px;
+  background:#fff;
+  color:var(--texto-2);
+  border:1px solid var(--borda);
+  border-radius:50%;
+  box-shadow:var(--sombra-sutil)}
+
+.comunicado-imagem-mapa .comunicado-ampliar .icon {
+  width:18px;
+  height:18px}
+
+.comunicado-imagem-mapa .comunicado-ampliar:hover {
+  color:var(--azul-marca);
+  border-color:var(--azul)}
+
+@media(prefers-reduced-motion:reduce) {
+  .comunicado-imagem-mapa .comunicado-area {
+    transition:none}
+}
+
 /* Cartaz vertical não vira uma coluna de 1.300 px: a peça cabe na altura da
    tela e a figura encolhe junto (a largura acompanha a imagem). */
 .comunicado-figura img {
@@ -2513,7 +2565,7 @@ th,td {
   background:
     linear-gradient(100deg,#071f49f2 0%,#071f49d9 38%,#0b376aa6 62%,#075c8070 85%,#075c8047 100%),
     linear-gradient(90deg,var(--marinho-escuro) 0 2px,color-mix(in srgb,var(--marinho-escuro) 55%,transparent) 18%,transparent 45%) right 0 top 0/var(--ph-foto-largura) 100% no-repeat,
-    url("../assets/images/banner/portal-gerencia-contabilidade.webp?v=20260922-1") right 0 top 30%/auto 420px no-repeat;
+    url("../assets/images/banner/portal-gerencia-contabilidade.webp?v=20260922-2") right 0 top 30%/auto 420px no-repeat;
   background-color:var(--marinho-escuro)}
 
 .ph-row {

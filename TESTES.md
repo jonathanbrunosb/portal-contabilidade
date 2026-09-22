@@ -386,6 +386,26 @@ identificado:
   `#fcfcfb`. A foto e o slogan da tela ficaram de fora.
 - Busca do cabeçalho: "claude" sugere o cartão; console limpo.
 
+## Links das imagens nos comunicados de e-mail — 22/09/2026
+
+Regra do usuário: o link que a imagem traz no e-mail fica embutido nela e
+também disponível na Comunicação. Conferido com Playwright em 1366 px:
+
+- **MigraSAP Verdade ou Mentira**: 3 trechos por cima da peça — o botão
+  "Clique aqui na 4ª rodada" (378×45) e o QR Code (151×147) levam ao quiz; o
+  e-mail do rodapé abre `mailto:proj.migrasap@…`. Botões: "Responder ao quiz"
+  (um só, embora dois trechos levem a ele) e o do e-mail. Passar o mouse
+  contorna os trechos; sobre o QR Code, véu azul.
+- **Agentes da Inovação**: o e-mail da peça (260×32) e o botão
+  `mailto:agentesdainovacao@eqtlab.com.br`.
+- **IFRS 16**: no e-mail a peça inteira era link para o sistema — a imagem
+  leva a `arrendamento.contabilidade-eqtl.com`, a lupa do canto amplia, e o
+  botão fica só o "Acessar IFRS 16 / CPC 06" (sem repetir).
+- **Segurança digital** e **Movimentação**: peça sem link, imagem como antes.
+- `msgread.py` nos e-mails de `projeto/modelos-emails`: aponta a imagem com
+  link direto do IFRS 16 e marca como rastreador as do MigraSAP, do Engaja+ e
+  dos boletins de Goiás. Console limpo.
+
 ## Limites e checklist para homologação corporativa
 
 Não houve navegação nos sistemas reais, pois seus endereços não foram fornecidos. Downloads foram validados pelo destino HTTP e atributo de download; o fluxo de salvamento do navegador não foi homologado separadamente. Pausa por hover, preferência de movimento, navegação completa por teclado, zoom de 200% e políticas específicas de Chrome/Edge devem integrar a homologação corporativa. A implementação desses comportamentos está no código, mas não se declara aqui uma certificação de acessibilidade.

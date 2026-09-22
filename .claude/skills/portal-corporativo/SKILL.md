@@ -179,7 +179,11 @@ no menu ou na capa.
   **três colunas, uma por origem**, no formato de portal de notícias. Cor por
   origem: Contabilidade verde-água, Equatorial azul do Grupo, Externo roxo;
   selo cheio; categoria sem cor. Ver `.claude/redesign/03-sistema-visual.md`
-  § 10.
+  § 10. **Comunicado tirado de e-mail** (21–22/09/2026): texto transcrito do
+  original, peça e fotos do próprio e-mail, `fonte` com remetente, data,
+  assunto e signatário, e **todo link das imagens embutido nelas e disponível
+  como botão** (campo `links`, com a área de cada trecho). Link de rastreador
+  nunca entra: o destino vem do QR Code, do texto da peça ou de link direto.
 - **Celular**: botão "Menu" abre painel com as mesmas seções (não usar
   `<select>` como o CFC); carrossel com proporção mais alta.
 - **Rodapé institucional** com **mapa do portal** (todas as seções/páginas),

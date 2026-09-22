@@ -174,6 +174,28 @@ def rtf_to_html(rtf):
     return ''.join(out)
 
 
+# Rastreadores de clique e de abertura dos e-mails da Comunicação: o endereço
+# carrega um código ligado a quem recebeu. Nunca vão para o portal e nunca são
+# abertos (abrir registra o clique em nome do destinatário).
+RASTREADORES = re.compile(r'app\.simplificaci\.com\.br/(dntracker|errata|mail-report)', re.I)
+IMAGENS_DE_SERVICO = re.compile(r'(dntracker|errata)\.png|/logos/unity_|logo-by-m', re.I)
+
+
+def imagens_com_link(html):
+    """Regra de 22/09/2026: todo link de imagem do e-mail vai para o comunicado.
+    Devolve cada imagem de conteúdo com o <a> que a envolve (se houver) e diz
+    se o link é de rastreador — nesse caso o destino tem de sair do QR Code ou
+    do texto da peça, nunca do link."""
+    achados = []
+    ancora = re.compile(r'<a\b[^>]*href=["\']?([^"\' >]+)[^>]*>((?:(?!</a>).){0,800}?)</a>', re.S | re.I)
+    imagem = re.compile(r'<img\b[^>]*src=["\']?([^"\' >]+)', re.I)
+    for m in ancora.finditer(html):
+        for src in imagem.findall(m.group(2)):
+            if not IMAGENS_DE_SERVICO.search(src) and m.group(1) != '#':
+                achados.append(dict(imagem=src, href=m.group(1), rastreado=bool(RASTREADORES.search(m.group(1)))))
+    return achados
+
+
 def extract(path, outdir):
     cfb = CFB(open(path, 'rb').read())
     p = props(cfb, 0)
@@ -206,7 +228,8 @@ def extract(path, outdir):
         if a['cid']:
             html = html.replace('cid:' + a['cid'], a['file'])
     open(os.path.join(outdir, 'email.html'), 'w', encoding='utf-8').write(html)
-    meta = dict(subject=subject, sender=sender, source=source, attachments=atts)
+    meta = dict(subject=subject, sender=sender, source=source, attachments=atts,
+                imagensComLink=imagens_com_link(html))
     json.dump(meta, open(os.path.join(outdir, 'meta.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
     return meta
 
@@ -218,3 +241,6 @@ if __name__ == '__main__':
             slug = re.sub(r'[^\w]+', '-', os.path.splitext(f)[0].lower()).strip('-')
             m = extract(os.path.join(src, f), os.path.join(dst, slug))
             print(slug, '|', m['subject'], '|', m['sender'], '|', m['source'], '|', [(a['file'], a['size']) for a in m['attachments']])
+            for ligada in m['imagensComLink']:
+                print('   imagem com link:', ligada['imagem'][-60:], '->',
+                      'RASTREADOR (achar o destino no QR Code ou no texto da peça)' if ligada['rastreado'] else ligada['href'])

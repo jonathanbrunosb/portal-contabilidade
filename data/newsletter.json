@@ -48,6 +48,18 @@
     "documento": null,
     "imagem": "assets/images/comunicados/ifrs16-melhorias-2026-09.webp",
     "imagemAlt": "Peça \"Sistema de Arrendamentos IFRS 16 / CPC 06 (R2) — Novidades da solução\": à esquerda, a nova funcionalidade Abertura RIT, com a tabela das obrigações de arrendamento por vencimento e a conciliação; à direita, a nova cara do sistema, com a tela de login redesenhada; no rodapé, mais clareza nas informações, melhor experiência de uso e evolução contínua da ferramenta.",
+    "links": [
+      {
+        "rotulo": "Acessar o Sistema de Arrendamentos IFRS 16",
+        "url": "https://arrendamento.contabilidade-eqtl.com/",
+        "area": [
+          0,
+          0,
+          1,
+          1
+        ]
+      }
+    ],
     "statusSistema": "Ativo",
     "sistemaId": "s1",
     "empresasImpactadas": [

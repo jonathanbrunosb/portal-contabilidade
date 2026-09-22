@@ -167,6 +167,18 @@
     "imagem": "assets/images/comunicados/agentes-inovacao-2026.webp",
     "imagemCapa": "assets/images/comunicados/agentes-inovacao-2026-capa.webp",
     "imagemAlt": "Peça do Programa Agentes da Inovação, Ciclo 2026, com o aviso \"Inscrições encerradas!\".",
+    "links": [
+      {
+        "rotulo": "Dúvidas: agentesdainovacao@eqtlab.com.br",
+        "url": "mailto:agentesdainovacao@eqtlab.com.br",
+        "area": [
+          0.236,
+          0.835,
+          0.547,
+          0.042
+        ]
+      }
+    ],
     "nivelImpacto": "Baixo",
     "empresasImpactadas": [
       "Grupo Equatorial"
@@ -210,6 +222,38 @@
     "imagem": "assets/images/comunicados/migrasap-verdade-ou-mentira-4.webp",
     "imagemCapa": "assets/images/comunicados/migrasap-verdade-ou-mentira-4-capa.webp",
     "imagemAlt": "Peça do MigraSAP: \"Você está preparado para a nova era do SAP? Verdade ou Mentira — 4ª edição\", com o QR Code do quiz.",
+    "links": [
+      {
+        "rotulo": "Responder ao quiz",
+        "url": "https://view.genially.com/6a919f986c06f9397668e87c",
+        "area": [
+          0.046,
+          0.674,
+          0.616,
+          0.061
+        ]
+      },
+      {
+        "rotulo": "QR Code do quiz: responder à 4ª rodada",
+        "url": "https://view.genially.com/6a919f986c06f9397668e87c",
+        "area": [
+          0.704,
+          0.543,
+          0.246,
+          0.202
+        ]
+      },
+      {
+        "rotulo": "Dúvidas: proj.migrasap@equatorialenergia.com.br",
+        "url": "mailto:proj.migrasap@equatorialenergia.com.br",
+        "area": [
+          0.054,
+          0.944,
+          0.479,
+          0.035
+        ]
+      }
+    ],
     "nivelImpacto": "Moderado",
     "empresasImpactadas": [
       "Grupo Equatorial"

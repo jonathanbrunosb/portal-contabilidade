@@ -5,7 +5,7 @@
 > **Snapshot técnico** — Data: **2026-09-22**
 > **Git:** branch `ajustes-frontend-dudu`, **25 commits à frente de `6b6273c`**, um por assunto (seção 2); depois do checkpoint ("Documentar o dia 21/09 e adotar commit por assunto") vieram o dos comunicados tirados dos e-mails (IFRS 16 e Movimentação da Controladoria) e os dois da capa da Movimentação com as fotos (a larga e a miniatura 8:7); em 22/09, a busca do cabeçalho com sugestões, os links do ECD e do ECF, os cartões do BMP e RIT e do Claude nos Externos e este registro das tarefas deixadas para depois. **Nada enviado** (`git push` só quando o usuário pedir). `main` não recebeu nada.
 > **App/Stack:** HTML + CSS + JavaScript puro (ES modules), sem build, sem CDN. Conteúdo em `data/*.json`. Servidor estático Python na porta **5500** (`.claude/launch.json`, nome `portal`). Backend **opcional** `server/server.js` (Node, porta 8787), ligado por `window.PORTAL_API_ENABLED = true`.
-> **Working tree:** limpo depois do commit do checkpoint. Cache-buster: `?v=20260922-1`.
+> **Working tree:** limpo depois do commit do checkpoint. Cache-buster: `?v=20260922-2`.
 > **Máquina:** `projeto/` (material interno) e as skills de terceiros estão no disco, fora do Git (`.gitignore`).
 
 ---

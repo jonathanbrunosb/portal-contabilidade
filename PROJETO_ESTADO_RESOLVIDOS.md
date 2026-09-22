@@ -6,6 +6,12 @@
 
 ## 2026-09-22
 
+### Links das imagens dos e-mails embutidos nos comunicados
+- **Era:** o usuário pediu que, em comunicado tirado de e-mail, o link que a imagem traz fique embutido na imagem do comunicado e também disponível na Comunicação — nos novos, nos já feitos, e daqui em diante.
+- **Solução:** campo `links` (`{rotulo, url, area, figura}`) com a área de cada trecho em fração da imagem; na página, `imagemComLinks()` põe um `<a>` por trecho sobre a peça (ou faz da imagem inteira o link, com a lupa para ampliar) e cada link vira botão nas ações, sem repetir a fonte nem o sistema. Aceita `mailto:` (ícone `mail` novo em `ui.js`). Aplicado aos já publicados: MigraSAP Verdade ou Mentira (botão e QR Code → quiz; e-mail), Agentes da Inovação (e-mail) e IFRS 16 (a peça inteira → sistema). Segurança digital e Movimentação não tinham link.
+- **Detalhes técnicos:** `js/newsletter.js` (`linksDe`, `urlDoLink`, `imagemComLinks`, `figuraHTML(...,links)`, `botoesDosLinks`); CSS `.comunicado-imagem-mapa`, `.comunicado-area`, `.comunicado-ampliar`. `.claude/tools/msgread.py` grava `imagensComLink` no `meta.json` e imprime cada imagem com link, marcando as de rastreador (`app.simplificaci.com.br/dntracker|errata|mail-report`), que nunca são abertas. O MigraSAP e a peça de LGPD de Goiás tinham a imagem inteira num link rastreado; no MigraSAP o destino saiu do QR Code. Regra registrada em `03-sistema-visual.md` § 10, README, skill e memória. Cache-buster 20260922-2.
+- **Verificação:** TESTES.md, "Links das imagens nos comunicados de e-mail — 22/09/2026".
+
 ### Comunicados do boletim da Comunicação Equatorial Goiás removidos
 - **Era:** o usuário pediu para tirar o boletim da Comunicação Equatorial Goiás ("Fique por Dentro").
 - **Solução:** confirmados com ele, saíram os três que vinham desses boletins: `eqtl-codigo-etica-eleicoes-2026` (14/09), `eqtl-codigo-etica-tratamento-dados` e `eqtl-open-innovation-10-cases` (24/08), com as imagens (`codigo-etica-eleicoes-2026.webp`, `codigo-etica-tratamento-dados.webp`, `open-innovation-10-cases[-capa].webp`). Nada no carrossel apontava para eles. A aba Equatorial ficou com 3.

@@ -1,4 +1,4 @@
-import { escapeHTML as e,icon,dateLabel,detailGrid,safeURL,comVersao,normalize,ORIGENS,seloOrigem } from './ui.js?v=20260922-1';
+import { escapeHTML as e,icon,dateLabel,detailGrid,safeURL,comVersao,normalize,ORIGENS,seloOrigem } from './ui.js?v=20260922-2';
 // Comunicação (decisão do usuário em 21/09/2026): a Newsletter Contábil e
 // Notícias & Impactos viraram uma lista só de comunicados, repartida por origem
 // nas abas da seção (Todos, Contabilidade, Equatorial, Externo). Cada
@@ -90,15 +90,49 @@ const textoCorrido=item=>linhasDe(item).filter(linha=>!MARCA_FIGURA.test(linha))
 export const textoDoComunicado=textoCorrido;
 // Escapa primeiro e só depois troca as marcas: o texto nunca vira HTML.
 const comNegrito=linha=>e(linha).replace(NEGRITO,'<strong>$1</strong>');
+// ===== Links das imagens (regra de 22/09/2026, pedido do usuário) =====
+// Comunicado tirado de e-mail: todo link que a imagem traz — a imagem inteira
+// envolvida por um <a> no e-mail, um "clique aqui", um QR Code, um endereço de
+// e-mail escrito na peça — vai para `links` ({rotulo, url, area, figura}).
+// `area` = [x, y, largura, altura] em fração da imagem: o trecho vira um link
+// por cima da peça ([0,0,1,1] = a imagem inteira). Sem `figura`, vale para a
+// imagem do topo; com `figura: N`, para a N-ª de `figuras`. Todo link também
+// vira um botão nas ações da página. Link de rastreador do e-mail nunca entra:
+// o destino sai do QR Code, do texto da peça ou de um link direto.
+const EMAIL=/^mailto:[^\s@]+@[^\s@]+\.[^\s@]+$/i;
+const urlDoLink=url=>EMAIL.test(url||'')?url:safeURL(url);
+const linksDe=item=>(item.links||[]).map(link=>({...link,url:urlDoLink(link.url)})).filter(link=>link.url&&link.rotulo);
+const eEmail=url=>url.startsWith('mailto:');
+const destinoDo=url=>eEmail(url)?`href="${e(url)}"`:`href="${e(url)}" target="_blank" rel="noopener noreferrer"`;
+const areaValida=area=>Array.isArray(area)&&area.length===4&&area.every(v=>Number.isFinite(Number(v)));
+const imagemInteira=area=>areaValida(area)&&area[0]<=0.01&&area[1]<=0.01&&area[2]>=0.99&&area[3]>=0.99;
+// A imagem com os trechos clicáveis. Quando a imagem inteira é um link, o
+// clique leva ao destino e um botão no canto abre a imagem ampliada; senão o
+// clique amplia e os trechos levam aos links.
+function imagemComLinks({src,alt,links,lazy=false}) {
+  const ampliar=`href="${e(comVersao(src))}" target="_blank" rel="noopener noreferrer"`;
+  const inteira=links.find(link=>imagemInteira(link.area));
+  const img=`<img src="${e(comVersao(src))}" alt="${e(alt||'')}"${lazy?' loading="lazy"':''}>`;
+  const principal=inteira
+    ?`<a class="comunicado-imagem-link" ${destinoDo(inteira.url)} title="${e(inteira.rotulo)}">${img}</a>`
+    :`<a ${ampliar} title="Abrir a imagem inteira em outra aba">${img}</a>`;
+  const areas=links.filter(link=>areaValida(link.area)&&!imagemInteira(link.area)).map(link=> {
+    const [x,y,w,h]=link.area.map(v=>(Math.min(1,Math.max(0,Number(v)))*100).toFixed(2));
+    return `<a class="comunicado-area" ${destinoDo(link.url)} style="left:${x}%;top:${y}%;width:${w}%;height:${h}%" aria-label="${e(link.rotulo)}" title="${e(link.rotulo)}"></a>`;
+  }
+  ).join('');
+  const lupa=inteira?`<a class="comunicado-ampliar" ${ampliar} aria-label="Abrir a imagem inteira em outra aba" title="Abrir a imagem inteira em outra aba">${icon('image')}</a>`:'';
+  return areas||lupa?`<div class="comunicado-imagem-mapa">${principal}${areas}${lupa}</div>`:principal;
+}
 // Como no jornal (pedido do usuário em 21/09/2026): a figura flutua e o texto
 // a contorna. A capa flutua à direita; as figuras do texto alternam, a 1ª à
 // esquerda, a 2ª à direita… Clicar abre a imagem inteira em outra aba —
 // infográfico na largura da coluna pode pedir zoom.
-function figuraHTML(figura,n) {
+function figuraHTML(figura,n,links=[]) {
   const src=figura&&safeURL(figura.imagem);
   if(!src)return '';
   const lado=n%2?'direita':'esquerda';
-  return `<figure class="comunicado-figura-texto flutua-${lado}"><a href="${e(comVersao(src))}" target="_blank" rel="noopener noreferrer" title="Abrir a imagem inteira em outra aba"><img src="${e(comVersao(src))}" alt="${e(figura.alt||'')}" loading="lazy"></a>${figura.legenda?`<figcaption>${e(figura.legenda)}</figcaption>`:''}</figure>`;
+  return `<figure class="comunicado-figura-texto flutua-${lado}">${imagemComLinks({src,alt:figura.alt,links,lazy:true})}${figura.legenda?`<figcaption>${e(figura.legenda)}</figcaption>`:''}</figure>`;
 }
 // Foto de pessoa (figura com `tipo: "retrato"`): pequena, à esquerda, presa ao
 // parágrafo seguinte, como nos comunicados de movimentação do Grupo — cada
@@ -121,7 +155,7 @@ function corpoComunicado(item) {
         if(junta)i++;
         continue;
       }
-      saida.push(figuraHTML(figura,Number(marca[1])-1));
+      saida.push(figuraHTML(figura,Number(marca[1])-1,linksDe(item).filter(link=>Number(link.figura)===Number(marca[1]))));
       continue;
     }
     if(linha.startsWith('## ')) {
@@ -152,11 +186,21 @@ const linkExterno=(url,rotulo,extra='')=>`<a class="primary-btn" href="${e(url)}
 export function paginaComunicado({item,colecao},{sistema=null}={}) {
   const fonte=safeURL(item.urlFonte||item.link),documento=safeURL(item.documento),src=safeURL(item.imagem);
   const acessoSistema=sistema&&safeURL(sistema.link);
+  // Os links das imagens também ficam à mão como botões — sem repetir o que a
+  // fonte ou o acesso ao sistema já oferecem.
+  const jaOferecidos=new Set([fonte,acessoSistema].filter(Boolean));
+  const botoesDosLinks=linksDe(item).filter(link=> {
+    if(jaOferecidos.has(link.url))return false;
+    jaOferecidos.add(link.url);
+    return true;
+  }
+  ).map(link=>eEmail(link.url)?`<a class="primary-btn" href="${e(link.url)}">${icon('mail')}${e(link.rotulo)}</a>`:linkExterno(link.url,link.rotulo)).join('');
   const acoes=[
     // `rotuloLink` quando o link não é a fonte, e sim uma ação (ex.: o quiz do MigraSAP).
     fonte?linkExterno(fonte,item.rotuloLink||'Consultar fonte'):'',
     documento?`<a class="primary-btn" href="${e(documento)}" download>${icon('download')}Baixar documento</a>`:'',
-    acessoSistema?linkExterno(acessoSistema,`Acessar ${sistema.nome.split(' — ')[0]}`,` data-quick="${e(sistema.nome)}"`):''
+    acessoSistema?linkExterno(acessoSistema,`Acessar ${sistema.nome.split(' — ')[0]}`,` data-quick="${e(sistema.nome)}"`):'',
+    botoesDosLinks
   ].join('');
   const voltar=ORIGENS[item.origem]?`#central/comunicacao-${item.origem}`:'#central/comunicacao';
   const paragrafos=corpoComunicado(item);
@@ -174,7 +218,8 @@ export function paginaComunicado({item,colecao},{sistema=null}={}) {
   // comunicados" (este entra pelo app.js, que tem a lista).
   // A peça original (cartaz, infográfico) costuma ter letra miúda: como nas
   // figuras do texto, clicar abre a imagem inteira em outra aba.
-  const figura=src?`<figure class="comunicado-figura"><a href="${e(comVersao(src))}" target="_blank" rel="noopener noreferrer" title="Abrir a imagem inteira em outra aba"><img src="${e(comVersao(src))}" alt="${e(item.imagemAlt||'')}"></a></figure>`:'';
+  // Os links que a peça trazia no e-mail ficam embutidos nela (ver linksDe).
+  const figura=src?`<figure class="comunicado-figura">${imagemComLinks({src,alt:item.imagemAlt,links:linksDe(item).filter(link=>!link.figura)})}</figure>`:'';
   return `<article class="comunicado-pagina${src?' com-figura':''}" data-origem="${e(item.origem||'')}" aria-labelledby="comunicado-titulo"><a class="text-btn comunicado-voltar" href="${e(voltar)}" data-route="${e(voltar)}">Voltar para a lista</a><header>${metaDe(item)}<h2 id="comunicado-titulo">${e(item.titulo)}</h2>${item.resumo?`<p class="comunicado-lead">${e(item.resumo)}</p>`:''}</header><div class="comunicado-materia">${figura}<div class="comunicado-texto">${paragrafos}</div>${renderIndicadoresNoticia(item)}</div><footer class="comunicado-rodape">${acoes?`<div class="comunicado-acoes">${acoes}</div>`:''}<div class="comunicado-rodape-grade"><section class="comunicado-ficha" aria-labelledby="comunicado-ficha-titulo"><h3 class="comunicado-ficha-titulo" id="comunicado-ficha-titulo">Ficha do comunicado</h3>${ficha}</section></div></footer></article>`;
 }
 // Capa: uma coluna por origem, no formato de portal de notícias — título da

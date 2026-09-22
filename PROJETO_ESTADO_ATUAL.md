@@ -19,7 +19,7 @@
 | Atalhos duplicados e artes órfãs removidos | concluída | Sim, `4bc7676` |
 | **Comunicação** unificada por origem + página do comunicado em **formato de jornal** + capa em 3 colunas | concluída | Sim, `803a3b6` |
 | Dados ilustrativos removidos; Jonathan e Eduardo administradores | concluída | Sim, `d65dd19` |
-| 6 comunicados da Comunicação Equatorial | concluída | Sim, `c074528` |
+| 6 comunicados da Comunicação Equatorial (3 do boletim de Goiás removidos em 22/09) | concluída | Sim, `c074528` |
 | **Carrossel** no molde do usuário, gestão pela tela, formatos imagem/molde, ferramentas de contraste | concluída | Sim, `a7343a1` |
 | Lápis do administrador; abas **Todos** e **Power BI** | concluída | Sim, `ed85f94` |
 | Reunião do Outlook em Avisos, com `.ics` | concluída — o convite não tem link de reunião | Sim, `01513bf` |

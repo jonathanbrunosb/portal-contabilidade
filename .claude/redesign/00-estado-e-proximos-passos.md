@@ -224,7 +224,9 @@ rodapé com mapa do portal.
     (extraídos em `projeto/brand/referencias/emails/`), publicados e aprovados
     por Eduardo dos Santos Rocha: segurança digital, Código de Ética nas
     eleições, Código de Ética e LGPD, MigraSAP (4ª rodada do quiz), Agentes da
-    Inovação e 10 cases de inovação aberta. Estão em `data/noticias.json`
+    Inovação e 10 cases de inovação aberta. **Em 22/09 o usuário mandou
+    remover os três do boletim "Fique por Dentro" da Comunicação Equatorial
+    Goiás** (eleições, LGPD e inovação aberta). Estão em `data/noticias.json`
     (ids `eqtl-*`); imagens em `assets/images/comunicados/`. Peça vertical tem
     `imagemCapa` (recorte 16:9 do topo) para a lista e a capa; a página mostra a
     peça inteira. **Regras usadas:** texto fiel à peça, com a Comunicação como

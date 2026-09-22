@@ -6,6 +6,11 @@
 
 ## 2026-09-22
 
+### Comunicados do boletim da Comunicação Equatorial Goiás removidos
+- **Era:** o usuário pediu para tirar o boletim da Comunicação Equatorial Goiás ("Fique por Dentro").
+- **Solução:** confirmados com ele, saíram os três que vinham desses boletins: `eqtl-codigo-etica-eleicoes-2026` (14/09), `eqtl-codigo-etica-tratamento-dados` e `eqtl-open-innovation-10-cases` (24/08), com as imagens (`codigo-etica-eleicoes-2026.webp`, `codigo-etica-tratamento-dados.webp`, `open-innovation-10-cases[-capa].webp`). Nada no carrossel apontava para eles. A aba Equatorial ficou com 3.
+- **Verificação:** aba Equatorial e coluna da capa com 3 comunicados; console limpo.
+
 ### Tarefas deixadas para depois, mapeadas
 - **Era:** o usuário quis deixar para depois a permissão "gerencial" dele e do Jonathan (para ver o Painel Editorial) e uma tela de cadastro de Avisos, "mapeado com os detalhes".
 - **Solução:** as duas viraram os itens 10 e 11 de "Próximos passos imediatos" em `PROJETO_ESTADO_ATUAL.md`, com o porquê, onde mexer, o que muda, o que decidir junto e o critério de pronto; o item 12 registra a questão dos termos curtos na busca.

@@ -153,48 +153,6 @@
     ]
   },
   {
-    "id": "eqtl-codigo-etica-eleicoes-2026",
-    "origem": "equatorial",
-    "categoria": "Ética e compliance",
-    "titulo": "Eleições: sua opinião é pessoal, os dados que você acessa não",
-    "resumo": "O Compliance lembra o que não pode durante as eleições: usar sistemas, dados, e-mail e demais recursos da Companhia para apoiar ou divulgar campanhas.",
-    "conteudoCompleto": "Durante as eleições, exerça sua cidadania com responsabilidade. Lembre-se do que não pode:\n• Não utilize sistemas ou bases de dados da Companhia para apoiar, divulgar ou impulsionar campanhas eleitorais.\n• Não utilize informações de clientes, fornecedores ou colaboradores para apoiar ou divulgar campanhas.\n• Não utilize e-mail corporativo, grupos institucionais ou demais recursos da Companhia para o compartilhamento de conteúdo político-partidário.\nÉtica e LGPD caminham juntas: proteja as informações que estão sob sua responsabilidade. As regras completas estão no Código de Ética e Conduta do Grupo Equatorial.",
-    "dataPublicacao": "2026-09-14",
-    "dataVigencia": null,
-    "fonte": "Comunicação Equatorial Goiás — Fique por Dentro de 14/09/2026",
-    "link": null,
-    "documento": null,
-    "imagem": "assets/images/comunicados/codigo-etica-eleicoes-2026.webp",
-    "imagemAlt": "Peça do Código de Ética: \"Sua opinião é pessoal. Os dados que você acessa não.\", com as três condutas que não podem durante as eleições.",
-    "nivelImpacto": "Relevante",
-    "empresasImpactadas": [
-      "Grupo Equatorial"
-    ],
-    "areaResponsavel": "Compliance Grupo Equatorial",
-    "responsavel": "Eduardo dos Santos Rocha",
-    "palavrasChave": [
-      "eleições",
-      "código de ética",
-      "compliance",
-      "LGPD",
-      "dados",
-      "campanha eleitoral"
-    ],
-    "ativo": true,
-    "status": "Publicado",
-    "aprovadoPor": "Eduardo dos Santos Rocha",
-    "dataAprovacao": "2026-09-21",
-    "motivoRecusa": null,
-    "historicoStatus": [
-      {
-        "de": null,
-        "para": "Publicado",
-        "autor": "Eduardo dos Santos Rocha",
-        "data": "2026-09-21"
-      }
-    ]
-  },
-  {
     "id": "eqtl-agentes-inovacao-2026-inscricoes-encerradas",
     "origem": "equatorial",
     "categoria": "Inovação",
@@ -265,90 +223,6 @@
       "migração",
       "quiz",
       "verdade ou mentira"
-    ],
-    "ativo": true,
-    "status": "Publicado",
-    "aprovadoPor": "Eduardo dos Santos Rocha",
-    "dataAprovacao": "2026-09-21",
-    "motivoRecusa": null,
-    "historicoStatus": [
-      {
-        "de": null,
-        "para": "Publicado",
-        "autor": "Eduardo dos Santos Rocha",
-        "data": "2026-09-21"
-      }
-    ]
-  },
-  {
-    "id": "eqtl-codigo-etica-tratamento-dados",
-    "origem": "equatorial",
-    "categoria": "Ética e compliance",
-    "titulo": "Você sabe o que é tratamento de dados pessoais?",
-    "resumo": "Coletar, consultar, armazenar, compartilhar ou excluir um dado pessoal já é tratamento — e tudo isso deve seguir a LGPD.",
-    "conteudoCompleto": "• Tratamento de dados pessoais é qualquer ação realizada com um dado, desde a coleta até a eliminação.\n• Coletar um nome, CPF, telefone ou e-mail já é uma forma de tratamento de dados.\n• Consultar, acessar, organizar, armazenar, compartilhar ou excluir dados também são atividades de tratamento.\n• O tratamento de dados deve observar a LGPD, garantindo segurança, confidencialidade e transparência.\n• Sempre que tiver dúvidas sobre o uso de dados pessoais, procure a área responsável por Privacidade ou Proteção de Dados antes de agir.\nAs regras completas estão no Código de Ética e Conduta do Grupo Equatorial.",
-    "dataPublicacao": "2026-08-24",
-    "dataVigencia": null,
-    "fonte": "Comunicação Equatorial Goiás — Fique por Dentro de 24/08/2026",
-    "link": null,
-    "documento": null,
-    "imagem": "assets/images/comunicados/codigo-etica-tratamento-dados.webp",
-    "imagemAlt": "Peça do Código de Ética: \"Você sabe o que é tratamento de dados pessoais?\", com cinco orientações sobre a LGPD.",
-    "nivelImpacto": "Moderado",
-    "empresasImpactadas": [
-      "Grupo Equatorial"
-    ],
-    "areaResponsavel": "Compliance Grupo Equatorial",
-    "responsavel": "Eduardo dos Santos Rocha",
-    "palavrasChave": [
-      "LGPD",
-      "dados pessoais",
-      "tratamento de dados",
-      "código de ética",
-      "privacidade"
-    ],
-    "ativo": true,
-    "status": "Publicado",
-    "aprovadoPor": "Eduardo dos Santos Rocha",
-    "dataAprovacao": "2026-09-21",
-    "motivoRecusa": null,
-    "historicoStatus": [
-      {
-        "de": null,
-        "para": "Publicado",
-        "autor": "Eduardo dos Santos Rocha",
-        "data": "2026-09-21"
-      }
-    ]
-  },
-  {
-    "id": "eqtl-open-innovation-10-cases",
-    "origem": "equatorial",
-    "categoria": "Inovação",
-    "titulo": "Grupo Equatorial leva 10 cases de inovação aberta a congresso latino-americano",
-    "resumo": "Projetos do EQT Lab foram apresentados no 5º Congresso Latino-Americano de Casos de Open Innovation, promovido pela 100 Open Startups em São Paulo.",
-    "conteudoCompleto": "O Grupo Equatorial participou do 5º Congresso Latino-Americano de Casos de Open Innovation, realizado em São Paulo, levando 10 cases de projetos conduzidos pelo time de inovação do EQT Lab para um dos principais fóruns de inovação aberta da América Latina, promovido pela 100 Open Startups, plataforma de referência em open innovation.\nA participação representa mais um passo na trajetória de evolução da inovação no Grupo e reforça a capacidade de transformar desafios reais do setor elétrico em projetos desenvolvidos por meio da colaboração com startups, universidades, centros de pesquisa e outros parceiros do ecossistema.\nOs cases apresentados contemplam diferentes frentes, como eficiência operacional, sustentabilidade, experiência do cliente, armazenamento de energia, soluções para energia eólica e redução de perdas, entre outras iniciativas.\nA presença no congresso reforça o protagonismo da companhia no ecossistema de inovação e evidencia o trabalho desenvolvido para aproximar conhecimento, tecnologia e experiência de mercado, ampliando a capacidade de criar soluções aplicáveis ao negócio e que contribuem para serviços cada vez mais eficientes e de qualidade para nossos clientes.",
-    "dataPublicacao": "2026-08-24",
-    "dataVigencia": null,
-    "fonte": "Comunicação Equatorial Goiás — Fique por Dentro de 24/08/2026",
-    "link": null,
-    "documento": null,
-    "imagem": "assets/images/comunicados/open-innovation-10-cases.webp",
-    "imagemCapa": "assets/images/comunicados/open-innovation-10-cases-capa.webp",
-    "imagemAlt": "Três colaboradores do Grupo Equatorial com os certificados de autores aprovados diante do painel do 5º Congresso Latino-Americano de Casos de Open Innovation.",
-    "nivelImpacto": "Baixo",
-    "empresasImpactadas": [
-      "Grupo Equatorial"
-    ],
-    "areaResponsavel": "EQT Lab",
-    "responsavel": "Eduardo dos Santos Rocha",
-    "palavrasChave": [
-      "open innovation",
-      "inovação aberta",
-      "EQT Lab",
-      "100 Open Startups",
-      "congresso",
-      "startups"
     ],
     "ativo": true,
     "status": "Publicado",

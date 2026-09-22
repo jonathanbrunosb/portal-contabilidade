@@ -12,6 +12,18 @@
     "destino": "portais-externos"
   },
   {
+    "id": "claude",
+    "origem": "externo",
+    "nome": "Claude",
+    "descricao": "Assistente de IA da Anthropic. Ajuda a redigir e revisar textos, analisar documentos longos, explicar uma norma em linguagem simples e esboçar fórmulas, planilhas e roteiros de automação.",
+    "icon": "radar",
+    "grupo": "Inteligência artificial",
+    "link": "https://claude.ai/",
+    "imagem": "assets/externos/claude.svg",
+    "observacao": "Ferramenta pública: não insira dado sigiloso do Grupo, informação de terceiros nem número ainda não divulgado.",
+    "destino": "portais-externos"
+  },
+  {
     "id": "coolors-paletas",
     "origem": "externo",
     "nome": "Coolors — paletas em alta",

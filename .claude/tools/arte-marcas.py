@@ -361,6 +361,8 @@ MARCA = {
     'servicenow': ('servicenow.svg', BRANCO, {}), 'microsoft': ('microsoft.svg', BRANCO, {}),
     'power-bi': ('power-bi.svg', BRANCO, {}), 'meta': ('meta.svg', BRANCO, {}),
     'gemini': ('gemini.svg', BRANCO, {}), 'coolors': ('coolors.svg', BRANCO, {}),
+    # Fundo medido na tela de entrada do claude.ai (tema claro), 22/09/2026.
+    'claude': ('claude.svg', '#fcfcfb', {}),
     'datylon': ('datylon.svg', BRANCO, {}), 'ilovepdf': ('ilovepdf.svg', BRANCO, {}),
     'actio': ('actio.png', BRANCO, {}), 'paytrack': ('paytrack.png', BRANCO, {}),
     'passatempo': ('passatempo.png', BRANCO, {}),
@@ -615,6 +617,7 @@ CARTOES = {
         'ey-canvas': marca('EY', 'ey', 'Canvas · Client Portal'),
         'chatgpt': marca('ChatGPT, da OpenAI', 'openai', 'ChatGPT'),
         'gemini': marca('Google Gemini', 'gemini'),
+        'claude': marca('Claude, da Anthropic', 'claude'),
         'wetransfer': marca('WeTransfer', 'wetransfer'),
         'datylon-graficos': marca('Datylon', 'datylon'),
         'coolors-paletas': marca('Coolors', 'coolors'),

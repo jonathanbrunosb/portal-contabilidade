@@ -374,6 +374,18 @@ identificado:
   no Chrome do usuário não entrou.
 - Busca do cabeçalho: "rit" sugere o cartão; console limpo.
 
+## Claude nos Externos — 22/09/2026
+
+- **Cartão** "Claude" em Portais e Links › Externos (8 cartões), grupo
+  "Inteligência artificial", ao lado do ChatGPT e do Gemini; Acessar abre
+  `https://claude.ai/`; ficha com a mesma observação dos outros assistentes
+  (ferramenta pública, nada sigiloso).
+- **Arte** no modo marca (`assets/externos/claude.svg`): a logo oficial da
+  tela de entrada do claude.ai — o SVG lido do DOM, conferido por soma dos
+  traçados (1938 e 5802 caracteres, iguais ao site) — sobre o fundo medido
+  `#fcfcfb`. A foto e o slogan da tela ficaram de fora.
+- Busca do cabeçalho: "claude" sugere o cartão; console limpo.
+
 ## Limites e checklist para homologação corporativa
 
 Não houve navegação nos sistemas reais, pois seus endereços não foram fornecidos. Downloads foram validados pelo destino HTTP e atributo de download; o fluxo de salvamento do navegador não foi homologado separadamente. Pausa por hover, preferência de movimento, navegação completa por teclado, zoom de 200% e políticas específicas de Chrome/Edge devem integrar a homologação corporativa. A implementação desses comportamentos está no código, mas não se declara aqui uma certificação de acessibilidade.

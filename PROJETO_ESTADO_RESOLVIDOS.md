@@ -6,6 +6,12 @@
 
 ## 2026-09-22
 
+### Claude em Portais e Links › Externos
+- **Era:** o usuário pediu o `https://claude.ai/` nos Externos.
+- **Solução:** registro `claude` em `data/externos.json` (grupo "Inteligência artificial", descrição e observação no padrão do ChatGPT e do Gemini). Arte no modo marca, como os vizinhos: a logo oficial sobre o fundo da tela de entrada.
+- **Detalhes técnicos:** `assets/marcas/claude.svg` montado com os dois traçados do SVG da logo da tela de entrada do claude.ai (viewBox 112×24; ícone `#d97757`, nome `#0b0b0b`), lidos do DOM no navegador do app e conferidos por soma de verificação; origem em `assets/marcas/FONTES.md`. `MARCA['claude']` com fundo `#fcfcfb` (medido no tema claro) e `CARTOES['externos']['claude']` no `arte-marcas.py`. A foto da tela (provavelmente licenciada) e o slogan não entraram. As artes que o gerador reescreveu sem ser do assunto voltaram ao commitado.
+- **Verificação:** TESTES.md, "Claude nos Externos — 22/09/2026".
+
 ### BMP e RIT (ANEEL) em Portais e Links › Externos
 - **Era:** o usuário pediu o `http://bmp2.aneel.gov.br/UploadRit.aspx` nos Externos, com o nome "BMP e RIT - Envio e Consulta", e deixou a página aberta no Chrome para mapear a identidade da arte.
 - **Solução:** registro `bmp-rit` em `data/externos.json` (`destino: portais-externos`, grupo "Setor elétrico", observação sobre o acesso do agente e o XML do RIT). Arte no modo tela, composta por `.claude/tools/arte_bmp.py` (registrada como `pronto` no `arte-marcas.py`): barra verde do governo, cabeçalho azul em listras de 2 px, faixa do menu com as abas chanfradas, faixa do título "RIT" e o quadro "Orientação".

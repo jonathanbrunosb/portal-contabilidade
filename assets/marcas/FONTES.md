@@ -26,6 +26,7 @@ botão **"Trocar imagem"**, na própria imagem do cartão.
 | `ey.svg` | EY | site oficial da EY |
 | `openai.svg` | OpenAI | Wikimedia Commons — `ChatGPT logo.svg` |
 | `gemini.svg` | Google | Wikimedia Commons — `Google Gemini logo.svg` |
+| `claude.svg` | Anthropic | claude.ai — o SVG da logo da tela de entrada (ícone em `#d97757` e o nome em `#0b0b0b`), lido do DOM em 22/09/2026 |
 | `google.svg` | Google | Wikimedia Commons |
 | `meta.svg` | Meta Platforms | Wikimedia Commons — usada no cartão do Workplace |
 | `servicenow.svg` | ServiceNow | Wikimedia Commons |

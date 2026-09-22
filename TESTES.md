@@ -331,6 +331,36 @@ Contabilidade (a Movimentação por decisão do usuário):
   "Mais comunicados" (página do IFRS 16), em 1366 e 375, as cinco pessoas
   aparecem inteiras no quadro de 128×112; o `imagemFoco` não entra ali.
 
+## Busca do cabeçalho com sugestões — 22/09/2026
+
+Pedido do usuário: a busca "não está funcionando" e, ao digitar, deve aparecer
+a lista de sugestões abaixo. Causa: os resultados apareciam abaixo do
+carrossel (a 537 px de uma janela de 657) e cada registro era comparado como
+JSON inteiro. Conferido com Playwright (Chromium), perfil Visitante e perfil
+identificado:
+
+- **Sugestões** (1366 px): 1 letra não abre; "sap" → SAP e SAP HANA (atalhos),
+  Fechamento SAP (automação), SAP — solicitações (Portal de Serviços), MigraSAP
+  e ProjectHub (comunicados), "Ver todos os 10 resultados"; "power bi" → o
+  portal, o BI - Gastos Gerenciáveis e a página Portais e Links › Power BI;
+  "fb03" → Print em Lote de Documentos (FB03); "cpc 06" → o sistema e o
+  comunicado do IFRS 16; "link" caiu de 59 para 8; "xyzw" → mensagem com o que
+  dá para buscar.
+- **Teclado e ARIA**: `role="combobox"`, `aria-expanded`, `aria-controls`,
+  `aria-activedescendant` seguindo as setas; Esc fecha; status "N resultados"
+  para leitor de tela. Enter numa sugestão externa abre a nova aba (SAP HANA);
+  clique idem (Snowflake).
+- **Destinos**: comunicado abre a página dele; página do portal abre com a aba
+  certa; Enter sem escolha → `#busca/ifrs` ("5 resultados", grupos Portais e
+  Links, Documentos & Normas e Comunicação); filtro "Onde" = Comunicação → 3;
+  Voltar do navegador retorna à busca; `#busca/transação SAP` aberto direto
+  preenche o campo.
+- **Perfil identificado** (Ana Laura, equipe da Contabilidade): "alexandra"
+  traz a pessoa (Pessoas) e o comunicado da Movimentação. Visitante não vê
+  Pessoas (sem a capacidade `time`).
+- **375 px**: a caixa ocupa a largura do campo (16–359 px), sem rolagem
+  lateral; console limpo em todos os passos.
+
 ## Limites e checklist para homologação corporativa
 
 Não houve navegação nos sistemas reais, pois seus endereços não foram fornecidos. Downloads foram validados pelo destino HTTP e atributo de download; o fluxo de salvamento do navegador não foi homologado separadamente. Pausa por hover, preferência de movimento, navegação completa por teclado, zoom de 200% e políticas específicas de Chrome/Edge devem integrar a homologação corporativa. A implementação desses comportamentos está no código, mas não se declara aqui uma certificação de acessibilidade.

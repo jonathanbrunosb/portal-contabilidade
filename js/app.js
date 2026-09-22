@@ -1,12 +1,13 @@
-import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260921-50';
-import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js?v=20260921-50';
-import { initializeNavigation,markCurrentSection,bindTabs,selectTab } from './navigation.js?v=20260921-50';
-import { comunicados,filtrarComunicados,faixaComunicado,paginaComunicado,colunasOrigem,itemDaColuna,hashComunicado,ligarMidias,ultimaAtualizacaoLabel } from './newsletter.js?v=20260921-50';
-import { renderTeamStructure } from './teams.js?v=20260921-50';
-import { initCarousel,slideHTML } from './carousel.js?v=20260921-50';
-import { TIPOS_ALVO,SITUACOES,LIMITE_NO_AR,situacaoDestaque,alvoDoDestaque,resolverDestaque,destaquesNoAr,destaqueDoAlvo } from './destaques.js?v=20260921-50';
-import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,comVersao,notify,ORIGENS,seloOrigem,opcoesOrigem } from './ui.js?v=20260921-50';
-import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js?v=20260921-50';
+import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260922-1';
+import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js?v=20260922-1';
+import { initializeNavigation,markCurrentSection,bindTabs,selectTab } from './navigation.js?v=20260922-1';
+import { comunicados,filtrarComunicados,faixaComunicado,paginaComunicado,colunasOrigem,itemDaColuna,hashComunicado,ligarMidias,ultimaAtualizacaoLabel,textoDoComunicado } from './newsletter.js?v=20260922-1';
+import { prepararIndice,agrupar,destacar,termosDe,atributosDoLink,ligarBuscaTopo,MINIMO_CARACTERES } from './busca.js?v=20260922-1';
+import { renderTeamStructure } from './teams.js?v=20260922-1';
+import { initCarousel,slideHTML } from './carousel.js?v=20260922-1';
+import { TIPOS_ALVO,SITUACOES,LIMITE_NO_AR,situacaoDestaque,alvoDoDestaque,resolverDestaque,destaquesNoAr,destaqueDoAlvo } from './destaques.js?v=20260922-1';
+import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,comVersao,notify,ORIGENS,seloOrigem,opcoesOrigem } from './ui.js?v=20260922-1';
+import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js?v=20260922-1';
 let data,currentTab='comunicacao',currentAdminTab='equipes',currentUser,currentMenu=[],navSections=[];
 const $=selector=>document.querySelector(selector);
 const TITULO_PADRAO=document.title;
@@ -554,6 +555,17 @@ function ligarLinha() {
 function routeItem(hash) {
   const [target,sub,colecao,id]=String(hash||'').replace(/^#/,'').split('/');
   if(target==='inicio'||!target)return {target:'inicio'};
+  // Página de resultados da busca: #busca/<termo> (não está no menu).
+  if(target==='busca') {
+    let consulta='';
+    try {
+      consulta=decodeURIComponent(sub||'');
+    }
+    catch {
+      consulta=sub||'';
+    }
+    return {target:'busca',consulta};
+  }
   const base=currentMenu.find(item=>item.target===target);
   if(!base)return null;
   if(target==='central'&&sub==='comunicado'&&colecao&&id)return {...base,tab:'comunicado',comunicado:{colecao,id:decodeURIComponent(id)}};
@@ -564,6 +576,7 @@ function routeItem(hash) {
   return base;
 }
 function routeHash(item) {
+  if(item.target==='busca')return `#busca/${encodeURIComponent(item.consulta||'')}`;
   if(item.target==='central'&&item.tab==='comunicado'&&item.comunicado)return hashComunicado(item.comunicado.colecao,item.comunicado.id);
   if(item.target==='central'&&item.tab)return `#central/${item.tab}`;
   if(item.target==='administracao'&&item.adminTab)return `#administracao/${item.adminTab}`;
@@ -586,6 +599,19 @@ function navigate(item,updateHistory=true) {
     if(updateHistory)history.pushState(null,'','#inicio');
     window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
     $('#main').focus({preventScroll:true});
+    return;
+  }
+  if(item.target==='busca') {
+    $('#home-view').hidden=true;
+    $('#page-view').hidden=false;
+    $('.pg-subnav').hidden=true;
+    $('#equipes').hidden=true;
+    $('#administracao').hidden=true;
+    activateMenu(item);
+    $('#page-title').textContent='Busca no portal';
+    if(updateHistory)history.pushState(null,'',routeHash(item));
+    renderResultadosBusca(item.consulta||'');
+    window.scrollTo({top:0,behavior:'auto'});
     return;
   }
   if(item.adminTab&&item.adminTab!==currentAdminTab)currentAdminTab=item.adminTab;
@@ -1530,45 +1556,173 @@ async function salvarImagemCartao(collection,item,imagem) {
     notify(error.message);
   }
 }
-// Coleções da busca global, na ordem dos resultados, e o nome de cada uma no
-// cartão do resultado.
-const BUSCA_COLECOES= {
-  newsletter:'Comunicação',noticias:'Comunicação',sistemas:'Sistemas da área',automacoes:'Automações',links:'Atalhos corporativos',portais:'Portais do Grupo',externos:'Links externos',documentos:'Documentos & Normas',processos:'Processos',equipes:'Equipes',usuarios:'Colaboradores',agenda:'Agenda',entregas:'Entregas'
-}
-;
-// Os atalhos (config.json › links) não têm id: a posição na lista faz esse
-// papel, como no "i" do cartão (`links:<posição>`, aberto por showLinkInfo).
-const registrosDaBusca=collection=>collection==='links'
-  ?data.config.links.map((item,index)=>({...item,id:String(index)})).filter(item=>!item.target)
-  :data[collection]||[];
-function search(query) {
-  const normalized=normalize(query.trim());
-  $('#search-section').hidden=!normalized;
-  if(!normalized)return 0;
-  const origem=$('#search-origem')?.value||'';
-  // Comunicados: só os que a Comunicação mostra (publicados, sem a cópia
-  // duplicada entre Newsletter e Notícias).
-  const visiveis=new Set(comunicados(data).map(({item,colecao})=>`${colecao}:${item.id}`));
-  const matches=[];
-  for(const collection of Object.keys(BUSCA_COLECOES)) {
-    if(!hasAccess(currentUser,COLLECTION_ACCESS[collection]))continue;
-    for(const item of registrosDaBusca(collection)) {
-      if((collection==='newsletter'||collection==='noticias')&&!visiveis.has(`${collection}:${item.id}`))continue;
-      if(collection==='automacoes'&&item.ativo===false)continue;
-      const origemItem=origemDe(collection,item);
-      if(origem&&origemItem!==origem)continue;
-      if(normalize(JSON.stringify(item)).includes(normalized))matches.push( {
-        collection,item,origem:origemItem
+// ===== Busca do cabeçalho =====
+// O que se busca (revisto em 22/09/2026): as páginas do portal, os
+// comunicados publicados, tudo o que tem cartão (sistemas, portais, links
+// externos, atalhos, automações, documentos), as pessoas das equipes, os
+// avisos e a agenda da capa e, para a gerência, processos e entregas. Cada
+// coleção entra só com os campos que uma pessoa usaria para achar o item
+// (nome, descrição, grupo, responsável…), nunca o JSON inteiro. O grupo de
+// cada resultado é o nome da seção do menu onde o item mora.
+const GRUPOS_BUSCA=['Páginas do portal','Comunicação','Portais e Links','Sistemas e automações','Documentos & Normas','Pessoas','Avisos e agenda','Gestão'];
+const acaoExterna=url=>({tipo:'externo',url});
+const acaoNavegar=item=>item?{tipo:'navegar',item,href:routeHash(item)}:null;
+const acaoFicha=(collection,id)=>({tipo:'funcao',executar:()=>collection==='links'?showLinkInfo(id):showRecord(collection,id)});
+function indiceDaBusca() {
+  const pode=collection=>hasAccess(currentUser,COLLECTION_ACCESS[collection]);
+  const entradas=[];
+  const incluir=entrada=>{if(entrada.acao)entradas.push(entrada);};
+  // Páginas: cada aba da faixa de subpáginas é uma página ("Portais e Links ›
+  // Power BI"); seção de uma página só entra pelo próprio nome.
+  navSections.forEach(secao=> {
+    const paginas=paginasDe(secao);
+    if(!paginas.length) {
+      incluir({grupo:'Páginas do portal',titulo:secao.label,detalhe:'Página do portal',icone:secao.icon,texto:'',peso:4,acao:acaoNavegar(secao.target==='inicio'?{target:'inicio'}:routeItem(`#${secao.target}`))});
+      return;
+    }
+    paginas.forEach(pagina=>incluir( {
+      grupo:'Páginas do portal',titulo:paginas.length>1?`${secao.label} › ${pagina.label}`:pagina.label,
+      detalhe:paginas.length>1?'Página do portal':`Página do portal · ${secao.label}`,icone:secao.icon||pagina.icon,
+      texto:secao.label,peso:4,acao:acaoNavegar(pagina)
+    }
+    ));
+  }
+  );
+  comunicados(data).forEach(({item,colecao})=>incluir( {
+    grupo:'Comunicação',titulo:item.titulo,detalhe:[ORIGENS[item.origem],item.categoria,dateLabel(item.dataPublicacao)].filter(Boolean).join(' · '),
+    resumo:item.resumo,origem:item.origem,icone:'news',
+    texto:[item.resumo,item.categoria,(item.palavrasChave||[]).join(' '),item.fonte,item.areaResponsavel,textoDoComunicado(item)].join(' '),
+    acao:acaoNavegar(routeItem(hashComunicado(colecao,item.id)))
+  }
+  ));
+  const destino=(url,collection,id)=>url?acaoExterna(url):acaoFicha(collection,id);
+  if(pode('sistemas'))data.sistemas.forEach(item=>incluir( {
+    grupo:'Portais e Links',titulo:item.nome,detalhe:['Sistema da Contabilidade',item.responsavel].filter(Boolean).join(' · '),
+    resumo:item.descricao,origem:origemDe('sistemas',item),icone:item.icon||'grid',texto:`${item.descricao||''} ${item.responsavel||''}`,
+    acao:safeURL(item.link)?acaoExterna(safeURL(item.link)):{tipo:'funcao',executar:()=>openAccess(item)}
+  }
+  ));
+  const linkDeGrupo=(collection,grupo)=>item=> {
+    const url=safeURL(item.link);
+    incluir( {
+      grupo,titulo:item.nome,detalhe:[item.grupo,url&&dominioDe(url)].filter(Boolean).join(' · '),resumo:item.descricao,
+      origem:origemDe(collection,item),icone:item.icon||'link',texto:`${item.descricao||''} ${item.grupo||''} ${url?dominioDe(url):''}`,
+      acao:destino(url,collection,item.id)
+    }
+    );
+  };
+  if(pode('portais'))data.portais.forEach(linkDeGrupo('portais','Portais e Links'));
+  if(pode('externos'))data.externos.forEach(item=>linkDeGrupo('externos',item.destino==='automacoes-externos'?'Sistemas e automações':'Portais e Links')(item));
+  if(pode('links'))data.config.links.forEach((item,indice)=> {
+    if(item.target)return;
+    const url=safeURL(item.link);
+    incluir( {
+      grupo:'Sistemas e automações',titulo:item.nome,detalhe:['Atalho corporativo',url&&dominioDe(url)].filter(Boolean).join(' · '),resumo:item.descricao,
+      origem:origemDe('links',item),icone:item.icon||'link',texto:item.descricao||'',acao:destino(url,'links',String(indice))
+    }
+    );
+  }
+  );
+  if(pode('automacoes'))activeAutomations().forEach(item=>incluir( {
+    grupo:'Sistemas e automações',titulo:item.titulo,detalhe:['Automação',AUTOMATION_FAMILIAS[item.familia]||item.tipo,item.statusDesenvolvimento].filter(Boolean).join(' · '),
+    resumo:item.descricao,origem:origemDe('automacoes',item),icone:'flow',texto:`${item.descricao||''} ${item.tipo||''} ${item.categoriaPortal||''}`,
+    acao:destino(safeURL(item.url),'automacoes',item.id)
+  }
+  ));
+  if(pode('documentos'))data.documentos.forEach(item=>incluir( {
+    grupo:'Documentos & Normas',titulo:item.titulo,detalhe:[item.grupo,item.fonte].filter(Boolean).join(' · '),resumo:item.descricao,
+    origem:item.origem,icone:ICONE_GRUPO[item.grupo]||'file',texto:`${item.descricao||''} ${item.grupo||''} ${item.fonte||''}`,
+    acao:destino(safeURL(item.link)||safeURL(item.arquivo),'documentos',item.id)
+  }
+  ));
+  // Pessoas: o quadro das equipes (a mesma pessoa em duas equipes entra uma vez).
+  const paginaEquipes=currentMenu.find(item=>item.view==='equipes');
+  if(pode('equipes')&&paginaEquipes) {
+    const vistas=new Set();
+    data.equipes.forEach(equipe=>(equipe.responsaveis||[]).forEach(pessoa=> {
+      if(vistas.has(pessoa.id))return;
+      vistas.add(pessoa.id);
+      incluir( {
+        grupo:'Pessoas',titulo:pessoa.nome,detalhe:[pessoa.cargo||'Colaborador',equipe.nome].join(' · '),origem:'contabilidade',icone:'users',
+        texto:`${pessoa.cargo||''} ${equipe.nome} ${equipe.sigla||''}`,acao:acaoNavegar(paginaEquipes)
       }
       );
     }
+    ));
   }
-  $('#search-count').textContent=`${matches.length} resultado${matches.length===1?'':'s'} para “${query.trim()}”${origem?` em ${ORIGENS[origem]}`:''}`;
-  $('#search-results').innerHTML=matches.map(( {
-    collection,item,origem
+  // Avisos e agenda: o que a capa mostra hoje.
+  (data.avisos||[]).filter(vigente).forEach(aviso=>incluir( {
+    grupo:'Avisos e agenda',titulo:aviso.titulo,detalhe:['Aviso',AVISO_TIPOS[aviso.tipo],aviso.janela].filter(Boolean).join(' · '),resumo:aviso.texto,
+    origem:aviso.origem,icone:'bell',texto:`${aviso.texto||''} ${aviso.area||''}`,acao:{tipo:'funcao',executar:()=>openAviso(aviso.id)}
   }
-  )=>`<article class="content-card"><p class="meta-label rotulo-com-selo">${seloOrigem(origem)}<span>${e(BUSCA_COLECOES[collection])}</span></p><h3>${e(item.titulo||item.nome)}</h3><p>${e(item.resumo||item.descricao||item.cargo||'')}</p><button class="text-btn" data-record="${e(collection)}:${e(item.id)}">Ver detalhes</button></article>`).join('')||'<p class="empty-state">Nenhum resultado. Experimente “SAP”, “IFRS” ou “Contabilidade IV”.</p>';
-  return matches.length;
+  ));
+  compromissosNaCapa().forEach(compromisso=>incluir( {
+    grupo:'Avisos e agenda',titulo:compromisso.nome,detalhe:['Agenda',dateLabel(compromisso.data),horarioCompromisso(compromisso)].filter(Boolean).join(' · '),
+    resumo:compromisso.descricao,origem:origemDe('agenda',compromisso),icone:'calendar',texto:`${compromisso.descricao||''} ${compromisso.local||''}`,
+    acao:{tipo:'funcao',executar:()=>openCompromisso(compromisso.id)}
+  }
+  ));
+  ['processos','entregas'].forEach(collection=> {
+    if(pode(collection))(data[collection]||[]).forEach(item=>incluir( {
+      grupo:'Gestão',titulo:item.nome,detalhe:[collection==='processos'?'Processo crítico':'Entrega',item.responsavel,item.status].filter(Boolean).join(' · '),
+      origem:origemDe(collection,item),icone:collection==='processos'?'flow':'check',texto:`${item.descricao||''} ${item.responsavel||''}`,acao:acaoFicha(collection,item.id)
+    }
+    ));
+  }
+  );
+  return entradas;
+}
+const buscarNoPortal=consulta=>prepararIndice(indiceDaBusca())(consulta);
+// Levar ao destino escolhido na busca (caixa de sugestões ou página de
+// resultados). Link externo já abriu pelo próprio <a>; aqui só se registra.
+function executarBusca(entrada,{consulta=''}={}) {
+  track('search_select',{query:consulta,grupo:entrada.grupo,titulo:entrada.titulo});
+  const acao=entrada.acao;
+  if(acao.tipo==='externo')track('system_access',{sistema:entrada.titulo,configurado:true});
+  else if(acao.tipo==='navegar')navigate(acao.item);
+  else if(acao.tipo==='funcao')acao.executar();
+}
+function abrirResultadosBusca(consulta) {
+  track('search',{query:consulta,resultados:buscarNoPortal(consulta).length});
+  navigate({target:'busca',consulta});
+}
+// Página de resultados (#busca/<termo>): a mesma faixa de busca e filtros das
+// outras telas, e os resultados agrupados pela seção do menu.
+let resultadosExibidos=[];
+function renderResultadosBusca(consulta) {
+  const busca={id:'res-busca',rotulo:'Pesquisar no portal',placeholder:'Sistema, portal, transação SAP, norma, comunicado ou pessoa…'};
+  // Os filtros só oferecem o que existe no índice de quem está buscando.
+  const indice=indiceDaBusca();
+  const presentes=GRUPOS_BUSCA.filter(grupo=>indice.some(entrada=>entrada.grupo===grupo));
+  const filtros=[{id:'res-grupo',rotulo:'Onde',todos:'Todo o portal',opcoes:presentes},...filtroOrigem('res-origem',indice)];
+  $('#content-view').innerHTML=`${barraFiltro({busca,filtros})}<div id="res-lista" class="busca-resultados"></div><div class="content-footer"><span id="res-count" role="status" aria-live="polite"></span><span>A busca olha nomes, descrições, grupos, responsáveis e o texto dos comunicados. Links externos abrem em outra aba.</span></div>`;
+  $('#res-busca').value=consulta;
+  ligarBarraFiltro({busca,filtros,aoMudar:()=> {
+    const termo=$('#res-busca').value.trim(),grupo=$('#res-grupo').value,origem=$('#res-origem')?.value||'';
+    // O endereço acompanha o termo, para voltar e compartilhar a busca.
+    if(!$('#page-view').hidden)history.replaceState(null,'',`#busca/${encodeURIComponent(termo)}`);
+    document.title=`${termo?`Busca: ${termo}`:'Busca'} | Portal Contabilidade`;
+    const encontrados=buscarNoPortal(termo).filter(r=>(!grupo||r.grupo===grupo)&&(!origem||r.origem===origem));
+    const termos=termosDe(termo);
+    let n=0;
+    const linha=entrada=>`<li><a class="busca-item" data-resultado="${n++}" ${atributosDoLink(entrada)}>${icon(entrada.icone||'file')}<span class="busca-item-corpo"><span class="busca-item-meta">${seloOrigem(entrada.origem)}<span>${e(entrada.detalhe||'')}</span></span><span class="busca-item-titulo">${destacar(entrada.titulo,termos)}</span>${entrada.resumo?`<span class="busca-item-resumo">${e(entrada.resumo)}</span>`:''}</span>${entrada.acao.tipo==='externo'?icon('external').replace('class="icon"','class="icon ext"'):''}</a></li>`;
+    const grupos=agrupar(encontrados);
+    resultadosExibidos=grupos.flatMap(g=>g.itens);
+    const curta=normalize(termo).length<MINIMO_CARACTERES;
+    $('#res-lista').innerHTML=grupos.map(g=>`<section class="busca-grupo" aria-labelledby="res-g-${n}"><h2 id="res-g-${n}">${e(g.grupo)} <span>${g.itens.length}</span></h2><ul>${g.itens.map(linha).join('')}</ul></section>`).join('')
+      ||`<p class="empty-state">${curta?'Digite ao menos duas letras para buscar.':`Nada encontrado para “${e(termo)}”${grupo||origem?' com esses filtros':''}. Procure pelo nome de um sistema, portal ou automação, uma transação SAP (ex.: FB03), uma norma (ex.: CPC 06), um comunicado ou uma pessoa.`}</p>`;
+    $('#res-count').textContent=curta?'':`${contagem(encontrados.length,'resultado','resultados')} para “${termo}”`;
+  }
+  }
+  );
+  $('#res-lista').addEventListener('click',evento=> {
+    const link=evento.target.closest('[data-resultado]');
+    const entrada=link&&resultadosExibidos[Number(link.dataset.resultado)];
+    if(!entrada)return;
+    if(entrada.acao.tipo!=='externo')evento.preventDefault();
+    executarBusca(entrada,{consulta:$('#res-busca').value.trim()});
+  }
+  );
 }
 function preferences() {
   let prefs= {
@@ -1697,27 +1851,13 @@ async function init() {
     $('#switch-identity').onclick=openIdentityPicker;
     if(!getStoredUserId())openIdentityPicker();
     $('#new-draft').onclick=openNewDraft;
-    $('#search-form').onsubmit=event=> {
-      event.preventDefault();
-      const query=$('#global-search').value.trim();
-      const resultados=search(query);
-      if(query)track('search',{query,resultados});
-      if(!$('#search-section').hidden)$('#search-section').scrollIntoView();
+    // Busca do cabeçalho: sugestões abaixo do campo enquanto se digita; Enter
+    // sem escolher uma sugestão abre a página com todos os resultados.
+    ligarBuscaTopo( {
+      form:$('#search-form'),campo:$('#global-search'),buscar:buscarNoPortal,
+      executar:executarBusca,verTodos:abrirResultadosBusca
     }
-    ;
-    $('#global-search').oninput=event=> {
-      if(event.target.value&&$('#home-view').hidden)navigate({target:'inicio'},false);
-      search(event.target.value);
-    };
-    $('#search-origem').innerHTML=`<option value="">Todas as origens</option>${Object.entries(ORIGENS).map(([valor,rotulo])=>`<option value="${valor}">${rotulo}</option>`).join('')}`;
-    $('#search-origem').onchange=()=>search($('#global-search').value);
-    $('#clear-search').onclick=()=> {
-      $('#global-search').value='';
-      $('#search-origem').value='';
-      search('');
-      $('#global-search').focus();
-    }
-    ;
+    );
     document.addEventListener('keydown',event=> {
       if(event.key==='/'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)&&!$('#detail-dialog').open) {
         event.preventDefault();

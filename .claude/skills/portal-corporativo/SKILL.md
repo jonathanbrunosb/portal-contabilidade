@@ -284,7 +284,8 @@ preview a cada fatia.
   um tema escuro for criado, confira os dois), navegando só pelo teclado ao menos uma vez (Tab, `/` para a busca,
   setas nas abas).
 - Veja o console (`read_console_messages`) — nenhum erro novo.
-- Busca global, abas da Central de conteúdo, diálogo de detalhes, janela de
+- Busca do cabeçalho (sugestões abaixo do campo ao digitar; Enter abre
+  `#busca/<termo>`), abas da Central de conteúdo, diálogo de detalhes, janela de
   Equipes e Administração precisam continuar funcionando.
 
 ## Checklist de saída de cada fatia

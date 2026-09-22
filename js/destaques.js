@@ -1,5 +1,5 @@
-import { safeURL } from './ui.js?v=20260921-50';
-import { comunicados,hashComunicado } from './newsletter.js?v=20260921-50';
+import { safeURL } from './ui.js?v=20260922-1';
+import { comunicados,hashComunicado } from './newsletter.js?v=20260922-1';
 // Destaques do carrossel da capa (decisão do usuário em 21/09/2026).
 //
 // Cada slide é um registro de data/destaques.json que **aponta para um

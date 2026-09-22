@@ -4,6 +4,16 @@
 
 ---
 
+## 2026-09-22
+
+### Busca do cabeçalho com sugestões
+- **Era:** o usuário disse que a busca do topo "não está funcionando" e pediu a lista de sugestões abaixo do campo ao digitar. Ela funcionava, mas mostrava os resultados numa seção abaixo do carrossel (a 537 px de uma janela de 657 — fora da tela), navegava para a capa a cada letra e comparava o JSON inteiro de cada registro ("link" achava 59 itens pelo nome do campo). Os cartões de resultado só abriam a ficha, não o destino.
+- **Solução:** caixa de sugestões abaixo do campo (padrão combobox da WAI-ARIA), agrupada pela seção do menu, com o trecho encontrado marcado; Enter sem escolha abre a página `#busca/<termo>` com os filtros "Onde" e "Origem". Escolher leva ao destino (página, comunicado, link em outra aba ou ficha). O índice passou a incluir as páginas do portal, os documentos e as pessoas das equipes, só com os campos que uma pessoa usaria.
+- **Detalhes técnicos:** módulo novo `js/busca.js` (`prepararIndice`, `pontuar` — título igual/começando/início de palavra/contendo > texto de apoio, todos os termos obrigatórios, palavras vazias fora —, `agrupar`, `destacar` com mapa letra normalizada → letra original, `ligarBuscaTopo`). Em `js/app.js`: `indiceDaBusca()`, `executarBusca()`, `abrirResultadosBusca()`, `renderResultadosBusca()`; rota `busca` em `routeItem`/`routeHash`/`navigate`; saíram `search()`, `BUSCA_COLECOES`, `registrosDaBusca` e os ouvintes antigos. `newsletter.js` exporta `textoDoComunicado`. `index.html` perdeu `#search-section`; CSS `.ph-sugestoes*`, `.ph-sugestao*`, `.busca-*` no lugar de `.search-section`/`.search-acoes`. Cache-buster 20260922-1.
+- **Verificação:** TESTES.md, "Busca do cabeçalho com sugestões — 22/09/2026".
+
+---
+
 ## 2026-09-21
 
 > O trabalho deste dia foi commitado **por assunto** na branch `ajustes-frontend-dudu` (`59832ff`..`8e7b0ef` + o commit do checkpoint), sem push.

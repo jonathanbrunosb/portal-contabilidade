@@ -1274,34 +1274,6 @@ tbody tr:hover {
   align-items:center;
   font-size:var(--fs-xs)}
 
-.search-section {
-  margin-bottom:22px;
-  padding-bottom:22px}
-
-.search-section>p,.search-section>.card-grid {
-  margin:0 24px 12px}
-
-.search-section .card-grid {
-  grid-template-columns:repeat(3,minmax(0,1fr))}
-
-.search-section .section-heading {
-  flex-wrap:wrap}
-
-/* Filtro de origem da busca global, ao lado de "Limpar busca". */
-.search-acoes {
-  display:flex;
-  align-items:center;
-  gap:12px}
-
-.search-acoes select {
-  min-width:0;
-  background:var(--superficie-sutil);
-  border:1px solid var(--borda);
-  padding:7px 10px;
-  border-radius:var(--raio-sm);
-  color:var(--texto);
-  font-size:var(--fs-sm)}
-
 .filter-bar {
   display:flex;
   flex-wrap:wrap;
@@ -2012,9 +1984,6 @@ th,td {
 .delivery-bottom {
   flex-wrap:wrap}
 
-.search-section .card-grid {
-  grid-template-columns:1fr}
-
 .detail-grid {
   grid-template-columns:1fr}
 
@@ -2544,7 +2513,7 @@ th,td {
   background:
     linear-gradient(100deg,#071f49f2 0%,#071f49d9 38%,#0b376aa6 62%,#075c8070 85%,#075c8047 100%),
     linear-gradient(90deg,var(--marinho-escuro) 0 2px,color-mix(in srgb,var(--marinho-escuro) 55%,transparent) 18%,transparent 45%) right 0 top 0/var(--ph-foto-largura) 100% no-repeat,
-    url("../assets/images/banner/portal-gerencia-contabilidade.webp?v=20260921-50") right 0 top 30%/auto 420px no-repeat;
+    url("../assets/images/banner/portal-gerencia-contabilidade.webp?v=20260922-1") right 0 top 30%/auto 420px no-repeat;
   background-color:var(--marinho-escuro)}
 
 .ph-row {
@@ -2840,6 +2809,200 @@ th,td {
   .ph-top,.ph-search {
   transition:none}
 
+}
+
+/* ===== Busca do cabeçalho (22/09/2026) =====
+   Sugestões abaixo do campo enquanto se digita, na linguagem do menu do
+   usuário (.ph-drop): painel branco, fio laranja no alto, sombra média. O foco
+   fica no campo; a opção ativa (setas ou mouse) ganha o fundo azul-suave. */
+.ph-search {
+  position:relative}
+
+.ph-sugestoes {
+  position:absolute;
+  top:calc(100% + 6px);
+  left:-1px;
+  right:-1px;
+  z-index:40;
+  max-height:min(70vh,560px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding:6px 0;
+  background:#fff;
+  color:var(--texto);
+  border:1px solid rgba(0,0,0,.15);
+  border-top:3px solid var(--ph-laranja);
+  border-radius:0 0 var(--raio-xs) var(--raio-xs);
+  box-shadow:var(--sombra-alta)}
+
+.ph-sugestoes[hidden] {
+  display:none}
+
+.ph-sugestoes-grupo {
+  margin:8px 16px 4px;
+  color:var(--texto-apoio);
+  font-size:var(--fs-sm);
+  font-weight:var(--peso-medio)}
+
+.ph-sugestoes-lista > div + div {
+  border-top:1px solid var(--borda);
+  margin-top:6px}
+
+.ph-sugestao {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-height:44px;
+  padding:7px 16px;
+  color:var(--texto);
+  text-decoration:none}
+
+.ph-sugestao > .icon {
+  flex:none;
+  width:18px;
+  height:18px;
+  color:var(--texto-apoio)}
+
+.ph-sugestao-texto {
+  display:grid;
+  gap:1px;
+  min-width:0;
+  flex:1}
+
+.ph-sugestao-titulo {
+  overflow:hidden;
+  font-size:var(--fs-md);
+  font-weight:var(--peso-medio);
+  line-height:1.3;
+  text-overflow:ellipsis;
+  white-space:nowrap}
+
+.ph-sugestao-detalhe {
+  overflow:hidden;
+  color:var(--texto-apoio);
+  font-size:var(--fs-sm);
+  line-height:1.35;
+  text-overflow:ellipsis;
+  white-space:nowrap}
+
+.ph-sugestao .ext {
+  flex:none;
+  width:14px;
+  height:14px;
+  color:var(--texto-apoio-2)}
+
+.ph-sugestao[aria-selected="true"] {
+  background:var(--azul-suave)}
+
+.ph-sugestao[aria-selected="true"] .ph-sugestao-titulo,.ph-sugestao[aria-selected="true"] > .icon {
+  color:var(--azul-marca)}
+
+/* O trecho que bate com a consulta. */
+.ph-sugestao mark,.busca-item mark {
+  background:var(--ambar-fundo);
+  color:inherit;
+  border-radius:2px}
+
+.ph-sugestao-todos {
+  margin-top:6px;
+  border-top:1px solid var(--borda)}
+
+.ph-sugestao-todos .ph-sugestao-titulo {
+  color:var(--azul)}
+
+.ph-sugestoes-vazio {
+  margin:0;
+  padding:12px 16px;
+  color:var(--texto-apoio);
+  font-size:var(--fs-base);
+  line-height:1.5}
+
+/* Página de resultados (#busca/<termo>): grupos com a seção do menu e a
+   contagem; cada resultado é uma linha inteira clicável. */
+.busca-grupo + .busca-grupo {
+  margin-top:22px}
+
+.busca-grupo h2 {
+  margin:0 0 6px;
+  color:var(--texto);
+  font-size:var(--fs-lg);
+  font-weight:var(--peso-forte)}
+
+.busca-grupo h2 span {
+  color:var(--texto-apoio);
+  font-weight:var(--peso-medio)}
+
+.busca-grupo ul {
+  margin:0;
+  padding:0;
+  list-style:none;
+  border-top:1px solid var(--borda)}
+
+.busca-grupo li {
+  border-bottom:1px solid var(--borda)}
+
+.busca-item {
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+  padding:12px 8px;
+  color:var(--texto);
+  text-decoration:none;
+  transition:background-color var(--dur-estado) var(--ease-saida)}
+
+.busca-item > .icon {
+  flex:none;
+  width:20px;
+  height:20px;
+  margin-top:2px;
+  color:var(--texto-apoio)}
+
+.busca-item-corpo {
+  display:grid;
+  gap:3px;
+  min-width:0;
+  flex:1}
+
+.busca-item-meta {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+  color:var(--texto-apoio);
+  font-size:var(--fs-sm)}
+
+.busca-item-titulo {
+  font-size:var(--fs-md);
+  font-weight:var(--peso-medio);
+  line-height:1.35}
+
+.busca-item-resumo {
+  display:-webkit-box;
+  overflow:hidden;
+  color:var(--texto-2);
+  font-size:var(--fs-base);
+  line-height:1.5;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2}
+
+.busca-item .ext {
+  flex:none;
+  width:14px;
+  height:14px;
+  margin-top:4px;
+  color:var(--texto-apoio-2)}
+
+.busca-item:hover {
+  background:var(--superficie-sutil)}
+
+.busca-item:hover .busca-item-titulo {
+  color:var(--azul-marca);
+  text-decoration:underline;
+  text-underline-offset:3px}
+
+@media(prefers-reduced-motion:reduce) {
+  .busca-item {
+    transition:none}
 }
 
 /* ===== Capa: carrossel 16:9 (metade esquerda) + avisos e acesso rápido ===== */

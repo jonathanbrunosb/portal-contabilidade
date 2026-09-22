@@ -686,6 +686,36 @@ de movimento `--ease-saida` (ease-out-quart), `--dur-estado` (0,2 s) e
 
 ---
 
+## 12b. Busca do cabeçalho (22/09/2026)
+
+Pedido do usuário: ao digitar, a lista de sugestões aparece **abaixo do
+campo** (antes os resultados iam para baixo do carrossel, fora da tela).
+
+- **Caixa de sugestões** (`.ph-sugestoes`, dentro do `.ph-search`, que ganhou
+  `position:relative`): a linguagem do menu do usuário (`.ph-drop`) — painel
+  branco, fio `--ph-laranja` de 3 px no alto, `--sombra-alta`, até
+  `min(70vh,560px)` com rolagem própria. Grupos com o nome da seção do menu em
+  `--fs-sm`/peso médio, sem caixa alta; separador `--borda` entre grupos.
+  Opção (`.ph-sugestao`, 44 px de altura mínima): ícone, título (`--fs-md`,
+  peso médio, uma linha com reticências) e detalhe (`--fs-sm`,
+  `--texto-apoio`); ícone de link externo quando abre outra aba. Opção ativa:
+  fundo `--azul-suave`, título e ícone `--azul-marca`. O trecho que bate vem
+  em `<mark>` com fundo `--ambar-fundo`. Por último, "Ver todos os N
+  resultados" em `--azul`.
+- **Comportamento** (`js/busca.js`, padrão combobox da WAI-ARIA): abre a
+  partir de 2 letras; até 8 sugestões, 3 por grupo; o grupo do melhor
+  resultado vem primeiro. O foco não sai do campo (o `mousedown` na caixa é
+  cancelado); fecha com Esc, Tab, clique fora ou ao sair do formulário.
+- **Página de resultados** (`#busca/<termo>`): a faixa de busca e filtros de
+  sempre ("Onde" e "Origem"), grupos com `h2` em `--fs-lg` e a contagem em
+  peso médio, e cada resultado uma linha inteira clicável (`.busca-item`):
+  ícone, selo da origem + detalhe, título, subtítulo em 2 linhas. Hover:
+  fundo `--superficie-sutil` e título sublinhado em `--azul-marca`.
+- A antiga seção "Resultados da busca" (`#search-section`, abaixo do
+  carrossel, cartões com "Ver detalhes") saiu, com o CSS dela.
+
+---
+
 ## 13. Como conferir depois de mexer
 
 O script de auditoria de contraste usado aqui está em

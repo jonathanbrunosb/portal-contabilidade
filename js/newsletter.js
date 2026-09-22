@@ -1,4 +1,4 @@
-import { escapeHTML as e,icon,dateLabel,detailGrid,safeURL,comVersao,normalize,ORIGENS,seloOrigem } from './ui.js?v=20260921-50';
+import { escapeHTML as e,icon,dateLabel,detailGrid,safeURL,comVersao,normalize,ORIGENS,seloOrigem } from './ui.js?v=20260922-1';
 // Comunicação (decisão do usuário em 21/09/2026): a Newsletter Contábil e
 // Notícias & Impactos viraram uma lista só de comunicados, repartida por origem
 // nas abas da seção (Todos, Contabilidade, Equatorial, Externo). Cada
@@ -86,6 +86,8 @@ const MARCA_FIGURA=/^\[figura (\d+)\]$/i;
 const NEGRITO=/\*\*(.+?)\*\*/g;
 const linhasDe=item=>(item.conteudoCompleto||'').split('\n').map(linha=>linha.trim()).filter(Boolean);
 const textoCorrido=item=>linhasDe(item).filter(linha=>!MARCA_FIGURA.test(linha)).map(linha=>linha.replace(/^##\s+/,'').replace(NEGRITO,'$1')).join(' ');
+// A busca do cabeçalho procura no texto do comunicado sem as marcas.
+export const textoDoComunicado=textoCorrido;
 // Escapa primeiro e só depois troca as marcas: o texto nunca vira HTML.
 const comNegrito=linha=>e(linha).replace(NEGRITO,'<strong>$1</strong>');
 // Como no jornal (pedido do usuário em 21/09/2026): a figura flutua e o texto

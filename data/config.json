@@ -153,6 +153,11 @@
   "competencia": "2026-09",
   "dataReferencia": "2026-09-14",
   "demonstracao": true,
-  "semanaLabel": "14 — 20 SETEMBRO"
+  "semanaLabel": "14 — 20 SETEMBRO",
+  "aiStudio": {
+    "publicKeySpki": null,
+    "requireSignature": false,
+    "pastaImagens": "assets/images/ai-studio",
+    "observacao": "Cole em publicKeySpki a chave pública exibida no AI Studio (Administração → Integrações) e mude requireSignature para true."
+  }
 }
-

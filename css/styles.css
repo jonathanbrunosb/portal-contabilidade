@@ -2814,3 +2814,12 @@ th,td {
 .no-motion .leader-info-panel {
   transition:none}
 
+
+/* Importação do AI Studio (Sprint 7) */
+.ai-import { display:grid; gap:12px }
+.ai-import-preview { display:grid; grid-template-columns:minmax(0,320px) minmax(0,1fr); gap:20px; padding:18px; border:1px solid var(--border); border-radius:12px; background:#fff }
+.ai-import-media img { inline-size:100%; border-radius:10px; border:1px solid var(--border); background:#f8fafc }
+.ai-import-preview h3 { margin:6px 0 }
+.ai-import-errors { padding:14px 16px; border:1px solid #fecaca; border-radius:12px; background:#fef2f2; color:#991b1b }
+.ai-import-errors ul { margin:6px 0 0; padding-left:18px }
+@media (max-width: 760px) { .ai-import-preview { grid-template-columns:1fr } }

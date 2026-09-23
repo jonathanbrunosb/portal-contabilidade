@@ -53,7 +53,11 @@ const SINGLETON_COLLECTIONS = ['config'];
 // propósito — isto não é uma máquina de estados completa, é o controle que
 // mais importava para este caso de uso.
 const EDITORIAL_COLLECTIONS = ['newsletter', 'noticias'];
-const EDITORIAL_STATUSES = ['Rascunho', 'Em revisão', 'Publicado', 'Recusado'];
+const EDITORIAL_STATUSES = ['Rascunho', 'Em revisão', 'Publicado', 'Recusado', 'Substituído'];
+// Imagens importadas do AI Studio: somente PNG, pasta própria, nome normalizado.
+const ASSETS_CONTENT_DIR = process.env.PORTAL_ASSETS_CONTENT_DIR || path.join(__dirname, '..', 'assets', 'images', 'ai-studio');
+const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+const MAX_CONTENT_IMAGE_BYTES = 20_000_000;
 
 function applyEditorialTransition(collection, current, incoming, autor) {
   if (!EDITORIAL_COLLECTIONS.includes(collection)) return null;
@@ -152,6 +156,23 @@ const server = http.createServer(async (req, res) => {
       if (req.method !== 'POST') { send(res, 405, { erro: 'Método não suportado.' }); return; }
       if (!isAuthorized(req)) { send(res, 401, { erro: 'Token de administração ausente ou inválido.' }); return; }
       const { filename, ext } = safeAssetFilename(url.searchParams.get('filename'), (req.headers['content-type'] || '').split('/')[1]);
+      if (url.searchParams.get('pasta') === 'conteudo') {
+        if (ext !== 'png') { send(res, 400, { erro: 'Imagens de conteúdo importado aceitam somente PNG.' }); return; }
+        const parts = [];
+        let total = 0;
+        for await (const chunk of req) {
+          total += chunk.length;
+          if (total > MAX_CONTENT_IMAGE_BYTES) { send(res, 413, { erro: 'Imagem excede o limite de 20MB.' }); return; }
+          parts.push(chunk);
+        }
+        const buffer = Buffer.concat(parts);
+        if (!buffer.subarray(0, 8).equals(PNG_SIGNATURE)) { send(res, 400, { erro: 'O arquivo não é um PNG válido.' }); return; }
+        await fs.mkdir(ASSETS_CONTENT_DIR, { recursive: true });
+        await fs.writeFile(path.join(ASSETS_CONTENT_DIR, filename), buffer);
+        await appendAudit({ acao: 'upload', colecao: 'assets/images/ai-studio', id: filename, autor });
+        send(res, 201, { caminho: `assets/images/ai-studio/${filename}` });
+        return;
+      }
       if (!ALLOWED_IMAGE_EXT.includes(ext)) {
         send(res, 400, { erro: `Extensão de imagem não permitida. Use: ${ALLOWED_IMAGE_EXT.join(', ')}.` });
         return;
@@ -202,6 +223,11 @@ const server = http.createServer(async (req, res) => {
       }
       if (body.id.includes(':')) { send(res, 400, { erro: 'O id não pode conter ":".' }); return; }
       if (items.some(i => i.id === body.id)) { send(res, 409, { erro: 'Já existe um registro com este id.' }); return; }
+      // Idempotência da importação do AI Studio: uma versão aprovada entra uma única vez.
+      if (body.aiStudio && items.some(i => i.aiStudio && i.aiStudio.versionId === body.aiStudio.versionId)) {
+        send(res, 409, { erro: 'Esta versão do AI Studio já foi importada.' });
+        return;
+      }
       if (EDITORIAL_COLLECTIONS.includes(collection)) {
         // Criação sempre entra como Rascunho, mesmo que o corpo peça outro status:
         // sem isso, POST seria um atalho para publicar sem passar pela revisão.

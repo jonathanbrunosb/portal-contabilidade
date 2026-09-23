@@ -236,6 +236,20 @@ O risco que esta fase fecha: publicar newsletter e notícias hoje significa edit
 - Confirmações usam `confirm()`/`prompt()` nativos do navegador (aprovar, recusar) em vez de um diálogo próprio — pragmático para esta entrega, mas o primeiro candidato a melhorar se o painel for usado no dia a dia.
 - `usuarios`, `processos`, `sistemas`, `equipes`, `agenda`, `documentos` e `entregas` não têm esse fluxo de aprovação — continuam editáveis via API sem revisão, ou via JSON manual.
 
+## Importação do AI Studio (Sprint 7)
+
+Administração → aba **Importar do AI Studio** recebe os pacotes `.zip` gerados pela Central de Publicações do AI Studio — Comunicação Contábil.
+
+- **O que é validado** (`js/ai-studio-import.js`, sem dependências): estrutura do ZIP (no máximo 8 arquivos, nomes sem caminho, sem criptografia, tamanhos limitados, CRC), `manifest.json` (esquema 1.0, identificadores, categoria, destino, datas, URLs somente HTTP(S)), hashes SHA-256 de manifesto e imagem (`checksums.sha256`), PNG real com as dimensões declaradas e, se configurada, a **assinatura ECDSA P-256** do manifesto.
+- **Origem**: cole em `data/config.json → aiStudio.publicKeySpki` a chave pública mostrada no AI Studio (Administração → Integrações) e defina `requireSignature: true`. Sem a chave, o administrador precisa confirmar manualmente que o pacote veio da Central de Publicações. O hash prova integridade; a assinatura prova a origem.
+- **Nada é publicado na importação**: o item entra como **Em revisão** no Painel Editorial. Textos são tratados como dados (escapados), só PNG é aceito, nenhum arquivo do pacote é executado.
+- **Com backend opcional**: a imagem vai para `assets/images/ai-studio/` (rota `_upload?pasta=conteudo`, somente PNG) e o item é gravado via API; importar a mesma versão duas vezes é recusado (`409`).
+- **Sem backend (GitHub Pages)**: a importação baixa o `newsletter.json` atualizado e a imagem; copie a imagem para `assets/images/ai-studio/`, substitua `data/newsletter.json` e faça o commit.
+- **Nova versão do mesmo conteúdo**: o item novo guarda `aiStudio.substitui`; a versão anterior só muda para `Substituído` quando a nova for publicada no Painel Editorial.
+- Depois de publicar, registre a confirmação no AI Studio (Central de Publicações → Confirmar publicação), informando o identificador `ais-xxxxxxxx-vN`.
+
+A sincronização automática AI Studio ↔ portal exige um backend seguro e acessível que guarde o token de integração; o portal publicado não tem esse backend, então a integração é feita por pacote. Testes: `node --test tests/*.test.mjs`.
+
 ## Próxima versão
 
 Substituir dados ilustrativos pelos conteúdos, fotos, documentos e URLs aprovados. O adaptador de dados para API (Fase 2), o fluxo editorial de rascunho/revisão/publicação (Fase 4) e um Painel administrativo com token de escrita compartilhado já existem como backend opcional — faltam: autenticação corporativa individual com SSO (o token de hoje é compartilhado, não distingue pessoas), permissões aplicadas de fato no servidor (hoje `hasAccess()` só organiza a interface), separação entre quem rascunha e quem aprova, integrações reais com SAP/Power BI/OneStream/SharePoint (Fase 3 — depende de endereços e credenciais que só a organização pode fornecer), histórico de indicadores e organograma completo. Essas integrações não estão implementadas nesta entrega.

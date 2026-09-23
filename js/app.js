@@ -1,10 +1,11 @@
-import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260918-1';
+import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,apiUploadContentImage,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260923-1';
 import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js?v=20260918-1';
 import { initializeNavigation,bindTabs,selectTab } from './navigation.js';
 import { renderNewsletter,showArticle,loadNoticias,renderNoticiasHeader,renderNoticiaFiltros,renderNoticias } from './newsletter.js?v=20260918-1';
 import { renderTeamStructure } from './teams.js?v=20260918-1';
 import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,notify } from './ui.js';
 import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js';
+import { readZip,validatePackage,findExisting,toPortalItem,portalItemId } from './ai-studio-import.js?v=20260923-1';
 let data,currentTab='newsletter',currentAdminTab='equipes',currentUser,currentMenu=[];
 const $=selector=>document.querySelector(selector);
 // Capability required to see each menu target / page section / searchable collection.
@@ -274,6 +275,8 @@ function editorialActions(collection,item) {
   return '';
 }
 function editorialFooter(item) {
+  const origem=item.aiStudio?` · AI Studio v${e(item.aiStudio.versionNumber)}${item.aiStudio.substitui?.length?' · substitui publicação anterior':''}`:'';
+  if(item.status==='Em revisão'&&origem)return `Responsável: ${e(item.responsavel)}${origem}`;
   if(item.status==='Publicado')return `Aprovado por ${e(item.aprovadoPor||'—')} em ${e(dateLabel(item.dataAprovacao))}`;
   if(item.status==='Recusado')return `Motivo: ${e(item.motivoRecusa||'Não informado')}`;
   return `Responsável: ${e(item.responsavel)}`;
@@ -323,6 +326,14 @@ async function handleEditorialAction(collection,id,action) {
     }
     );
     data[collection][data[collection].findIndex(i=>i.id===id)]=updated;
+    // Substituição controlada: a versão anterior do AI Studio só sai do ar quando a nova é publicada.
+    if(action==='publicar'&&Array.isArray(updated.aiStudio?.substitui)) {
+      for(const oldId of updated.aiStudio.substitui) {
+        const index=data[collection].findIndex(i=>i.id===oldId);
+        if(index===-1||data[collection][index].status==='Substituído')continue;
+        data[collection][index]=await apiWrite(collection,{id:oldId,method:'PUT',body:{status:'Substituído'},autor:currentUser.nome});
+      }
+    }
     renderEditorial();
     if(currentTab===collection)renderContent(collection);
     notify('Conteúdo editorial atualizado.');
@@ -700,7 +711,97 @@ function renderAdmin() {
   if(tokenSave)tokenSave.onclick=()=> { setAdminToken($('#admin-token').value.trim());notify('Token salvo neste navegador.');renderAdmin(); };
   selectTab('#admin-tabs',$(`#admin-tab-${currentAdminTab}`));
   $('#admin-view').setAttribute('aria-labelledby',`admin-tab-${currentAdminTab}`);
-  if(currentAdminTab==='automacoes')renderAdminAutomacoes();else renderAdminEquipes();
+  if(currentAdminTab==='automacoes')renderAdminAutomacoes();
+  else if(currentAdminTab==='ai-studio')renderAdminAiStudio();
+  else renderAdminEquipes();
+}
+// ===== Importação de pacotes do AI Studio (Sprint 7) =====
+// Fluxo: selecionar ZIP → validar formato, CRC, SHA-256 e assinatura → pré-visualizar →
+// confirmar → item "Em revisão" no Painel Editorial. Nunca publica automaticamente.
+let aiImportState=null;
+function aiStudioConfig() {
+  return data.config.aiStudio||{};
+}
+function originBadge(origin) {
+  const labels={verified:'Origem verificada (assinatura válida)',unverifiable:'Origem não verificável (chave pública não configurada)',unsigned:'Pacote sem assinatura',invalid:'Assinatura inválida'};
+  return badge(labels[origin]||origin,origin==='verified'?'':'');
+}
+function renderAdminAiStudio() {
+  const live=isLiveDataSource();
+  const cfg=aiStudioConfig();
+  $('#admin-view').innerHTML=`<div class="ai-import"><p class="muted">Importe pacotes gerados na <strong>Central de Publicações do AI Studio</strong>. O conteúdo entra como <strong>Em revisão</strong> no Painel Editorial e só aparece na Central de Conteúdo após a aprovação final.</p><p class="muted">${cfg.publicKeySpki?`Verificação de origem ativa${cfg.requireSignature?' — pacotes sem assinatura válida são bloqueados':''}.`:'Chave pública do AI Studio não configurada (data/config.json → aiStudio.publicKeySpki): a origem precisará ser confirmada manualmente.'} ${live?'Backend conectado: o item e a imagem serão gravados no servidor.':'Sem backend: a importação gera os arquivos para atualizar a publicação (newsletter.json e imagem).'}</p><label class="primary-btn admin-import">Selecionar pacote .zip<input id="ai-import-file" type="file" accept=".zip,application/zip"></label><div id="ai-import-result"></div></div>`;
+  $('#ai-import-file').onchange=event=>event.target.files[0]&&analyzeAiPackage(event.target.files[0]);
+}
+async function analyzeAiPackage(file) {
+  const out=$('#ai-import-result');
+  out.innerHTML='<p class="loading">Validando pacote…</p>';
+  if(aiImportState?.previewUrl)URL.revokeObjectURL(aiImportState.previewUrl);
+  aiImportState=null;
+  try {
+    if(!/\.zip$/i.test(file.name))throw new Error('Selecione um arquivo .zip gerado pelo AI Studio.');
+    const files=await readZip(await file.arrayBuffer());
+    const cfg=aiStudioConfig();
+    const result=await validatePackage(files,{publicKeySpki:cfg.publicKeySpki||null,requireSignature:Boolean(cfg.requireSignature)});
+    if(!result.ok) {
+      out.innerHTML=`<div class="ai-import-errors" role="alert"><strong>Importação bloqueada.</strong><ul>${result.errors.map(err=>`<li>${e(err)}</li>`).join('')}</ul></div>`;
+      track('ai_import_rejected',{motivos:result.errors.length});
+      return;
+    }
+    const manifest=result.manifest;
+    const collection=manifest.destination.portal_collection;
+    const existing=findExisting(data[collection]||[],manifest);
+    if(existing?.kind==='duplicate') {
+      out.innerHTML=`<div class="ai-import-errors" role="alert"><strong>Pacote já importado.</strong><p>A versão v${e(manifest.approval.version_number)} deste conteúdo já existe no portal como "${e(existing.item.titulo)}" (${e(existing.item.status)}). Nenhum registro duplicado foi criado.</p></div>`;
+      return;
+    }
+    const previewUrl=URL.createObjectURL(new Blob([result.image],{type:'image/png'}));
+    aiImportState={manifest,result,collection,replaces:existing?.kind==='replaces'?existing.items.map(i=>i.id):[],previewUrl};
+    const categorias=[...new Set([manifest.destination.portal_category,...(data.config.newsletterCategorias||[])])];
+    const needsManualOrigin=result.origin!=='verified';
+    out.innerHTML=`<div class="ai-import-preview"><div class="ai-import-media"><img src="${previewUrl}" alt="Pré-visualização da peça"></div><div><span class="section-kicker">${e(manifest.category_label||manifest.category)} · ${e(manifest.destination.label)}</span><h3>${e(manifest.title)}</h3><p>${e(manifest.summary||'')}</p>${detailGrid({'Versão aprovada':`v${manifest.approval.version_number} (${manifest.version_id})`,'Aprovada em':manifest.approval.approved_at,'Data de referência':dateLabel(manifest.reference_date),'Fonte':manifest.source_name,'Link da fonte':manifest.source_url,'Link de acesso':manifest.access_url,'Sistema':manifest.system_name,'SHA-256 da imagem':result.imageHash})}<p>${originBadge(result.origin)} ${badge('Integridade conferida')}</p>${result.warnings.map(w=>`<p class="empty-state compact">${e(w)}</p>`).join('')}${aiImportState.replaces.length?`<p class="empty-state compact">Este pacote é uma nova versão de um conteúdo já importado (${aiImportState.replaces.map(e).join(', ')}). A publicação anterior permanece no ar até esta ser publicada; então será marcada como "Substituído".</p>`:''}<form id="ai-import-form"><div class="admin-form-grid"><label class="field">Categoria no portal<select id="ai-import-categoria">${categorias.map(c=>`<option ${c===manifest.destination.portal_category?'selected':''}>${e(c)}</option>`).join('')}</select></label><label class="field">Nível de impacto<select id="ai-import-impacto"><option>Baixo</option><option>Moderado</option><option>Alto</option></select></label></div><label class="field">Área responsável<input id="ai-import-area" value="${e(manifest.institutional_owner||'Gerência de Contabilidade')}" maxlength="120" required></label>${needsManualOrigin?'<label class="admin-validated"><input type="checkbox" id="ai-import-origin" required> Confirmo que recebi este pacote diretamente da Central de Publicações do AI Studio, por canal interno autorizado.</label>':''}<div class="admin-form-actions"><button class="primary-btn" type="submit">Importar para revisão</button><button class="text-btn" type="button" id="ai-import-cancel">Cancelar</button></div></form></div></div>`;
+    $('#ai-import-cancel').onclick=renderAdminAiStudio;
+    $('#ai-import-form').onsubmit=event=> { event.preventDefault(); confirmAiImport(); };
+  }
+  catch(error) {
+    out.innerHTML=`<div class="ai-import-errors" role="alert"><strong>Pacote inválido.</strong><p>${e(error.message)}</p></div>`;
+  }
+}
+function downloadBlob(blob,name) {
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement('a');
+  link.href=url;link.download=name;link.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+async function confirmAiImport() {
+  const state=aiImportState;
+  if(!state)return;
+  const {manifest,result,collection,replaces}=state;
+  const fileName=`${portalItemId(manifest)}.png`;
+  const pasta=aiStudioConfig().pastaImagens||'assets/images/ai-studio';
+  const options={categoria:$('#ai-import-categoria').value,nivelImpacto:$('#ai-import-impacto').value,areaResponsavel:$('#ai-import-area').value.trim(),autor:currentUser.nome,origin:result.origin,replaces};
+  try {
+    if(isLiveDataSource()) {
+      const imagePath=await apiUploadContentImage(result.image,fileName,{autor:currentUser.nome});
+      const item=toPortalItem(manifest,{...options,imagePath});
+      await apiWrite(collection,{method:'POST',body:item,autor:currentUser.nome});
+      const updated=await apiWrite(collection,{id:item.id,method:'PUT',body:{status:'Em revisão'},autor:currentUser.nome});
+      data[collection].push(updated);
+      renderEditorial();
+      notify('Conteúdo importado como "Em revisão". Publique pelo Painel Editorial e confirme no AI Studio.');
+    }
+    else {
+      const item=toPortalItem(manifest,{...options,imagePath:`${pasta}/${fileName}`});
+      const updatedCollection=[...data[collection],item];
+      downloadBlob(new Blob([result.image],{type:'image/png'}),fileName);
+      downloadBlob(new Blob([JSON.stringify(updatedCollection,null,2)+'\n'],{type:'application/json'}),`${collection}.json`);
+      notify(`Arquivos gerados: copie ${fileName} para ${pasta}/ e substitua data/${collection}.json na publicação.`);
+    }
+    track('ai_import_confirmed',{colecao:collection});
+    renderAdminAiStudio();
+  }
+  catch(error) {
+    notify(error.message);
+  }
 }
 function showRecord(collection,id) {
   const item=data[collection]?.find(i=>i.id===id);

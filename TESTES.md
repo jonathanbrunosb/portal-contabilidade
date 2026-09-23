@@ -43,3 +43,9 @@ A diferença de 15 px corresponde à barra de rolagem vertical. No celular, a ta
 Não houve navegação nos sistemas reais, pois seus endereços não foram fornecidos. Downloads foram validados pelo destino HTTP e atributo de download; o fluxo de salvamento do navegador não foi homologado separadamente. Pausa por hover, preferência de movimento, navegação completa por teclado, zoom de 200% e políticas específicas de Chrome/Edge devem integrar a homologação corporativa. A implementação desses comportamentos está no código, mas não se declara aqui uma certificação de acessibilidade.
 
 Todos os conteúdos e indicadores são demonstrativos. Validar documentos, datas, contagens, responsáveis e URLs com a Gerência antes do uso operacional.
+
+## Importação do AI Studio — 23/09/2026
+
+- `node --test tests/*.test.mjs`: 7 testes aprovados — pacote real gerado pelo AI Studio com assinatura verificada, origem não verificável sem chave, pacote adulterado (CRC), arquivo não ZIP e nomes com caminho, manifesto com URL `javascript:` e categoria inválida, duplicidade/substituição, e backend opcional (token obrigatório, somente PNG, normalização de `../../`, `409` ao reimportar a mesma versão).
+- Navegador (Chromium headless, servidor estático, 1366 × 900): aba "Importar do AI Studio", upload da fixture, pré-visualização com hashes e origem, confirmação manual e geração de `ais-…-v4.png` e `newsletter.json`; nenhum erro de console.
+- Não testado: importação pelo navegador com o backend opcional ligado (coberto pelo teste da API) e publicação real no GitHub Pages.

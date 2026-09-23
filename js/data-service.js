@@ -166,6 +166,22 @@ export async function apiUploadPhoto(file,{autor}= {}) {
   if(!response.ok)throw new Error(payload?.erro||`A API recusou o upload (${response.status}).`);
   return payload.caminho;
 }
+// Envia a imagem de um pacote do AI Studio para assets/images/ai-studio/ (somente PNG, validado no servidor).
+export async function apiUploadContentImage(bytes,filename,{autor}= {}) {
+  if(!isLiveDataSource())throw new Error('O backend opcional não está ativo — ver README, "Backend opcional".');
+  const url=`${API_BASE}/_upload?pasta=conteudo&filename=${encodeURIComponent(filename)}`;
+  const response=await withTimeout(signal=>fetch(url, {
+    method:'POST',signal,cache:'no-cache',
+    headers: {
+      'Content-Type':'image/png',...(autor?{'X-Autor':autor}:{}),...(getAdminToken()?{'X-Admin-Token':getAdminToken()}:{})
+    }
+    ,body:bytes
+  }
+  ),UPLOAD_TIMEOUT_MS);
+  const payload=await response.json().catch(()=>null);
+  if(!response.ok)throw new Error(payload?.erro||`A API recusou o upload (${response.status}).`);
+  return payload.caminho;
+}
 export async function loadData() {
   const live=await checkAPI();
   const pairs=await Promise.all(collections.map(async name=> {

@@ -161,3 +161,4 @@
     "observacao": "Cole em publicKeySpki a chave pública exibida no AI Studio (Administração → Integrações) e mude requireSignature para true."
   }
 }
+

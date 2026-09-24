@@ -1,4 +1,4 @@
-import { escapeHTML as e,normalize,icon } from './ui.js?v=20260921-50';
+import { escapeHTML as e,normalize,icon } from './ui.js?v=20260924-1';
 // Busca do cabeçalho (refeita em 22/09/2026, pedido do usuário: "quando o
 // usuário digitar, deve aparecer abaixo a lista dos itens sugeridos"). Antes,
 // os resultados apareciam abaixo do carrossel, fora da tela, e cada registro

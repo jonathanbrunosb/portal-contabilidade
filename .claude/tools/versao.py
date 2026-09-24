@@ -22,7 +22,7 @@ import sys
 
 ALVOS = ['index.html', 'css/styles.css', 'js/app.js', 'js/ui.js', 'js/auth.js',
          'js/navigation.js', 'js/newsletter.js', 'js/teams.js', 'js/data-service.js',
-         'js/carousel.js', 'js/analytics.js', 'js/destaques.js']
+         'js/carousel.js', 'js/analytics.js', 'js/destaques.js', 'js/busca.js']
 PADRAO = re.compile(r'\?v=(\d{8}-\d+)')
 
 

@@ -4,6 +4,29 @@
 
 ---
 
+## 2026-09-24
+
+> Dia de integração: o redesign saiu da branch e virou o site publicado. Commits `0c485f6`, `0d94011` e `195a90c`; a `main` andou de `9271dae` para `195a90c` e o workflow do Pages concluiu com sucesso.
+
+### O redesign chegou à `main`, junto com o importador do AI Studio
+- **Era:** a `main` tinha seguido por fora desta máquina — o importador de pacotes do AI Studio (PR #38), um comunicado do IFRS 16 (PR #37) e um commit que gravou CRLF no repositório — enquanto a `ajustes-frontend-dudu` levava 34 commits de redesign. As duas frentes conflitavam em 8 arquivos e a publicação estava bloqueada por decisão de hospedagem.
+- **Solução:** o usuário decidiu em 24/09 **manter repositório e site públicos, sem remover conteúdo** (o bloqueio antigo deixou de valer, ver `PROJETO_ESTADO_ATUAL.md` § 1). Uma branch `integracao-main`, criada da `main` num worktree separado, recebeu o merge; resolvidos os conflitos, a `main` avançou direto para ela.
+- **Detalhes técnicos:**
+  - **Quebra de linha era quase todo o conflito.** Com `git -c merge.renormalize=true merge` os conflitos caíram de 8 arquivos para 6 (o `index.html` conflitava da primeira à última linha) e os blobs saíram em LF, desfazendo o CRLF que a `main` tinha introduzido.
+  - **Comunicado do IFRS 16 publicado duas vezes:** a mesma peça entrou pela `main` (`n7-arrendamentos-ifrs16-atualizacao` + `interno-arrendamentos-ifrs16-atualizacao-2026`) e pela nossa branch (`n7-ifrs16-abertura-rit-nova-cara`). Decisão do usuário: fica o nosso, com o texto do e-mail original, `origem` e a imagem clicável; saíram os dois registros da `main` e a imagem órfã `arrendamentos-ifrs16-atualizacao.webp`.
+  - **Resoluções:** `index.html` com as duas abas de Administração (Carrossel e Importar do AI Studio) e cache-buster único; `js/app.js` com os imports dos dois lados e a cadeia de `renderAdmin` com as duas abas; `css/styles.css` com os dois blocos do fim do arquivo; `data/config.json` com a chave `aiStudio` recolocada (a âncora dela, `semanaLabel`, não existe mais) e a aba registrada em `navegacao`.
+  - **Adaptações que o git não pega:** `toPortalItem()` passou a gravar `origem` (o formulário ganhou o seletor — sem o campo, o conteúdo importado ficaria sem coluna na capa e sem selo); `section-kicker` e o modificador `compact`, aposentados no redesign, deram lugar a `meta-label` e `empty-state`; o CSS do importador trocou `--border` (renomeado para `--borda`) e os literais pelo vermelho semântico da paleta.
+  - **Erro cometido e corrigido:** ao remontar o bloco do importador a chave de fechamento de `confirmAiImport` ficou para trás e o `app.js` inteiro parou de carregar. O `node --check` não pegou (analisa como script); o preview pegou, com `Unexpected end of input` no console. Daí em diante a conferência de sintaxe passou a ser `node --input-type=module --check`.
+  - **De quebra:** o `js/busca.js` importava `ui.js?v=20260921-50` e estava fora da lista ALVOS do `versao.py` desde 22/09 — o navegador baixava o `ui.js` duas vezes, em versões diferentes. Corrigido em `195a90c`.
+- **Verificação:** `TESTES.md`, "Integração da `main` — 24/09/2026".
+
+### Repositório público: a decisão e o que ela muda
+- **Era:** as regras diziam "não fazer merge na `main` enquanto a hospedagem não for interna", supondo que não dar merge protegia o conteúdo.
+- **Solução:** a conferência mostrou que o repositório `jonathanbrunosb/portal-contabilidade` **já era público** (`visibility: public`, arquivos da branch legíveis sem credencial em `raw.githubusercontent.com`) — o merge não era o que expunha o conteúdo. Apresentados os caminhos (repositório privado, remover conteúdo interno, hospedagem interna), o usuário optou por **manter tudo público por enquanto**.
+- **Detalhes técnicos:** `.claude/CLAUDE.md` regra 7 e `PROJETO_ESTADO_ATUAL.md` § 1 reescritos (commit `0c485f6`; a mudança da regra 7 ficou para o usuário commitar). O que está exposto: 34 nomes em `data/equipes.json`, 9 fotos em `assets/images/comunicados/movimentacao-controladoria-2026/`, o texto dos e-mails internos e as telas do SAP, os endereços dos sistemas internos e o hash do código de administração em `js/app.js`. A hospedagem interna virou item adiado; o código da Administração ganhou peso por causa disso.
+
+---
+
 ## 2026-09-22
 
 > Tudo commitado **por assunto** na branch `ajustes-frontend-dudu` (`4c8a552`..`8ac9f49`, 8 commits) + o commit do checkpoint, sem push. A pergunta "onde editar a capa" foi respondida e está em `PROJETO_ESTADO_ATUAL.md` § 1.5; as tarefas que o usuário deixou para depois estão lá nos itens 10–13.

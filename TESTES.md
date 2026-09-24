@@ -426,6 +426,28 @@ autorização do usuário), origem Equatorial. Conferido com Playwright em 1366 
   limpo. O trecho do e-mail na peça longa encolhe com ela (103×10 em 1366) —
   o botão logo abaixo leva ao mesmo endereço.
 
+## Integração da `main` — 24/09/2026
+
+Merge da `main` (importador do AI Studio, PR #38) na branch do redesign, numa
+branch `integracao-main` servida por `python -m http.server 5501` a partir do
+worktree, em 1366 px:
+
+- **`node --test tests/ai-studio-import.test.mjs`: 7 de 7 passando**, incluindo o
+  teste que sobe o `server/server.js` real (401 sem token, 400 para não-PNG,
+  409 na reimportação).
+- **`node --input-type=module --check`** no `js/app.js` e no
+  `js/ai-studio-import.js`. O `node --check` sozinho **não serve**: analisa como
+  script e deixou passar uma chave faltando que derrubou o `app.js` inteiro.
+- **Console limpo** em aba nova; todos os módulos servidos na mesma versão
+  (`?v=20260924-1`), inclusive `busca.js` e `ai-studio-import.js`.
+- **Comunicação:** o comunicado do IFRS 16 aparece **uma vez** (o nosso, 21/09,
+  selo Contabilidade); os comunicados de demonstração (`n1`–`n5`,
+  `news1`–`news5`) continuam fora; o filtro de categorias traz as 16 da branch.
+- **`data/config.json`** depois do merge: `kpis` vazio, `links` com 5,
+  `navegacao` com 8 seções e a chave `aiStudio` presente.
+- **Não conferido:** a aba "Importar do AI Studio" renderizada — fica atrás do
+  código da Administração, que ninguém tem à mão (próximos passos, item 3).
+
 ## Limites e checklist para homologação corporativa
 
 Não houve navegação nos sistemas reais, pois seus endereços não foram fornecidos. Downloads foram validados pelo destino HTTP e atributo de download; o fluxo de salvamento do navegador não foi homologado separadamente. Pausa por hover, preferência de movimento, navegação completa por teclado, zoom de 200% e políticas específicas de Chrome/Edge devem integrar a homologação corporativa. A implementação desses comportamentos está no código, mas não se declara aqui uma certificação de acessibilidade.

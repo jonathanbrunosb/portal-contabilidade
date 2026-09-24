@@ -2,10 +2,10 @@
 
 > **Documento vivo — fonte única de estado.** Pode ser atualizado ou sobrescrito livremente sempre que o projeto evoluir. Histórico e rollback ficam no **git**. Itens concluídos vão para `PROJETO_ESTADO_RESOLVIDOS.md`. O detalhe de design (decisões travadas do redesign, medidas, receitas) continua em `.claude/redesign/00-estado-e-proximos-passos.md` e `.claude/redesign/03-sistema-visual.md`. **Regras de trabalho e de commit:** `.claude/CLAUDE.md`.
 >
-> **Snapshot técnico** — Data: **2026-09-22 (checkpoint)**
-> **Git:** branch `ajustes-frontend-dudu`, **29 commits à frente de `6b6273c`** depois do commit deste checkpoint, um por assunto (seção 2). Último antes do checkpoint: `8ac9f49` "Publicar os três comunicados do MigraSAP de setembro". **Enviada ao GitHub em 22/09** a pedido do usuário (`6b6273c..d23dd61`); nada pendente de push. `main` não recebeu nada — o merge depende de pedido e ainda tem a divergência da seção 6, item 1.
+> **Snapshot técnico** — Data: **2026-09-24**
+> **Git:** a `main` recebeu o redesign em **24/09/2026** (`9271dae..195a90c`, avanço direto) e o Pages publicou. `ajustes-frontend-dudu`, `integracao-main` e `main` apontam todas para `195a90c`; trabalhe na `ajustes-frontend-dudu` e nunca commite na `main` (regra em `.claude/CLAUDE.md`). O merge da integração é `0d94011`; a análise dele está no RESOLVIDOS de 24/09.
 > **App/Stack:** HTML + CSS + JavaScript puro (ES modules), sem build, sem CDN. Conteúdo em `data/*.json`. Servidor estático Python na porta **5500** (`.claude/launch.json`, nome `portal`). Backend **opcional** `server/server.js` (Node, porta 8787), ligado por `window.PORTAL_API_ENABLED = true`.
-> **Working tree:** limpo depois do commit do checkpoint. Cache-buster: `?v=20260922-3`.
+> **Working tree:** limpo, fora a edição da regra 7 do `.claude/CLAUDE.md` que o usuário ainda vai commitar. Cache-buster: `?v=20260924-1`.
 > **Máquina:** `projeto/` (material interno: e-mails, peças baixadas, moldes) e as skills de terceiros estão no disco, fora do Git (`.gitignore`).
 
 ---
@@ -137,9 +137,9 @@
 
 ## 6. Próximos passos imediatos
 
-1. **Integrar a branch na `main`** quando o usuário pedir (o merge dispara o Pages e publica o site). Não é só `git merge`: a `main` tem 4 commits que a branch não conhece — o import do AI Studio (`js/ai-studio-import.js`, `tests/ai-studio-import.test.mjs`, mudanças no `server/server.js`, PR #38) e o commit que devolveu CRLF — e o merge dá **conflito em 8 arquivos**: `README.md`, `css/styles.css`, `data/config.json`, `data/newsletter.json`, `data/noticias.json`, `index.html`, `js/app.js`, `js/data-service.js`. Resolver numa branch de integração, conferir no preview e só então levar para a `main`.
+1. **Conferir o portal publicado** em `portal.contabilidade-eqtl.com` — o deploy de 24/09 terminou com sucesso, mas o firewall bloqueia o domínio a partir desta máquina, então a conferência é do usuário: capa, Comunicação, busca do cabeçalho e as artes dos cartões. Só o usuário enxerga o site de verdade.
 2. **Hospedagem interna — adiada** por decisão do usuário em 24/09 (ver o aviso da seção 1). Retomar se a TI/segurança pedir: repositório privado (aí o Pages sai do ar no plano gratuito e o portal precisa de servidor interno) ou autenticação na frente do site.
-3. **Código da Administração**: o usuário recupera o código na sessão de 16/09 (commit `9d9736c`) ou define um novo com `.claude/tools/trocar-codigo-admin.py`.
+3. **Código da Administração**: o usuário recupera o código na sessão de 16/09 (commit `9d9736c`) ou define um novo com `.claude/tools/trocar-codigo-admin.py`. Duas coisas dependem disso: conferir na tela a aba **Importar do AI Studio** (integrada em 24/09, nunca vista renderizada) e o fato de o repositório ser público — o hash em `js/app.js` fica testável offline, então o código novo não pode ser reaproveitado de outro lugar.
 4. **Conteúdo dos moldes do carrossel** (`data/destaques.json`): fundo licenciado para o IFRS 16; texto certo do Cronograma; Auditoria "Em desenvolvimento" ou "Ativo"; "Executiva IV" ou "Contabilidade IV"; descrição própria do Controle de Horas. O slide do IFRS 16 ainda aponta para o sistema — pode passar a abrir o comunicado das melhorias.
 5. **Link da reunião** da RR (25/09) em `data/agenda.json › link`.
 6. **Comunicado do CFC**: o artigo é de 19/04/2024 — confirmar a data de publicação no portal (21/09/2026).

@@ -3,7 +3,7 @@
 > **Documento vivo — fonte única de estado.** Pode ser atualizado ou sobrescrito livremente sempre que o projeto evoluir. Histórico e rollback ficam no **git**. Itens concluídos vão para `PROJETO_ESTADO_RESOLVIDOS.md`. O detalhe de design (decisões travadas do redesign, medidas, receitas) continua em `.claude/redesign/00-estado-e-proximos-passos.md` e `.claude/redesign/03-sistema-visual.md`. **Regras de trabalho e de commit:** `.claude/CLAUDE.md`.
 >
 > **Snapshot técnico** — Data: **2026-09-22 (checkpoint)**
-> **Git:** branch `ajustes-frontend-dudu`, **29 commits à frente de `6b6273c`** depois do commit deste checkpoint, um por assunto (seção 2). Último antes do checkpoint: `8ac9f49` "Publicar os três comunicados do MigraSAP de setembro". **Nada enviado** (`git push` só quando o usuário pedir). `main` não recebeu nada.
+> **Git:** branch `ajustes-frontend-dudu`, **29 commits à frente de `6b6273c`** depois do commit deste checkpoint, um por assunto (seção 2). Último antes do checkpoint: `8ac9f49` "Publicar os três comunicados do MigraSAP de setembro". **Enviada ao GitHub em 22/09** a pedido do usuário (`6b6273c..d23dd61`); nada pendente de push. `main` não recebeu nada — o merge depende de pedido e ainda tem a divergência da seção 6, item 1.
 > **App/Stack:** HTML + CSS + JavaScript puro (ES modules), sem build, sem CDN. Conteúdo em `data/*.json`. Servidor estático Python na porta **5500** (`.claude/launch.json`, nome `portal`). Backend **opcional** `server/server.js` (Node, porta 8787), ligado por `window.PORTAL_API_ENABLED = true`.
 > **Working tree:** limpo depois do commit do checkpoint. Cache-buster: `?v=20260922-3`.
 > **Máquina:** `projeto/` (material interno: e-mails, peças baixadas, moldes) e as skills de terceiros estão no disco, fora do Git (`.gitignore`).
@@ -27,10 +27,10 @@
 | Links do ECD e do ECF no gov.br | concluída | Sim, `9b63979` |
 | Externos: **BMP e RIT** (ANEEL, arte da tela) e **Claude** | concluída | Sim, `dfd3e7e`, `8867bd9` |
 | Permissão "gerencial" para Eduardo/Jonathan; tela de Avisos | **mapeadas — o usuário faz depois** (itens 10 e 11) | Não |
-| Publicação (GitHub Pages é público; o portal "será interno") | **bloqueada** — decisão de hospedagem | n/a |
+| Publicação: repositório **e** Pages públicos | **decidido em 24/09: fica público, sem remover nada, por enquanto** | n/a |
 | Decisões de conteúdo pendentes (moldes do carrossel, ANEEL, avisos, link da RR) | pendente, com o usuário | Não |
 
-> **Atenção — bloqueio de publicação:** `.github/workflows/pages.yml` publica a `main` em **portal.contabilidade-eqtl.com, sem login**. O usuário decidiu que o portal **será interno** e autorizou conteúdo interno (comunicados do Grupo, fotos e currículos de colegas, capturas reais dos sistemas e do SAP). **Não fazer merge desta branch na `main` enquanto a hospedagem não for interna ou com autenticação.** Commits e `git push` da branch não publicam nada (o Pages publica só a `main`); o push continua dependendo de pedido do usuário.
+> **Publicação — decisão de 24/09/2026: fica tudo público, sem remover nada, por enquanto.** O repositório `jonathanbrunosb/portal-contabilidade` é **público** (`visibility: public`, conferido na API em 24/09) e o `.github/workflows/pages.yml` publica a `main` em **portal.contabilidade-eqtl.com, sem login** (`CNAME` versionado). Quer dizer que **não é o merge que expõe o conteúdo**: qualquer pessoa já lê os arquivos da branch pelo GitHub, sem credencial (verificado em `raw.githubusercontent.com`). O que está exposto: 34 nomes completos em `data/equipes.json`, 9 fotos de colegas em `assets/images/comunicados/movimentacao-controladoria-2026/`, o texto dos e-mails internos e as telas do SAP dos comunicados, os endereços dos sistemas internos e o hash do código de administração em `js/app.js` (que o próprio comentário chama de dissuasão, não autenticação). O usuário conhece a situação e optou por mantê-la; a hospedagem interna virou o item 2 da seção 6. **O merge na `main` continua dependendo de pedido do usuário** — porque publica o site, não por causa do sigilo.
 
 ---
 
@@ -137,8 +137,8 @@
 
 ## 6. Próximos passos imediatos
 
-1. **Resolver a hospedagem antes de qualquer merge na `main`** — `pages.yml` publica site aberto; a branch tem conteúdo interno.
-2. **Enviar a branch** (`git push`) quando o usuário pedir — 29 commits locais.
+1. **Integrar a branch na `main`** quando o usuário pedir (o merge dispara o Pages e publica o site). Não é só `git merge`: a `main` tem 4 commits que a branch não conhece — o import do AI Studio (`js/ai-studio-import.js`, `tests/ai-studio-import.test.mjs`, mudanças no `server/server.js`, PR #38) e o commit que devolveu CRLF — e o merge dá **conflito em 8 arquivos**: `README.md`, `css/styles.css`, `data/config.json`, `data/newsletter.json`, `data/noticias.json`, `index.html`, `js/app.js`, `js/data-service.js`. Resolver numa branch de integração, conferir no preview e só então levar para a `main`.
+2. **Hospedagem interna — adiada** por decisão do usuário em 24/09 (ver o aviso da seção 1). Retomar se a TI/segurança pedir: repositório privado (aí o Pages sai do ar no plano gratuito e o portal precisa de servidor interno) ou autenticação na frente do site.
 3. **Código da Administração**: o usuário recupera o código na sessão de 16/09 (commit `9d9736c`) ou define um novo com `.claude/tools/trocar-codigo-admin.py`.
 4. **Conteúdo dos moldes do carrossel** (`data/destaques.json`): fundo licenciado para o IFRS 16; texto certo do Cronograma; Auditoria "Em desenvolvimento" ou "Ativo"; "Executiva IV" ou "Contabilidade IV"; descrição própria do Controle de Horas. O slide do IFRS 16 ainda aponta para o sistema — pode passar a abrir o comunicado das melhorias.
 5. **Link da reunião** da RR (25/09) em `data/agenda.json › link`.

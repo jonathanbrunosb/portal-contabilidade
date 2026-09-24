@@ -40,18 +40,20 @@ portal-contabilidade/
 ├── css/
 │   └── styles.css
 ├── js/
-│   ├── app.js                 # Composição das telas, catálogo, busca e eventos
+│   ├── app.js                 # Composição das telas, catálogo, índice da busca e eventos
 │   ├── analytics.js           # Registro local de uso (abas, buscas, acessos, downloads)
-│   ├── auth.js                # Identificação por seleção de nome e perfis demonstrativos
+│   ├── busca.js               # Busca do cabeçalho: pontuação, destaque e caixa de sugestões
+│   ├── auth.js                # Identificação por seleção de nome e perfis de acesso
 │   ├── data-service.js        # Carregamento das bases, futuro adaptador de API
-│   ├── navigation.js          # Menu, foco e tabs por teclado
-│   ├── newsletter.js          # Radar, cards e leitura das publicações
+│   ├── carousel.js            # Carrossel de destaques da capa
+│   ├── navigation.js          # Menu do cabeçalho, submenus, menu do usuário e tabs por teclado
+│   ├── newsletter.js          # Comunicação: lista, página de cada comunicado e colunas da capa
 │   ├── teams.js               # Janela do organograma e expansão das equipes
 │   └── ui.js                  # Ícones, escape de texto, URLs e diálogos
 ├── server/
 │   └── server.js              # Backend opcional (Fase 2) — API viva sobre os mesmos JSONs
 ├── data/
-│   ├── config.json            # KPIs, resumo executivo, menu e acessos rápidos
+│   ├── config.json            # Indicadores do Painel, menu, navegação e atalhos corporativos
 │   ├── usuarios.json
 │   ├── newsletter.json
 │   ├── noticias.json
@@ -60,11 +62,12 @@ portal-contabilidade/
 │   ├── sistemas.json
 │   ├── documentos.json
 │   ├── agenda.json
-│   └── entregas.json
+│   ├── entregas.json
+│   ├── destaques.json         # Carrossel da capa
+│   └── avisos.json            # Avisos da capa (Extra, Prazo, Info)
 └── assets/
     ├── logos/portal.svg
-    ├── users/                 # Avatar padrão e avatar de iniciais
-    └── documents/             # 13 documentos HTML demonstrativos
+    └── users/                 # Fotos da equipe, avatar padrão e avatar de visitante
 ```
 
 ## Editar os conteúdos
@@ -79,39 +82,47 @@ Edite os JSONs em UTF-8, mantenha a sintaxe válida e atualize o navegador. Os a
 | Sistemas, descrições e endereços | `data/sistemas.json` |
 | Equipes, líderes, empresas e responsabilidades | `data/equipes.json` |
 | Acessos SAP, Power BI, OneStream, SharePoint etc. | `data/config.json`, propriedade `links` |
-| Resumo do banner e indicadores | `data/config.json`, propriedades `resumo` e `kpis` |
+| Indicadores do Painel da gerência | `data/config.json`, propriedade `kpis` (lista vazia mostra "Nenhum indicador cadastrado ainda") |
 | Processos, prazos e status | `data/processos.json` |
 | Agenda e entregas | `data/agenda.json` e `data/entregas.json` |
-| Documentos e categorias | `data/documentos.json` e arquivos em `assets/documents/` |
+| Documentos & Normas (referências oficiais) | `data/documentos.json`; grupos em `config.json › navegacao` |
+| Destaques do carrossel da capa | `data/destaques.json` |
+| Avisos da capa (Extra, Prazo, Info) | `data/avisos.json` |
 
 Datas editoriais da home e competência são parametrizadas por `data/config.json`. Agenda e entregas representam o calendário da base, sem atualização por serviço externo.
 
 ### Usuários e identificação
 
-A identificação aceita `?matricula=...` e prioriza uma matrícula válida recebida pela URL. Sem esse parâmetro, no primeiro acesso — ou ao clicar em "Trocar identificação" — o portal abre o diálogo "Quem é você?", listando os nomes de `data/usuarios.json`. A escolha fica salva neste navegador (`localStorage`, chave `portal-identity`, ver `js/auth.js`). Cadastre a foto em `assets/users/` e informe o caminho em `foto`; falhas de imagem usam o avatar padrão. Esses mecanismos personalizam a interface e não constituem autenticação.
+A identificação aceita `?matricula=...` e prioriza uma matrícula válida recebida pela URL. Sem esse parâmetro, no primeiro acesso — ou ao clicar em "Trocar identificação" — o portal abre o diálogo "Qual área você atua?", que lista as áreas e as pessoas de `data/equipes.json` (ou a opção Visitante). O perfil sai do papel na equipe: líder = Gestor, Gerência = Gerência, demais = Colaborador. `data/usuarios.json` guarda só as exceções — hoje, Jonathan Bruno e Eduardo dos Santos Rocha, com a permissão extra `administracao`; cada entrada usa o mesmo `id` da pessoa em `equipes.json` e vale quando ela é escolhida na identificação. A escolha fica salva neste navegador (`localStorage`, chave `portal-identity`, ver `js/auth.js`). Cadastre a foto em `assets/users/` e informe o caminho em `foto`; falhas de imagem usam o avatar padrão. Esses mecanismos personalizam a interface e não constituem autenticação.
 
 | Ação | Resultado esperado | Seções visíveis |
 | --- | --- | --- |
-| Selecionar "Jonathan Bruno Santos Bezerra" | Gestor, Contabilidade IV | Central de conteúdo, Estrutura das equipes, Administração |
-| Selecionar "Marina Oliveira" | Gerência | Central de conteúdo, Estrutura das equipes, Painel da gerência |
-| Selecionar "Ana Martins" | Colaborador | Central de conteúdo |
-| Fechar o diálogo sem escolher | Colaborador não identificado, avatar padrão | Central de conteúdo |
+| Selecionar "Jonathan Bruno Santos Bezerra" (Contabilidade IV) | Gestor | Conteúdo, Pessoas, Administração |
+| Selecionar "Eduardo dos Santos Rocha" (Contabilidade IV) | Colaborador | Conteúdo, Pessoas, Administração |
+| Selecionar "Alexandra Furtado Freire Paes Landim" (Gerência) | Gerência | Conteúdo, Pessoas, Gestão |
+| Selecionar outra pessoa de uma equipe | Colaborador (ou Gestor, se for o líder) | Conteúdo, Pessoas |
+| Escolher Visitante ou fechar sem escolher | Visitante | Conteúdo |
 
-A escolha personaliza a interface; não autentica o usuário — o próprio perfil exibido traz o aviso "Identificação local, salva neste navegador — não é um login corporativo". O que o perfil determina é **o que aparece na tela**, não uma barreira de segurança: `hasAccess()` (`js/auth.js`), aplicado em `js/app.js`, usa a lista `permissoes` de cada usuário (`data/usuarios.json`) — ou o mapa `PERMISSIONS` por perfil, como padrão — para filtrar o menu, ocultar as seções "Estrutura das equipes" e "Painel da gerência" e restringir os resultados da busca global às coleções permitidas (`conteudo`, `time`, `gerencial`). Uma quarta capacidade, `administracao`, libera o "Painel administrativo" (ver seção própria) — hoje só `Jonathan Bruno` tem essa capacidade adicionada em `permissoes`; conceda a outros usuários do mesmo jeito, adicionando `"administracao"` à lista. Quem fecha o diálogo sem escolher recebe o mesmo acesso de um Colaborador. Todos os JSONs continuam públicos para quem acessa o site publicado; não coloque credenciais neles, e trate isso como organização de interface, não como controle de acesso real — esse controle só existe com autenticação no servidor (ver "Próxima versão").
+A escolha personaliza a interface; não autentica o usuário — o próprio perfil exibido traz o aviso "Identificação local, salva neste navegador — não é um login corporativo". O que o perfil determina é **o que aparece na tela**, não uma barreira de segurança: `hasAccess()` (`js/auth.js`), aplicado em `js/app.js`, usa a lista `permissoes` de cada usuário (`data/usuarios.json`) — ou o mapa `PERMISSIONS` por perfil, como padrão — para filtrar o menu, ocultar as seções "Estrutura das equipes" e "Painel da gerência" e restringir os resultados da busca global às coleções permitidas (`conteudo`, `time`, `gerencial`). Uma quarta capacidade, `administracao`, libera a Administração (ver seção própria) — hoje Jonathan Bruno e Eduardo dos Santos Rocha a têm em `permissoes`; para conceder a outra pessoa, crie em `data/usuarios.json` uma entrada com o `id` dela em `equipes.json` e inclua `"administracao"` na lista. A janela de Administração ainda pede um código de acesso. Quem fecha o diálogo sem escolher recebe o mesmo acesso de um Colaborador. Todos os JSONs continuam públicos para quem acessa o site publicado; não coloque credenciais neles, e trate isso como organização de interface, não como controle de acesso real — esse controle só existe com autenticação no servidor (ver "Próxima versão").
 
-### Newsletter
+### Comunicação (Newsletter e notícias)
 
-Duplique um objeto e preencha: `id`, `categoria`, `titulo`, `resumo`, `conteudoCompleto`, `dataPublicacao`, `dataVigencia`, `fonte`, `link`, `documento`, `empresasImpactadas`, `areaResponsavel`, `responsavel`, `nivelImpacto`, `status`.
+A seção **Comunicação** mostra, numa lista só, os comunicados publicados de `data/newsletter.json` e `data/noticias.json`, do mais recente ao mais antigo, com abas **Todos, Contabilidade, Equatorial e Externo** (pelo campo `origem`). Cada comunicado é uma faixa — imagem à esquerda; origem, categoria e data; título; subtítulo (`resumo`); e o começo do texto — e tem **página própria**, com endereço `#central/comunicado/<coleção>/<id>`, que pode ser copiado e enviado. A capa mostra os mais recentes em três colunas, uma por origem. Um comunicado cadastrado nos dois arquivos com o mesmo título aparece uma vez só (vale a cópia da Newsletter).
+
+Duplique um objeto e preencha: `id`, `origem`, `categoria`, `titulo`, `resumo`, `conteudoCompleto`, `dataPublicacao`, `dataVigencia`, `fonte`, `link`, `documento`, `empresasImpactadas`, `areaResponsavel`, `responsavel`, `nivelImpacto`, `status`. Opcionais: `imagem` (de preferência 16:9) com `imagemAlt`; `imagemCapa`, um recorte horizontal usado na faixa e na capa quando a `imagem` é uma peça vertical (cartaz de e-mail) — a página do comunicado mostra a peça inteira; `rotuloLink`, o texto do botão quando o `link` não é a fonte e sim uma ação (ex.: "Responder ao quiz"); `indicadores`; e `sistemaId` (id de `data/sistemas.json`, vira o botão "Acessar" na página do comunicado). Sem `imagem`, a faixa e a capa mostram um quadro na cor da origem.
+
+Ao reaproveitar e-mails da Comunicação, **não copie os links do e-mail**: eles passam por um rastreador de cliques com um código ligado a quem recebeu. Use só o endereço de destino (o QR Code da peça costuma trazê-lo). Para **preservar a fonte original**: transcreva o texto do e-mail como está (sem as saudações), use a peça e as fotos do próprio e-mail e ponha em `fonte` o remetente, a data, o assunto e quem assina. Imagem que o e-mail só carrega de fora (servidor da Comunicação) precisa ser baixada; os pixels de rastreamento (`errata`, `dntracker`) não.
 
 - Datas: `AAAA-MM-DD`; vigência opcional pode ser `null`.
-- Conteúdo: texto simples; use `\n` entre parágrafos. HTML não é interpretado.
-- `status` segue o fluxo editorial da Fase 4 — `Rascunho` → `Em revisão` → `Publicado` (ou `Recusado`). Só itens com `status: "Publicado"` aparecem na newsletter e na busca; os demais ficam fora dessas visualizações, o que organiza a interface mas não é controle de acesso — o arquivo JSON continua completo e público a quem acessa o servidor. Editar manualmente ainda funciona; o "Painel editorial" (ver seção própria) é a alternativa validada, com o backend opcional ligado.
+- Conteúdo: texto simples; use `\n` entre parágrafos. HTML não é interpretado. Duas marcas leves, para comunicado longo: uma linha `## Título` vira intertítulo e uma linha `[figura N]` põe ali a N-ª imagem de `figuras` — lista de `{ "imagem", "alt", "legenda" }`, mostrada com a legenda embaixo e na largura do texto. Mais duas marcas preservam o original de um e-mail: `**trecho**` é negrito, e uma figura com `"tipo": "retrato"` (foto de pessoa) fica pequena à esquerda, com o parágrafo seguinte ao lado, como num comunicado de movimentação. Na faixa da lista e na busca as marcas somem. `imagemFoco` (`"esquerda"` ou `"direita"`) faz a miniatura da capa e a faixa estreita do celular guardarem esse lado da imagem, e não o centro. **Links das imagens** (regra de 22/09/2026, para comunicado tirado de e-mail): todo link que a peça traz — a imagem inteira com link, um "clique aqui", um QR Code, um e-mail escrito nela — vai em `links`, lista de `{ "rotulo", "url", "area": [x, y, largura, altura] }` (frações da imagem; `[0,0,1,1]` = a imagem inteira; `"figura": N` para uma das `figuras`). Na página, o trecho fica clicável por cima da peça e o link vira também um botão nas ações. Aceita `https://`, `http://` e `mailto:`; link de rastreador do e-mail nunca entra — o destino sai do QR Code, do texto da peça ou de um link direto (`.claude/tools/msgread.py` aponta as imagens com link e as de rastreador). `imagemMiniatura` é uma versão 8:7 da imagem, só para a miniatura da capa e de "Mais comunicados", quando a composição não cabe inteira no quadro pequeno. Exemplo: o comunicado do CFC sobre IA generativa (`cfc-ia-contabilidade-seguranca-dados`), com capa e uma figura — só duas imagens, geradas no Gemini (o usuário pediu poucas, para não ficar "com cara de IA"); o crédito vai em `creditoImagens`, que vira a linha "Imagens" da ficha.
+- Conteúdo de terceiros (origem Externo): escreva um resumo com as próprias palavras, credite autor e veículo em `fonte` e ponha o endereço da íntegra em `urlFonte`/`link` com `rotuloLink` ("Ler o artigo no site do CFC"). Imagem de terceiro não entra sem licença; ilustração própria, sim.
+- `status` segue o fluxo editorial da Fase 4 — `Rascunho` → `Em revisão` → `Publicado` (ou `Recusado`). Só itens com `status: "Publicado"` aparecem na Comunicação, na capa e na busca; os demais ficam fora dessas visualizações, o que organiza a interface mas não é controle de acesso — o arquivo JSON continua completo e público a quem acessa o servidor. Editar manualmente ainda funciona; o "Painel editorial" (ver seção própria) é a alternativa validada, com o backend opcional ligado.
 - Impactos: `Alto`, `Moderado`, `Baixo`.
 - Categorias sugeridas estão em `config.json`: ANEEL, CPC, IFRS, Deliberação do Grupo, Comunicado Interno, Regulatório, Auditoria, Tecnologia, IA e Processos.
 - `link` recebe a fonte primária e `documento` um arquivo local opcional.
-- O radar reúne as publicações, movimenta-se automaticamente e pausa por hover, foco, botão ou preferência de movimento reduzido.
+- O movimento automático ficou restrito ao carrossel de destaques da capa, que pausa por hover, foco, botão ou preferência de movimento reduzido.
 
-As notícias usam o mesmo esquema. Todo o acervo inicial é demonstrativo: não representa novas normas nem orientações legais verificadas.
+As notícias usam o mesmo esquema. Os comunicados de exemplo foram removidos em 21/09/2026; cadastre só conteúdo real.
 
 ### Sistemas e acessos
 
@@ -127,25 +138,65 @@ Para cadastrar um integrante, inclua em `responsaveis` um objeto `{ "id", "areaI
 
 Responsabilidades e empresas atendidas aparecem na janela somente quando `dadosAreaValidados` for `true`. Mantenha o valor como `false` enquanto as informações ainda forem demonstrativas ou aguardarem validação.
 
+### Origem do conteúdo
+
+Todo conteúdo publicado tem o campo `origem`, que diz **quem escreveu** o conteúdo (não o tema):
+
+- `"contabilidade"`: criado e gerido pela Gerência de Contabilidade;
+- `"equatorial"`: do Grupo, para a empresa toda;
+- `"externo"`: de fora do Grupo (órgão, norma, fornecedor, serviço de terceiro).
+
+Uma análise da equipe sobre uma norma é `contabilidade`; a notícia reproduzida da ANEEL é `externo`; o tema continua em `categoria` ou `grupo`. O campo é **obrigatório** em `newsletter.json`, `noticias.json`, `documentos.json`, `avisos.json` e `destaques.json`. Em `sistemas.json`, `automacoes.json`, `portais.json`, `externos.json` e `config.json › links` ele também está preenchido; se faltar, vale o padrão da coleção (Contabilidade, Contabilidade, Equatorial, Externo e Equatorial). A origem vira as abas da Comunicação e as colunas da capa, o filtro "Origem" de Documentos e da busca global, o selo (na cor da origem: Contabilidade verde-água, Equatorial azul, Externo roxo) e a linha "Origem" de cada ficha.
+
 ### Documentos
 
-Troque os documentos demonstrativos por arquivos aprovados, como PDF, HTML ou DOCX, atualizando `arquivo`, `formato`, `versao`, `data` e `responsavel`. O navegador determina se o formato abre diretamente ou é baixado. Categoria e busca textual podem ser combinadas. Os 13 modelos locais abrem e podem ser baixados sem depender de links externos.
+Documentos & Normas lista **somente referências reais**, com link oficial verificado: cada item tem `grupo`, `titulo`, `descricao`, `fonte`, `link` (abre em nova aba) e `verificadoEm` (AAAA-MM-DD da última conferência do link). Um documento interno aprovado pode entrar com `arquivo` (caminho em `assets/documents/`), que habilita o botão "Baixar", e com `imagem`, que substitui o ícone do grupo no cartão. Os grupos e a ordem deles ficam em `config.json › navegacao` (`gruposDocumentos`); o menu abre direto a grade e a faixa de subpáginas mostra "Todos" e cada grupo. Não cadastre item sem link ou arquivo real.
+
+### Destaques e avisos da capa
+
+A capa abre com o **carrossel de destaques** e, a partir de 1200 px, **Avisos** e **Acesso rápido** numa coluna ao lado dele; o carrossel mede pela altura da janela (46%, entre 300 e 420 px), para as três colunas da **Comunicação** aparecerem sem rolar nos monitores comuns. Abaixo de 1200 px, o carrossel ocupa a largura toda e Avisos e Acesso rápido ficam abaixo dele, em duas colunas. Cada coluna da Comunicação mostra os 4 comunicados mais recentes da origem.
+
+O carrossel segue o **molde desenhado pelo usuário** (Figma, 2000×519, em `projeto/comunicados`): faixa larga e baixa (proporção 3,85, com altura mínima de 300 px); as imagens de um lado; do outro, o **selo da origem** + a área, título, subtítulo, descrição e a ação. O texto é HTML, nunca pintado na imagem. Cada slide tem um de dois **formatos**:
+
+- **Imagem** (o padrão, para comunicados, sistemas e links): a imagem ocupa **a altura toda**, encostada na borda (zona 16:9, até 56% da faixa), e se desfaz num fundo que é ela mesma espelhada e desfocada; por cima, as listras finas do molde do Cronograma, a diagonal para a segunda cor do slide e a sombra do canto de fora. Do lado do texto só há efeitos que escurecem, então o contraste nunca cai abaixo do da cor do slide.
+- **Molde** (`"formato": "molde"`): a arte montada no Figma — fundo próprio (`fundoImagem`) e a **cena** (as peças já nas posições do molde, sobre fundo transparente) ocupando a zona das imagens; aceita até duas imagens soltas. Com fundo próprio, um halo escuro suave fica atrás do texto e a área vai em branco, para o texto passar de 4,5:1 sobre a arte. `python .claude/tools/moldes-destaques.py` gera `assets/destaques/<nome>-fundo.webp` e `<nome>-cena.webp` a partir dos SVGs de `projeto/comunicados` (o texto do Figma vem em contorno e não é extraído). Do formato do Conecta ficaram os cantos de 10 px, o deslizamento de 0,5 s, as setas de 42 px e as bolinhas de 9 px. **O slide inteiro é clicável**; destino externo abre em outra aba. No celular, as imagens vão para cima e o texto para baixo. Troca a cada 7 s, pausa com mouse/foco em cima, tem botão de pausa e não gira com "Reduzir movimento".
+
+- `data/destaques.json` — **um registro por slide, apontando para um destino** (`js/destaques.js`):
+  - `alvo`: `{ "tipo", "ref" }`. Tipos: `comunicado` (`ref` = `"newsletter:<id>"` ou `"noticias:<id>"`; só aparece se o comunicado estiver publicado), `sistema` (id de `sistemas.json`), `portal` (id de `portais.json`), `externo` (id de `externos.json`), `atalho` (nome em `config.json › links`), `pagina` (rota do portal, ex.: `"#central/documentos"`) ou `url` (endereço `https://` livre).
+  - Agenda: `ativo` (falso = pausado, sem apagar), `inicio` e `fim` (AAAA-MM-DD — fora do período o slide sai sozinho) e `ordem`.
+  - Aparência, **toda opcional** — o que ficar em branco vem do destino (título, resumo, descrição, categoria/grupo, imagem): `titulo`, `subtitulo`, `descricao`, `rotulo` (a área, ao lado do selo), `acao` (texto do botão), `imagens` (lista com até 2 caminhos; no formato imagem vale só a primeira), `formato` (`"molde"`; ausente = imagem), `fundoImagem`, `fundo` e `fundoFim` (cores do slide — o véu e a diagonal do formato imagem saem delas), `lado` (`"esquerda"`/`"direita"`, onde ficam as imagens) e `alt`. Página e endereço livre precisam de `titulo`.
+  - Recomendação: **no máximo 5 no ar** — o primeiro slide concentra a maior parte dos cliques; a Administração avisa quando passa disso.
+  - **Gestão pela tela** (exige o servidor opcional ligado): Administração → aba **Carrossel** (lista com a situação de cada slide — No ar, Agendado, Pausado, Encerrado —, Subir/Descer, Editar, Novo destaque); bloco **"Carrossel da capa"** na página de cada comunicado; botão **"Destacar no carrossel"** nas fichas de sistemas, portais, links externos e atalhos. O formulário mostra a prévia do slide e envia imagens para `assets/destaques/`. Sem servidor, tudo abre em modo leitura, com a prévia.
+  - `python .claude/tools/fundo-destaques.py` preenche `fundo`/`fundoFim` a partir da primeira imagem, só nos slides sem cor e sem `fundoImagem` (`--refazer` recalcula todos).
+- `data/avisos.json`: cada aviso tem `tipo` (`extra`, `prazo` ou `info`, no molde do "Extra!" da Comunicação), `titulo`, `texto`, `janela` (quando: horário ou prazo), `area` responsável, `inicio` e `fim`. A capa mostra até 3 vigentes, Extra primeiro; sem nenhum vigente, mostra "Nenhum aviso vigente".
+- **Compromisso da agenda em Avisos** (21/09/2026): o item de `data/agenda.json` com `"naCapa": true` aparece no alto de Avisos como uma linha de calendário — a folhinha com o dia, o nome, o dia da semana e o horário (quem organiza não aparece, a pedido do usuário) — até a hora em que termina (até 2 por vez). Campos: `nome`, `descricao`, `data` (AAAA-MM-DD), `inicio` e `fim` (HH:MM, horário de Brasília), `horario` (texto, usado no Painel), `responsavel` (só no Painel da gerência), `local`, `link` e `fonte`. Com `link` (Teams, por exemplo), a linha ganha o botão **Entrar na reunião**; o nome abre a ficha, com **Salvar no calendário** — um `.ics` montado na hora, só com o que o portal mostra (sem a lista de convidados do convite original). Ao aproveitar um convite do Outlook (`.ics`), copie só título, data, horário, organizador, local e o link da reunião, se houver.
+- **Acesso rápido** é montado sozinho: links de `config.json > links` com endereço e sistemas `Ativo` de `data/sistemas.json` (até 8).
 
 ### Adicionar menu
 
-Inclua um objeto em `config.json > menu`: `label`, `icon`, `target` e, opcionalmente, `tab` ou `view`. `tab` seleciona uma aba da Central de Conteúdo; `view` identifica uma janela principal, como `equipes`. Para uma nova janela, adicione sua seção ao HTML e um renderizador modular. Os ícones disponíveis estão em `ui.js`. Se a nova seção só deve aparecer para certos perfis, registre seu `target` em `TARGET_ACCESS` (`js/app.js`) com a capacidade exigida.
+O menu exibido fica em `config.json > navegacao`: cada seção tem `label` e `icon` e, ou um `target` direto (como `Início`), ou uma lista `itens` que vira o submenu. Cada item de submenu aponta para um destino do portal: `target` e, opcionalmente, `tab` (aba da Central de Conteúdo), `view` (janela principal, como `equipes`) ou `adminTab` (aba da Administração). Duas chaves especiais montam a seção a partir dos dados: `acessosCorporativos` acrescenta os links de `config.json > links` (abrem em nova aba) e `gruposDocumentos` lista os grupos de Documentos & Normas na faixa de páginas, sem submenu. `config.json > menu` continua sendo a tabela de rotas (`target` → seção). Para uma nova janela, adicione sua seção ao HTML e um renderizador modular. Os ícones disponíveis estão em `ui.js`. Se o destino só deve aparecer para certos perfis, registre seu `target` em `TARGET_ACCESS` (`js/app.js`); seções sem itens visíveis somem do menu.
 
 ## Decisões técnicas e experiência
 
 - Módulos ES nativos, dados separados e sem dependências externas.
-- Layout com sidebar fixa, topbar sticky, Central de Conteúdo e janela exclusiva para as equipes.
-- Menu móvel com fechamento após seleção, Escape e controle de foco.
+- Cabeçalho institucional com a imagem da gerência, título, busca, "Bem-vindo" (menu do usuário: trocar identificação, preferências e, para a gerência, alertas) e o menu principal com ícones embutido na base da faixa. **O menu não abre submenu suspenso**: cada seção é um link direto para a sua primeira página, e as demais aparecem na faixa de subpáginas logo abaixo, em abas.
+- Rotas em hash: `#inicio`, `#central/<aba>`, `#administracao/<aba>`, `#busca/<termo>` e `#<seção>`; o botão Voltar do navegador funciona entre elas.
+- No celular, o botão "Menu" abre as mesmas seções dentro da faixa e fecha após a seleção.
+- Faixa de subpáginas no padrão do CFC, logo abaixo do menu, com as páginas da seção aberta. Vale para qualquer seção (inclusive Gestão, cujas páginas são painéis da capa) e fica escondida quando a seção tem uma página só (Pessoas) ou quando é uma janela com abas próprias (Administração); uma linha azul de 3 px fica sobre a página atual e desliza até o item sob o mouse ou foco (0,25 s; sem animação com "Reduzir movimento"). Seções: Comunicação (Todos, Contabilidade, Equatorial, Externo), **Portais e Links** (**Todos** = tudo da seção, de A a Z, com selo e filtro de origem; Contabilidade = sistemas da área; Equatorial = 4 portais do Grupo (comunicação, SharePoint e viagens); Portal de Serviços = os 8 serviços do atendimento interno; Gente e Gestão = os 8 de RH, a começar pelo Conecta; **Power BI** = painéis do Power BI (`destino: "portais-powerbi"`, hoje o BI - Gastos Gerenciáveis); Externos = 8 sites de terceiros, entre eles o BMP e RIT da ANEEL e três assistentes de IA (ChatGPT, Claude e Gemini)), **Sistemas e automações** (**Todos**; Contabilidade = automações; Equatorial = atalhos de `config.json › links`, como SAP e Snowflake; Externos = ferramentas de terceiros que automatizam tarefa) e Documentos & Normas (por categoria). As abas Todos e Power BI são de 21/09; "Todos" é a primeira aba e é onde o menu leva.
+- **Grade de cartões padrão** (`.pcard`) em todas as telas de lista — Portais e Links → Contabilidade, Sistemas e automações → Contabilidade e → Equatorial, e Documentos & Normas: cada item é uma **faixa horizontal** (~176 px de altura) com a imagem numa coluna fixa à esquerda, em altura cheia, e rótulo, título, descrição e ações no restante do espaço. **Dois por faixa** em telas largas, um abaixo de 1100 px, e continua faixa no celular. As ações são o status, o botão **"i"** (ficha do item) e **Acessar**/**Baixar**; **o clique em qualquer parte do cartão leva ao destino**, por um `::after` esticado a partir da ação principal (sem aninhar links). O cartão é um alvo só: o texto dele não é selecionável — a tentativa de deixá-lo selecionável foi testada em 20/09 e recusada, porque arrastar o mouse dentro do cartão selecionava texto em vez de parecer um botão. Cartão sem destino cadastrado não clica. Sem imagem cadastrada, o cartão mostra o ícone da categoria no mesmo espaço. Estilo de borda e sombra tirado de microsoft.com/pt-br.
+- **Arte dos cartões**: todo cartão tem um SVG em `assets/{atalhos,sistemas,automacoes,documentos,portais,externos}/`, gerado por `.claude/tools/arte-marcas.py` (62 artes, uma por cartão). Quando o destino tem **tela de entrada própria**, a arte reproduz essa tela — o fundo, a logo e o título dela (ProjectHub, Cronograma de Fechamento, Portal de Auditoria, IFRS 16/CPC 06, Gestor de Horas, Central de Resultados, e o Brasão da República nas leis do Planalto). Quando não tem, entra a **marca oficial do titular** sobre o fundo da própria marca (ChatGPT em preto, EY no carvão `#2E2E38`, WeTransfer no azul `#409FFF`), **sem desenho decorativo**, com **rótulo abaixo** quando a mesma marca serve a vários cartões — a transação (`ME23N`, `FB03`), a norma (`SPED · ECD`) ou o sistema. Marcas em `assets/marcas/` (origem em `FONTES.md`); os insumos das telas em `projeto/marcas-telas/`, fora do site. **Uso referencial**: o cartão leva ao site da própria instituição. O passo a passo para criar a arte de um item novo está em `.claude/redesign/04-arte-dos-cartoes.md`.
+- A arte do IFRS 16 / CPC 06 reproduz a **tela de entrada nova** (21/09/2026: painel branco e painel azul com a curva, a foto das torres e o "Contrato de Arrendamento"): é composta por `.claude/tools/arte_arrendamento.py`, que o `arte-marcas.py` chama, e que também gera o fundo do slide do IFRS no carrossel (`python .claude/tools/arte_arrendamento.py`). Os insumos (foto, ilustração, logo) estão em `projeto/marcas-telas/arrendamento-*`, tirados da página salva do sistema.
+- Quem tem o perfil de administração troca a arte de um cartão pelo **lápis no canto de cima da imagem** (campo `imagem` em `data/sistemas.json` e `data/automacoes.json`; os atalhos de `config.json › links` são somente leitura na API e precisam ser editados no arquivo). Uploads vão para `assets/sistemas/`, `assets/automacoes/`, `assets/portais/`, `assets/externos/` ou `assets/users/`.
+- Em Documentos & Normas o cartão traz o grupo como rótulo, a fonte oficial na faixa de ações e a data de conferência do link na ficha do "i". Sem tabela: a única que sobrou no portal é a de processos críticos, no painel da gerência.
+- Rodapé institucional em todas as telas, com o **mapa do portal** (as mesmas seções e páginas do menu, filtradas pelo perfil), a área responsável (vinda de `data/equipes.json`, equipe `tipo: gerencia`) e a data de atualização da base.
 - Tabs acessíveis por setas, Home e End; diálogos nativos com Escape e retorno de foco.
-- Busca sem diferenciação de acentos, abrangendo conteúdos, equipes, colaboradores, agenda e entregas.
-- Indicadores executivos demonstrativos independentes do subconjunto de registros detalhados: 24 processos e 07 sistemas não são contagens automáticas dos cinco processos e quatro sistemas exibidos.
+- **Busca do cabeçalho** (refeita em 22/09/2026, `js/busca.js`): ao digitar duas letras, a lista de **sugestões** aparece logo abaixo do campo, agrupada pela seção do menu onde cada item mora, com o trecho encontrado marcado. Setas escolhem, Enter abre, Esc fecha; Enter sem escolher (ou "Ver todos os N resultados") abre a página de resultados, `#busca/<termo>`, com a faixa de busca e os filtros "Onde" e "Origem". Escolher leva direto ao destino: página do portal ou comunicado abrem no portal; sistema, portal, link, atalho e documento abrem o endereço em outra aba; item sem endereço abre a ficha. **O que se busca**: as páginas do portal (ex.: "Portais e Links › Power BI"), os comunicados publicados (título, subtítulo, categoria, palavras-chave, fonte e o texto), sistemas, portais, links externos, atalhos, automações (inclusive pela transação SAP do título, como FB03), documentos e normas, as pessoas das equipes (perfis com `time`), os avisos e compromissos da capa e, para a gerência, processos e entregas. Cada coleção entra só com nome, descrição, grupo, responsável e afins — nunca o JSON inteiro (antes, "link" achava 59 itens pelo nome do campo). Sem diferença de acento ou maiúscula; todos os termos precisam aparecer; o título pesa mais que o texto de apoio.
+- **Faixa de busca e filtros padrão** em todas as telas de conteúdo (a capa não tem, porque lá a busca é a do cabeçalho): busca à esquerda, filtros no meio e "Limpar filtros" no fim, com a contagem do resultado no rodapé da tela. As grades de Portais e Links listam em ordem alfabética do título. Comunicação filtra por categoria (a origem é a aba), Portais e Links por equipe responsável, Automações por tecnologia e status, Documentos por origem (o grupo é a aba).
+- Painel da gerência, Processos críticos, Agenda e Entregas mostram "Nenhum … cadastrado ainda" enquanto `config.json › kpis`, `processos.json`, `agenda.json` e `entregas.json` estiverem vazios.
 - Preferências locais de tamanho de texto e movimento, com tolerância a armazenamento bloqueado.
 - Tratamento de erro no carregamento e nova tentativa; nenhuma autenticação real, com ou sem o backend opcional (ver "Backend opcional").
-- Identidade visual em azul marinho, azul corporativo e teal; logo vetorial, ícones inline e fontes do sistema, sem requisições a CDNs.
+- Identidade visual em azul marinho e azul corporativo; logo vetorial, ícones inline e a fonte do sistema (`"Segoe UI", Arial`), sem requisições a CDNs.
+- **Sistema visual em tokens** no `:root` de `css/styles.css`: escala de 8 tamanhos (11 a 30 px), 3 pesos, 5 raios, 3 sombras e a paleta completa. Nenhuma cor literal fora do `:root`. Todo texto da interface atende ao contraste AA (4,5:1); ao mexer em cor, mantenha essa margem.
 
 ## Uso e métricas locais
 
@@ -222,7 +273,7 @@ No portal estático e no GitHub Pages, as alterações são salvas em `localStor
 
 ## Painel editorial (Fase 4 — governança de conteúdo)
 
-O risco que esta fase fecha: publicar newsletter e notícias hoje significa editar `data/newsletter.json` ou `data/noticias.json` na mão, sem revisão nem trilha de quem aprovou o quê — arriscado para conteúdo com peso regulatório (ANEEL, CPC/IFRS, deliberações). O "Painel editorial", no menu lateral (visível para perfis com a capacidade `gerencial` — ver "Usuários e identificação"), dá um fluxo com um mínimo de controle:
+O risco que esta fase fecha: publicar newsletter e notícias hoje significa editar `data/newsletter.json` ou `data/noticias.json` na mão, sem revisão nem trilha de quem aprovou o quê — arriscado para conteúdo com peso regulatório (ANEEL, CPC/IFRS, deliberações). O "Painel editorial", no menu Gestão (visível para perfis com a capacidade `gerencial` — ver "Usuários e identificação"), dá um fluxo com um mínimo de controle:
 
 - **Fluxo de status**: `Rascunho` → `Em revisão` → `Publicado`, com desvio para `Recusado` (que pode reabrir como `Rascunho`). Cada item guarda um `historicoStatus` com quem moveu o quê e quando.
 - **A única regra que o backend impõe de verdade**: não existe transição para `Publicado` sem um `aprovadoPor` informado no corpo da requisição — o servidor recusa (`400`) qualquer tentativa de publicar, ou de "reafirmar" a publicação de algo já publicado, sem essa informação. É deliberadamente a única regra rígida: o resto do fluxo (enviar para revisão, recusar, reabrir) é permissivo, porque o ponto de risco identificado era especificamente "publicar sem aprovação registrada", não uma máquina de estados completa.

@@ -1,0 +1,107 @@
+[
+  {
+    "id": "chatgpt",
+    "origem": "externo",
+    "nome": "ChatGPT",
+    "descricao": "Assistente de IA da OpenAI. Ajuda a redigir e revisar textos, explicar uma norma em linguagem simples, montar fórmulas e esboçar roteiros de automação.",
+    "icon": "radar",
+    "grupo": "Inteligência artificial",
+    "link": "https://chatgpt.com/",
+    "imagem": "assets/externos/chatgpt.svg",
+    "observacao": "Ferramenta pública: não insira dado sigiloso do Grupo, informação de terceiros nem número ainda não divulgado.",
+    "destino": "portais-externos"
+  },
+  {
+    "id": "claude",
+    "origem": "externo",
+    "nome": "Claude",
+    "descricao": "Assistente de IA da Anthropic. Ajuda a redigir e revisar textos, analisar documentos longos, explicar uma norma em linguagem simples e esboçar fórmulas, planilhas e roteiros de automação.",
+    "icon": "radar",
+    "grupo": "Inteligência artificial",
+    "link": "https://claude.ai/",
+    "imagem": "assets/externos/claude.svg",
+    "observacao": "Ferramenta pública: não insira dado sigiloso do Grupo, informação de terceiros nem número ainda não divulgado.",
+    "destino": "portais-externos"
+  },
+  {
+    "id": "coolors-paletas",
+    "origem": "externo",
+    "nome": "Coolors — paletas em alta",
+    "descricao": "Galeria e gerador de paletas de cores, com o código hexadecimal pronto para copiar. Ajuda a padronizar as cores de apresentações e painéis.",
+    "icon": "image",
+    "grupo": "Referências visuais",
+    "link": "https://coolors.co/palettes/trending",
+    "imagem": "assets/externos/coolors-paletas.svg",
+    "destino": "portais-externos"
+  },
+  {
+    "id": "datylon-graficos",
+    "origem": "externo",
+    "nome": "Datylon — tipos de gráfico",
+    "descricao": "Catálogo comentado de tipos de gráfico, com exemplo de cada um e a situação em que funciona melhor. Consulta rápida antes de montar relatório ou painel.",
+    "icon": "chart",
+    "grupo": "Referências visuais",
+    "link": "https://www.datylon.com/blog/types-of-charts-graphs-examples-data-visualization",
+    "imagem": "assets/externos/datylon-graficos.svg",
+    "destino": "portais-externos"
+  },
+  {
+    "id": "ey-canvas",
+    "origem": "externo",
+    "nome": "EY Canvas — Client Portal",
+    "descricao": "Portal da EY para a auditoria independente. É por onde chegam as solicitações de evidência (PBC) e por onde os arquivos do fechamento sobem para o time de auditoria.",
+    "icon": "shield",
+    "grupo": "Auditoria",
+    "link": "https://eycanvas.ey.com/",
+    "imagem": "assets/externos/ey-canvas.svg",
+    "destino": "portais-externos"
+  },
+  {
+    "id": "gemini",
+    "origem": "externo",
+    "nome": "Google Gemini",
+    "descricao": "Assistente de IA do Google, com leitura de imagem e PDF. Alternativa ao ChatGPT para resumir documento longo e conferir raciocínio de cálculo.",
+    "icon": "radar",
+    "grupo": "Inteligência artificial",
+    "link": "https://gemini.google.com/",
+    "imagem": "assets/externos/gemini.svg",
+    "observacao": "Ferramenta pública: não insira dado sigiloso do Grupo, informação de terceiros nem número ainda não divulgado.",
+    "destino": "portais-externos"
+  },
+  {
+    "id": "wetransfer",
+    "origem": "externo",
+    "nome": "WeTransfer",
+    "descricao": "Envio de arquivo grande por link, acima do limite do e-mail. Usado na troca de bases e evidências com auditoria e consultorias.",
+    "icon": "link",
+    "grupo": "Arquivos e documentos",
+    "link": "https://wetransfer.com/",
+    "imagem": "assets/externos/wetransfer.svg",
+    "observacao": "O link gerado abre para qualquer um que o tenha. Combine o envio com o destinatário e evite dado pessoal sem necessidade.",
+    "destino": "portais-externos"
+  },
+  {
+    "id": "bmp-rit",
+    "origem": "externo",
+    "nome": "BMP e RIT - Envio e Consulta",
+    "descricao": "Sistema da ANEEL para enviar e consultar o Balancete Mensal Padronizado (BMP) e o Relatório de Informações Trimestrais (RIT) dos agentes do setor elétrico.",
+    "icon": "chart",
+    "grupo": "Setor elétrico",
+    "link": "http://bmp2.aneel.gov.br/UploadRit.aspx",
+    "imagem": "assets/externos/bmp-rit.svg",
+    "observacao": "Exige o acesso do agente cadastrado na ANEEL. O RIT vai em arquivo XML e pode ser reenviado; enviado fora do prazo fica como \"Irregular\", e competência sem envio, como \"Inadimplente\".",
+    "destino": "portais-externos"
+  },
+  {
+    "id": "ilovepdf",
+    "origem": "externo",
+    "nome": "iLovePDF",
+    "descricao": "Automatiza tarefas repetitivas de PDF no navegador: juntar, dividir, comprimir, converter para Word ou Excel, numerar páginas e proteger com senha, em lote.",
+    "icon": "file",
+    "grupo": "Automação de tarefas",
+    "link": "https://www.ilovepdf.com/pt",
+    "imagem": "assets/externos/ilovepdf.svg",
+    "observacao": "O arquivo sobe para o servidor do serviço. Para documento sigiloso, prefira o recurso equivalente do Adobe ou do Microsoft 365.",
+    "destino": "automacoes-externos"
+  }
+]

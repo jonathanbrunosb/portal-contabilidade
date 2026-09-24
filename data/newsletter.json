@@ -1,160 +1,7 @@
 [
   {
-    "id": "n1",
-    "categoria": "ANEEL",
-    "titulo": "Agenda regulatória: pontos de atenção para o fechamento",
-    "resumo": "Confira os temas para análise da equipe e a preparação das evidências regulatórias.",
-    "conteudoCompleto": "CONTEÚDO DEMONSTRATIVO — não constitui norma, orientação regulatória ou deliberação vigente.\nEsta publicação ilustra o fluxo de comunicação da Gerência. Substitua por conteúdo revisado e aprovado, incluindo a fonte primária e a data de vigência confirmada.\nPróximos passos: avaliar os processos impactados, designar responsáveis e registrar as evidências da análise. Compartilhe o resultado no checkpoint do time.",
-    "dataPublicacao": "2026-09-14",
-    "dataVigencia": null,
-    "fonte": "Pauta demonstrativa · acompanhamento ANEEL",
-    "link": null,
-    "documento": null,
-    "empresasImpactadas": [
-      "Empresa A (exemplo)",
-      "Empresa B (exemplo)"
-    ],
-    "areaResponsavel": "Normas e Reporte",
-    "responsavel": "Marina Oliveira",
-    "nivelImpacto": "Alto",
-    "status": "Publicado",
-    "aprovadoPor": "Marina Oliveira",
-    "dataAprovacao": "2026-09-14",
-    "motivoRecusa": null,
-    "historicoStatus": [
-      {
-        "de": null,
-        "para": "Publicado",
-        "autor": "Marina Oliveira",
-        "data": "2026-09-14"
-      }
-    ]
-  },
-  {
-    "id": "n2",
-    "categoria": "CPC / IFRS",
-    "titulo": "IFRS 18: preparação e avaliação de impactos",
-    "resumo": "Uma pauta para discutir apresentação, reporte e adequação dos processos contábeis.",
-    "conteudoCompleto": "CONTEÚDO DEMONSTRATIVO — não constitui norma, orientação regulatória ou deliberação vigente.\nEsta publicação ilustra o fluxo de comunicação da Gerência. Substitua por conteúdo revisado e aprovado, incluindo a fonte primária e a data de vigência confirmada.\nPróximos passos: avaliar os processos impactados, designar responsáveis e registrar as evidências da análise. Compartilhe o resultado no checkpoint do time.",
-    "dataPublicacao": "2026-09-13",
-    "dataVigencia": null,
-    "fonte": "Pauta demonstrativa · normas e reporte",
-    "link": null,
-    "documento": null,
-    "empresasImpactadas": [
-      "Empresa A (exemplo)",
-      "Empresa B (exemplo)"
-    ],
-    "areaResponsavel": "Normas e Reporte",
-    "responsavel": "Marina Oliveira",
-    "nivelImpacto": "Alto",
-    "status": "Publicado",
-    "aprovadoPor": "Marina Oliveira",
-    "dataAprovacao": "2026-09-13",
-    "motivoRecusa": null,
-    "historicoStatus": [
-      {
-        "de": null,
-        "para": "Publicado",
-        "autor": "Marina Oliveira",
-        "data": "2026-09-13"
-      }
-    ]
-  },
-  {
-    "id": "n3",
-    "categoria": "DELIBERAÇÃO DO GRUPO",
-    "titulo": "Alinhamento das diretrizes de fechamento",
-    "resumo": "Responsabilidades, prazos e aprovações reunidos para o ciclo de setembro.",
-    "conteudoCompleto": "CONTEÚDO DEMONSTRATIVO — não constitui norma, orientação regulatória ou deliberação vigente.\nEsta publicação ilustra o fluxo de comunicação da Gerência. Substitua por conteúdo revisado e aprovado, incluindo a fonte primária e a data de vigência confirmada.\nPróximos passos: avaliar os processos impactados, designar responsáveis e registrar as evidências da análise. Compartilhe o resultado no checkpoint do time.",
-    "dataPublicacao": "2026-09-12",
-    "dataVigencia": null,
-    "fonte": "Exemplo de deliberação corporativa",
-    "link": null,
-    "documento": null,
-    "empresasImpactadas": [
-      "Empresa A (exemplo)",
-      "Empresa B (exemplo)"
-    ],
-    "areaResponsavel": "Gerência de Contabilidade",
-    "responsavel": "Marina Oliveira",
-    "nivelImpacto": "Moderado",
-    "status": "Publicado",
-    "aprovadoPor": "Marina Oliveira",
-    "dataAprovacao": "2026-09-12",
-    "motivoRecusa": null,
-    "historicoStatus": [
-      {
-        "de": null,
-        "para": "Publicado",
-        "autor": "Marina Oliveira",
-        "data": "2026-09-12"
-      }
-    ]
-  },
-  {
-    "id": "n4",
-    "categoria": "COMUNICADO INTERNO",
-    "titulo": "Conciliações: novo roteiro de evidências",
-    "resumo": "Conheça o modelo de organização dos suportes e a rotina de revisão entre os times.",
-    "conteudoCompleto": "CONTEÚDO DEMONSTRATIVO — não constitui norma, orientação regulatória ou deliberação vigente.\nEsta publicação ilustra o fluxo de comunicação da Gerência. Substitua por conteúdo revisado e aprovado, incluindo a fonte primária e a data de vigência confirmada.\nPróximos passos: avaliar os processos impactados, designar responsáveis e registrar as evidências da análise. Compartilhe o resultado no checkpoint do time.",
-    "dataPublicacao": "2026-09-11",
-    "dataVigencia": null,
-    "fonte": "Exemplo de comunicado interno",
-    "link": null,
-    "documento": null,
-    "empresasImpactadas": [
-      "Empresa A (exemplo)",
-      "Empresa B (exemplo)"
-    ],
-    "areaResponsavel": "Gerência de Contabilidade",
-    "responsavel": "Jonathan Bruno",
-    "nivelImpacto": "Baixo",
-    "status": "Publicado",
-    "aprovadoPor": "Jonathan Bruno",
-    "dataAprovacao": "2026-09-11",
-    "motivoRecusa": null,
-    "historicoStatus": [
-      {
-        "de": null,
-        "para": "Publicado",
-        "autor": "Jonathan Bruno",
-        "data": "2026-09-11"
-      }
-    ]
-  },
-  {
-    "id": "n5",
-    "categoria": "Comunicado Interno",
-    "titulo": "Novo roteiro de fechamento trimestral",
-    "resumo": "Rascunho em elaboração: consolidação dos ajustes de calendário para o próximo trimestre.",
-    "conteudoCompleto": "CONTEÚDO EM ELABORAÇÃO — ainda não passou por revisão nem aprovação.\nEste rascunho ilustra o fluxo editorial: Rascunho → Em revisão → Publicado, com aprovação obrigatória registrada pelo backend antes da publicação.",
-    "dataPublicacao": "2026-09-15",
-    "dataVigencia": null,
-    "fonte": "Rascunho interno — Fase 4 do roadmap",
-    "link": null,
-    "documento": null,
-    "empresasImpactadas": [
-      "Empresa A (exemplo)"
-    ],
-    "areaResponsavel": "Gerência de Contabilidade",
-    "responsavel": "Jonathan Bruno",
-    "nivelImpacto": "Moderado",
-    "status": "Rascunho",
-    "aprovadoPor": null,
-    "dataAprovacao": null,
-    "motivoRecusa": null,
-    "historicoStatus": [
-      {
-        "de": null,
-        "para": "Rascunho",
-        "autor": "Jonathan Bruno",
-        "data": "2026-09-15T10:00:00.000Z"
-      }
-    ]
-  },
-  {
     "id": "n6-projecthub-lancamento",
+    "origem": "contabilidade",
     "categoria": "COMUNICADO INTERNO",
     "titulo": "ProjectHub: nova solução integra a gestão de projetos da Contabilidade",
     "resumo": "Criado pelo time da Contabilidade, o ProjectHub concentra planejamento, execução, prazos, recursos, riscos e indicadores em uma única visão, fortalecendo a governança e a tomada de decisão.",
@@ -188,36 +35,60 @@
     ]
   },
   {
-    "id": "n7-arrendamentos-ifrs16-atualizacao",
-    "categoria": "COMUNICADO INTERNO",
-    "titulo": "Sistema de Arrendamentos IFRS 16 / CPC 06 (R2): novidades da solução",
-    "resumo": "Nova janela de Abertura RIT para visualização das obrigações por vencimento e login redesenhado trazem mais clareza, melhor experiência de uso e evolução contínua da ferramenta.",
-    "conteudoCompleto": "O time da Contabilidade segue evoluindo o Sistema de Arrendamentos IFRS 16 / CPC 06 (R2), com melhorias que ampliam a usabilidade, a qualidade da informação e a experiência de acesso à ferramenta.\nNova funcionalidade — Abertura RIT: nova janela para visualização da abertura das obrigações de arrendamento por vencimento, trazendo maior apoio à análise e ao reporte das informações, com detalhamento por instituição/credora, cronograma de amortização de principal e juros de longo prazo e conciliação do saldo contábil.\nNova cara do sistema: login redesenhado, interface mais moderna e experiência visual mais intuitiva, reforçando a identidade corporativa da solução.\nEssas evoluções seguem a mesma diretriz das demais soluções da área: mais clareza nas informações, melhor experiência de uso e evolução contínua da ferramenta.",
-    "dataPublicacao": "2026-09-22",
+    "id": "n7-ifrs16-abertura-rit-nova-cara",
+    "origem": "contabilidade",
+    "categoria": "Tecnologia",
+    "titulo": "Sistema de Arrendamentos IFRS 16: novas melhorias disponíveis",
+    "resumo": "O time da Contabilidade segue evoluindo a solução de arrendamentos, com melhorias que ampliam a usabilidade, a qualidade da informação e a experiência de acesso à ferramenta.",
+    "conteudoCompleto": "Dando continuidade à evolução do Sistema de Arrendamentos – IFRS 16 / CPC 06 (R2), desenvolvido pelo time da Contabilidade, informamos a disponibilização de duas novas melhorias:\n• **Abertura RIT:** nova funcionalidade para consulta das obrigações de arrendamento por vencimento, com segregação entre curto e longo prazo, detalhamento do cronograma financeiro e exportação para Excel.\n• **Nova cara do sistema:** reformulação da tela de login, proporcionando uma experiência de acesso mais moderna, intuitiva e alinhada à identidade corporativa.\nAs novidades reforçam nosso compromisso com a melhoria contínua da ferramenta, a centralização das informações e a eficiência dos processos contábeis.\nConfira no material as novidades implementadas!\nAtenciosamente,\n**Time de Contabilidade**",
+    "dataPublicacao": "2026-09-21",
     "dataVigencia": null,
-    "fonte": "Gerência de Contabilidade",
-    "link": "https://arrendamento.contabilidade-eqtl.com/",
+    "fonte": "Time de Contabilidade — e-mail de Jonathan Bruno de 21/09/2026, \"Sistema de Arrendamentos IFRS 16 | Novas melhorias disponíveis\"",
+    "link": null,
     "documento": null,
-    "imagem": "assets/images/comunicados/arrendamentos-ifrs16-atualizacao.webp",
-    "imagemAlt": "Comunicado das novidades do Sistema de Arrendamentos IFRS 16 / CPC 06 (R2): nova funcionalidade de Abertura RIT e login redesenhado",
+    "imagem": "assets/images/comunicados/ifrs16-melhorias-2026-09.webp",
+    "imagemAlt": "Peça \"Sistema de Arrendamentos IFRS 16 / CPC 06 (R2) — Novidades da solução\": à esquerda, a nova funcionalidade Abertura RIT, com a tabela das obrigações de arrendamento por vencimento e a conciliação; à direita, a nova cara do sistema, com a tela de login redesenhada; no rodapé, mais clareza nas informações, melhor experiência de uso e evolução contínua da ferramenta.",
+    "links": [
+      {
+        "rotulo": "Acessar o Sistema de Arrendamentos IFRS 16",
+        "url": "https://arrendamento.contabilidade-eqtl.com/",
+        "area": [
+          0,
+          0,
+          1,
+          1
+        ]
+      }
+    ],
     "statusSistema": "Ativo",
     "sistemaId": "s1",
     "empresasImpactadas": [
       "Gerência de Contabilidade"
     ],
-    "areaResponsavel": "Contabilidade IV",
+    "areaResponsavel": "Gerência de Contabilidade",
     "responsavel": "Jonathan Bruno",
     "nivelImpacto": "Moderado",
+    "palavrasChave": [
+      "IFRS 16",
+      "CPC 06",
+      "arrendamento",
+      "Abertura RIT",
+      "obrigações por vencimento",
+      "curto e longo prazo",
+      "cronograma financeiro",
+      "Excel",
+      "tela de login"
+    ],
     "status": "Publicado",
-    "aprovadoPor": "Jonathan Bruno",
-    "dataAprovacao": "2026-09-22",
+    "aprovadoPor": "Eduardo dos Santos Rocha",
+    "dataAprovacao": "2026-09-21",
     "motivoRecusa": null,
     "historicoStatus": [
       {
         "de": null,
         "para": "Publicado",
-        "autor": "Jonathan Bruno",
-        "data": "2026-09-22"
+        "autor": "Eduardo dos Santos Rocha",
+        "data": "2026-09-21"
       }
     ]
   }

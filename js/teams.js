@@ -1,9 +1,9 @@
-import { escapeHTML as e,icon,safeURL } from './ui.js';
+import { escapeHTML as e,icon,safeURL,comVersao } from './ui.js?v=20260924-1';
 
 const DEFAULT_AVATAR='assets/users/default.svg';
 
 function photo(value) {
-  return safeURL(value)||DEFAULT_AVATAR;
+  return comVersao(safeURL(value)||DEFAULT_AVATAR);
 }
 
 function leaderFor(area) {
@@ -79,8 +79,9 @@ export function renderTeamStructure(areas) {
   const branches=areas.filter(area=>area!==management);
   const manager=management?leaderFor(management):null;
   root.innerHTML=`
+    <h1 class="sr-only">Estrutura das Equipes</h1>
     <div class="structure-toolbar">
-      <div><span class="section-kicker">PESSOAS & LIDERANÇA</span><h1>Estrutura das Equipes</h1><p>Gerência de Contabilidade · visão da estrutura</p></div>
+      <p class="meta-label">Gerência de Contabilidade · visão da estrutura</p>
       <div class="structure-actions" aria-label="Controles do organograma"><button class="secondary-btn" id="expand-all-teams" type="button">Expandir todas</button><button class="secondary-btn" id="collapse-all-teams" type="button">Recolher todas</button></div>
     </div>
     <div class="structure-frame">

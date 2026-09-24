@@ -1,60 +1,66 @@
 [
   {
     "id": "s1",
+    "origem": "contabilidade",
     "nome": "IFRS 16 / CPC 06",
     "descricao": "Gestão de contratos, passivos, ativo de direito de uso, eventos contratuais e reportes.",
     "icon": "file",
-    "imagem": "assets/sistemas/ifrs16-cpc06.webp",
+    "imagem": "assets/sistemas/ifrs16-cpc06.svg",
     "status": "Ativo",
     "link": "https://arrendamento.contabilidade-eqtl.com/",
     "responsavel": "Contabilidade IV"
   },
   {
     "id": "s2",
+    "origem": "contabilidade",
     "nome": "Monitor de Desempenho",
     "descricao": "Gestão da equipe, avaliações, feedbacks, carreira e desenvolvimento.",
     "icon": "chart",
-    "imagem": "assets/sistemas/monitor-de-desempenho.webp",
+    "imagem": "assets/sistemas/monitor-de-desempenho.svg",
     "status": "Link não configurado",
     "link": null,
     "responsavel": "Contabilidade IV"
   },
   {
     "id": "s3",
+    "origem": "contabilidade",
     "nome": "Controle de Horas",
     "descricao": "Banco de horas, folgas, compensações e acompanhamento por colaborador.",
     "icon": "clock",
-    "imagem": "assets/sistemas/controle-de-horas.webp",
+    "imagem": "assets/sistemas/controle-de-horas.svg",
     "status": "Ativo",
     "link": "https://gestorhoras.contabilidade-eqtl.com/",
     "responsavel": "Contabilidade IV"
   },
   {
     "id": "s4",
+    "origem": "contabilidade",
     "nome": "ProjectHub — Gerenciador de Projetos",
     "descricao": "Gestão de projetos, tarefas, prazos, responsáveis e acompanhamento das iniciativas da área.",
     "icon": "grid",
-    "imagem": "assets/sistemas/projecthub.webp",
+    "imagem": "assets/sistemas/projecthub.svg",
     "status": "Ativo",
     "link": "https://projecthub.contabilidade-eqtl.com/",
     "responsavel": "Contabilidade IV"
   },
   {
     "id": "s5",
+    "origem": "contabilidade",
     "nome": "Cronograma de Fechamento",
     "descricao": "Fluxo de fechamento contábil, acompanhamento de processos e reportes finais da competência.",
     "icon": "calendar",
-    "imagem": "assets/sistemas/cronograma-de-fechamento.webp",
+    "imagem": "assets/sistemas/cronograma-de-fechamento.svg",
     "status": "Ativo",
     "link": "https://eqtl-cronograma-fechamento.pufach.easypanel.host/",
     "responsavel": "Contabilidade IV"
   },
   {
     "id": "s6",
+    "origem": "contabilidade",
     "nome": "Portal de Auditoria",
     "descricao": "Solicitações, etapas anuais, visão global e relatórios de desempenho por área da auditoria.",
     "icon": "shield",
-    "imagem": "assets/sistemas/portal-de-auditoria.webp",
+    "imagem": "assets/sistemas/portal-de-auditoria.svg",
     "status": "Ativo",
     "link": "https://duducarinhoso.github.io/eqtl_controle_planejamento/#/p/planejamento/s/a51370da-2adb-4ee9-8cfa-52396949ae92",
     "responsavel": "Contabilidade IV"

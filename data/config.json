@@ -1,62 +1,11 @@
 {
-  "resumo": [
-    {
-      "label": "Processos monitorados",
-      "valor": "24"
-    },
-    {
-      "label": "Sistemas integrados",
-      "valor": "07"
-    },
-    {
-      "label": "Meta de fechamento",
-      "valor": "D+4"
-    }
-  ],
-  "kpis": [
-    {
-      "nome": "Fechamento",
-      "valor": "87%",
-      "status": "No prazo",
-      "progresso": 87,
-      "cor": "",
-      "icon": "calendar",
-      "metrica": "87% das atividades concluídas"
-    },
-    {
-      "nome": "Conciliações críticas",
-      "valor": "12",
-      "status": "Atenção",
-      "progresso": 60,
-      "cor": "yellow",
-      "icon": "shield",
-      "metrica": "12 de 20 contas críticas revisadas"
-    },
-    {
-      "nome": "Auditoria",
-      "valor": "91%",
-      "status": "Em andamento",
-      "progresso": 91,
-      "cor": "purple",
-      "icon": "file",
-      "metrica": "91% das evidências entregues"
-    },
-    {
-      "nome": "Entregas regulatórias",
-      "valor": "96%",
-      "status": "3 alertas",
-      "progresso": 96,
-      "cor": "teal",
-      "icon": "chart",
-      "metrica": "96% do plano executado"
-    }
-  ],
+  "kpis": [],
   "menu": [
     {
       "label": "Central de Conteúdo",
       "icon": "news",
       "target": "central",
-      "tab": "newsletter"
+      "tab": "comunicacao"
     },
     {
       "label": "Estrutura das Equipes",
@@ -94,46 +43,47 @@
   "links": [
     {
       "nome": "SAP",
+      "origem": "equatorial",
       "icon": "grid",
       "link": "https://unifica.equatorialenergia.com.br:9230/sap/bc/nwbc/nwbc_sapguilink?sap-language=PT",
       "descricao": "Acesso corporativo ao SAP (NWBC).",
+      "imagem": "assets/atalhos/sap.svg",
       "responsavel": "Administração do portal"
     },
     {
       "nome": "SAP HANA - Ambiente QA",
+      "origem": "equatorial",
       "icon": "chart",
       "link": "https://fiori-qass4.sap.equatorialenergia.com.br:44382/sap/bc/ui2/flp?sap-client=300&sap-language=PT#Shell-home",
       "descricao": "Fiori Launchpad do SAP HANA — ambiente de homologação (QA).",
-      "responsavel": "Administração do portal"
-    },
-    {
-      "nome": "Cronograma de Fechamento",
-      "icon": "briefcase",
-      "link": "https://eqtl-cronograma-fechamento.pufach.easypanel.host/",
-      "descricao": "Cronograma de fechamento contábil da Gerência.",
+      "imagem": "assets/atalhos/sap-hana-qa.svg",
       "responsavel": "Administração do portal"
     },
     {
       "nome": "SharePoint",
+      "origem": "equatorial",
       "icon": "globe",
       "link": null,
       "descricao": "Acesso corporativo. Cadastre o endereço validado pela organização.",
+      "imagem": "assets/atalhos/sharepoint.svg",
       "responsavel": "Administração do portal"
     },
     {
-      "nome": "Auditoria",
-      "icon": "shield",
-      "link": "https://duducarinhoso.github.io/eqtl_controle_planejamento/#/p/planejamento/s/a51370da-2adb-4ee9-8cfa-52396949ae92",
-      "descricao": "Controle de planejamento da auditoria.",
+      "nome": "Snowflake",
+      "origem": "equatorial",
+      "icon": "chart",
+      "link": "https://app.snowflake.com/",
+      "descricao": "Plataforma de dados em nuvem do Grupo. Consulta às bases analíticas e execução das queries usadas nas extrações da área.",
+      "imagem": "assets/atalhos/snowflake.svg",
       "responsavel": "Administração do portal"
     },
     {
-      "nome": "Outros",
-      "icon": "link",
-      "link": null,
-      "target": "central",
-      "tab": "sistemas",
-      "descricao": "Veja a lista completa de sistemas da área.",
+      "nome": "ONESOURCE TAX ONE",
+      "origem": "equatorial",
+      "icon": "file",
+      "link": "https://www.onesourcetax.com/",
+      "descricao": "Suíte fiscal da Thomson Reuters usada na apuração e nas obrigações tributárias. O acesso entra pelo SSO corporativo.",
+      "imagem": "assets/atalhos/onesource.svg",
       "responsavel": "Administração do portal"
     }
   ],
@@ -148,12 +98,215 @@
     "Auditoria",
     "Tecnologia",
     "IA",
-    "Processos"
+    "Processos",
+    "SAP",
+    "Segurança da informação",
+    "Ética e compliance",
+    "Inovação",
+    "Carreira"
   ],
   "competencia": "2026-09",
   "dataReferencia": "2026-09-14",
-  "demonstracao": true,
-  "semanaLabel": "14 — 20 SETEMBRO",
+  "navegacao": [
+    {
+      "label": "Início",
+      "icon": "home",
+      "target": "inicio"
+    },
+    {
+      "label": "Comunicação",
+      "icon": "news",
+      "itens": [
+        {
+          "label": "Todos",
+          "icon": "news",
+          "target": "central",
+          "tab": "comunicacao"
+        },
+        {
+          "label": "Contabilidade",
+          "icon": "grid",
+          "target": "central",
+          "tab": "comunicacao-contabilidade"
+        },
+        {
+          "label": "Equatorial",
+          "icon": "briefcase",
+          "target": "central",
+          "tab": "comunicacao-equatorial"
+        },
+        {
+          "label": "Externo",
+          "icon": "globe",
+          "target": "central",
+          "tab": "comunicacao-externo"
+        }
+      ]
+    },
+    {
+      "label": "Portais e Links",
+      "icon": "grid",
+      "itens": [
+        {
+          "label": "Todos",
+          "icon": "grid",
+          "target": "central",
+          "tab": "portais-todos"
+        },
+        {
+          "label": "Contabilidade",
+          "icon": "grid",
+          "target": "central",
+          "tab": "sistemas"
+        },
+        {
+          "label": "Equatorial",
+          "icon": "briefcase",
+          "target": "central",
+          "tab": "portais-equatorial"
+        },
+        {
+          "label": "Portal de Serviços",
+          "icon": "check",
+          "target": "central",
+          "tab": "portais-servicos"
+        },
+        {
+          "label": "Gente e Gestão",
+          "icon": "users",
+          "target": "central",
+          "tab": "portais-gente"
+        },
+        {
+          "label": "Power BI",
+          "icon": "chart",
+          "target": "central",
+          "tab": "portais-powerbi"
+        },
+        {
+          "label": "Externos",
+          "icon": "globe",
+          "target": "central",
+          "tab": "portais-externos"
+        }
+      ]
+    },
+    {
+      "label": "Sistemas e automações",
+      "icon": "flow",
+      "itens": [
+        {
+          "label": "Todos",
+          "icon": "flow",
+          "target": "central",
+          "tab": "automacoes-todos"
+        },
+        {
+          "label": "Contabilidade",
+          "icon": "flow",
+          "target": "central",
+          "tab": "automacoes"
+        },
+        {
+          "label": "Equatorial",
+          "icon": "briefcase",
+          "target": "central",
+          "tab": "atalhos-equatorial"
+        },
+        {
+          "label": "Externos",
+          "icon": "globe",
+          "target": "central",
+          "tab": "automacoes-externos"
+        }
+      ]
+    },
+    {
+      "label": "Documentos & Normas",
+      "icon": "file",
+      "target": "central",
+      "tab": "documentos",
+      "gruposDocumentos": [
+        "Normas contábeis",
+        "Setor elétrico",
+        "Obrigações acessórias",
+        "Legislação",
+        "Grupo Equatorial"
+      ]
+    },
+    {
+      "label": "Pessoas",
+      "icon": "users",
+      "itens": [
+        {
+          "label": "Estrutura das Equipes",
+          "icon": "users",
+          "target": "equipes",
+          "view": "equipes"
+        }
+      ]
+    },
+    {
+      "label": "Gestão",
+      "icon": "chart",
+      "itens": [
+        {
+          "label": "Painel da Gerência",
+          "icon": "chart",
+          "target": "painel"
+        },
+        {
+          "label": "Processos críticos",
+          "icon": "flow",
+          "target": "processos"
+        },
+        {
+          "label": "Agenda & Entregas",
+          "icon": "calendar",
+          "target": "agenda"
+        },
+        {
+          "label": "Painel Editorial",
+          "icon": "check",
+          "target": "editorial"
+        }
+      ]
+    },
+    {
+      "label": "Administração",
+      "icon": "settings",
+      "itens": [
+        {
+          "label": "Equipes",
+          "icon": "users",
+          "target": "administracao",
+          "view": "administracao",
+          "adminTab": "equipes"
+        },
+        {
+          "label": "Automações",
+          "icon": "flow",
+          "target": "administracao",
+          "view": "administracao",
+          "adminTab": "automacoes"
+        },
+        {
+          "label": "Carrossel",
+          "icon": "image",
+          "target": "administracao",
+          "view": "administracao",
+          "adminTab": "carrossel"
+        },
+        {
+          "label": "Importar do AI Studio",
+          "icon": "download",
+          "target": "administracao",
+          "view": "administracao",
+          "adminTab": "ai-studio"
+        }
+      ]
+    }
+  ],
   "aiStudio": {
     "publicKeySpki": null,
     "requireSignature": false,
@@ -161,4 +314,3 @@
     "observacao": "Cole em publicKeySpki a chave pública exibida no AI Studio (Administração → Integrações) e mude requireSignature para true."
   }
 }
-

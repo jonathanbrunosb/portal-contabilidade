@@ -22,6 +22,9 @@ const HOST = process.env.PORTAL_API_HOST || '127.0.0.1';
 const PORT = Number(process.env.PORTAL_API_PORT) || 8787;
 const DATA_DIR = process.env.PORTAL_DATA_DIR || path.join(__dirname, '..', 'data');
 const ASSETS_USERS_DIR = process.env.PORTAL_ASSETS_USERS_DIR || path.join(__dirname, '..', 'assets', 'users');
+// Pastas de destino aceitas no upload. Lista fechada: o nome vem da query, e
+// um valor livre ali viraria escrita em qualquer ponto do disco.
+const UPLOAD_DIRS = { users: 'users', sistemas: 'sistemas', automacoes: 'automacoes', documentos: 'documentos', atalhos: 'atalhos', portais: 'portais', externos: 'externos', destaques: 'destaques' };
 const AUDIT_LOG = process.env.PORTAL_AUDIT_LOG || path.join(__dirname, 'audit.log');
 const ALLOWED_ORIGIN = process.env.PORTAL_ALLOWED_ORIGIN || '*';
 const ADMIN_TOKEN = process.env.PORTAL_ADMIN_TOKEN || '';
@@ -40,7 +43,7 @@ function safeAssetFilename(rawName, fallbackExt) {
 }
 
 // Arrays of records, each with a unique "id" (matches js/data-service.js).
-const LIST_COLLECTIONS = ['usuarios', 'newsletter', 'noticias', 'equipes', 'processos', 'sistemas', 'automacoes', 'agenda', 'documentos', 'entregas'];
+const LIST_COLLECTIONS = ['usuarios', 'newsletter', 'noticias', 'equipes', 'processos', 'sistemas', 'automacoes', 'agenda', 'documentos', 'entregas', 'destaques', 'avisos', 'portais', 'externos'];
 // Singleton objects (KPIs, menu, links). Read-only for now: writing config
 // safely needs schema validation per field, left for a later pass.
 const SINGLETON_COLLECTIONS = ['config'];
@@ -184,10 +187,12 @@ const server = http.createServer(async (req, res) => {
         if (size > MAX_UPLOAD_BYTES) { send(res, 413, { erro: 'Arquivo excede o limite de 5MB.' }); return; }
         chunks.push(chunk);
       }
-      await fs.mkdir(ASSETS_USERS_DIR, { recursive: true });
-      await fs.writeFile(path.join(ASSETS_USERS_DIR, filename), Buffer.concat(chunks));
-      await appendAudit({ acao: 'upload', colecao: 'assets/users', id: filename, autor });
-      send(res, 201, { caminho: `assets/users/${filename}` });
+      const pasta = UPLOAD_DIRS[url.searchParams.get('pasta')] || 'users';
+      const destino = pasta === 'users' ? ASSETS_USERS_DIR : path.join(ASSETS_USERS_DIR, '..', pasta);
+      await fs.mkdir(destino, { recursive: true });
+      await fs.writeFile(path.join(destino, filename), Buffer.concat(chunks));
+      await appendAudit({ acao: 'upload', colecao: `assets/${pasta}`, id: filename, autor });
+      send(res, 201, { caminho: `assets/${pasta}/${filename}` });
       return;
     }
     if (SINGLETON_COLLECTIONS.includes(collection)) {

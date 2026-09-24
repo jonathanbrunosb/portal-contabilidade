@@ -1,167 +1,7 @@
 [
   {
-    "id": "news1",
-    "categoria": "Tecnologia",
-    "titulo": "IA no apoio às rotinas contábeis",
-    "resumo": "Pauta de discussão: como avaliar automação, revisão humana e qualidade das evidências.",
-    "conteudoCompleto": "CONTEÚDO DEMONSTRATIVO — não constitui norma, orientação regulatória ou deliberação vigente.\nEsta publicação ilustra o fluxo de comunicação da Gerência. Substitua por conteúdo revisado e aprovado, incluindo a fonte primária e a data de vigência confirmada.\nPróximos passos: avaliar os processos impactados, designar responsáveis e registrar as evidências da análise. Compartilhe o resultado no checkpoint do time.",
-    "dataPublicacao": "2026-09-14",
-    "dataVigencia": null,
-    "fonte": "Pauta editorial demonstrativa — sem notícia externa vinculada",
-    "link": null,
-    "documento": null,
-    "empresasImpactadas": [
-      "Empresa A (exemplo)",
-      "Empresa B (exemplo)"
-    ],
-    "areaResponsavel": "Normas e Reporte",
-    "responsavel": "Marina Oliveira",
-    "nivelImpacto": "Moderado",
-    "status": "Publicado",
-    "aprovadoPor": "Marina Oliveira",
-    "dataAprovacao": "2026-09-14",
-    "motivoRecusa": null,
-    "historicoStatus": [
-      {
-        "de": null,
-        "para": "Publicado",
-        "autor": "Marina Oliveira",
-        "data": "2026-09-14"
-      }
-    ]
-  },
-  {
-    "id": "news2",
-    "categoria": "Auditoria",
-    "titulo": "Trilha de evidências e rastreabilidade",
-    "resumo": "Pauta de discussão: fortalecer os registros das revisões durante o fechamento.",
-    "conteudoCompleto": "CONTEÚDO DEMONSTRATIVO — não constitui norma, orientação regulatória ou deliberação vigente.\nEsta publicação ilustra o fluxo de comunicação da Gerência. Substitua por conteúdo revisado e aprovado, incluindo a fonte primária e a data de vigência confirmada.\nPróximos passos: avaliar os processos impactados, designar responsáveis e registrar as evidências da análise. Compartilhe o resultado no checkpoint do time.",
-    "dataPublicacao": "2026-09-14",
-    "dataVigencia": null,
-    "fonte": "Pauta editorial demonstrativa — sem notícia externa vinculada",
-    "link": null,
-    "documento": null,
-    "empresasImpactadas": [
-      "Empresa A (exemplo)",
-      "Empresa B (exemplo)"
-    ],
-    "areaResponsavel": "Normas e Reporte",
-    "responsavel": "Marina Oliveira",
-    "nivelImpacto": "Moderado",
-    "status": "Publicado",
-    "aprovadoPor": "Marina Oliveira",
-    "dataAprovacao": "2026-09-14",
-    "motivoRecusa": null,
-    "historicoStatus": [
-      {
-        "de": null,
-        "para": "Publicado",
-        "autor": "Marina Oliveira",
-        "data": "2026-09-14"
-      }
-    ]
-  },
-  {
-    "id": "news3",
-    "categoria": "Energia",
-    "titulo": "Monitoramento do ambiente regulatório",
-    "resumo": "Pauta de discussão: organizar a análise de publicações e seus potenciais impactos.",
-    "conteudoCompleto": "CONTEÚDO DEMONSTRATIVO — não constitui norma, orientação regulatória ou deliberação vigente.\nEsta publicação ilustra o fluxo de comunicação da Gerência. Substitua por conteúdo revisado e aprovado, incluindo a fonte primária e a data de vigência confirmada.\nPróximos passos: avaliar os processos impactados, designar responsáveis e registrar as evidências da análise. Compartilhe o resultado no checkpoint do time.",
-    "dataPublicacao": "2026-09-14",
-    "dataVigencia": null,
-    "fonte": "Pauta editorial demonstrativa — sem notícia externa vinculada",
-    "link": null,
-    "documento": null,
-    "empresasImpactadas": [
-      "Empresa A (exemplo)",
-      "Empresa B (exemplo)"
-    ],
-    "areaResponsavel": "Normas e Reporte",
-    "responsavel": "Marina Oliveira",
-    "nivelImpacto": "Moderado",
-    "status": "Publicado",
-    "aprovadoPor": "Marina Oliveira",
-    "dataAprovacao": "2026-09-14",
-    "motivoRecusa": null,
-    "historicoStatus": [
-      {
-        "de": null,
-        "para": "Publicado",
-        "autor": "Marina Oliveira",
-        "data": "2026-09-14"
-      }
-    ]
-  },
-  {
-    "id": "news4",
-    "categoria": "IFRS",
-    "titulo": "Evolução dos reportes financeiros",
-    "resumo": "Pauta de discussão: conectar normas, processos e qualidade da informação.",
-    "conteudoCompleto": "CONTEÚDO DEMONSTRATIVO — não constitui norma, orientação regulatória ou deliberação vigente.\nEsta publicação ilustra o fluxo de comunicação da Gerência. Substitua por conteúdo revisado e aprovado, incluindo a fonte primária e a data de vigência confirmada.\nPróximos passos: avaliar os processos impactados, designar responsáveis e registrar as evidências da análise. Compartilhe o resultado no checkpoint do time.",
-    "dataPublicacao": "2026-09-14",
-    "dataVigencia": null,
-    "fonte": "Pauta editorial demonstrativa — sem notícia externa vinculada",
-    "link": null,
-    "documento": null,
-    "empresasImpactadas": [
-      "Empresa A (exemplo)",
-      "Empresa B (exemplo)"
-    ],
-    "areaResponsavel": "Normas e Reporte",
-    "responsavel": "Marina Oliveira",
-    "nivelImpacto": "Moderado",
-    "status": "Publicado",
-    "aprovadoPor": "Marina Oliveira",
-    "dataAprovacao": "2026-09-14",
-    "motivoRecusa": null,
-    "historicoStatus": [
-      {
-        "de": null,
-        "para": "Publicado",
-        "autor": "Marina Oliveira",
-        "data": "2026-09-14"
-      }
-    ]
-  },
-  {
-    "id": "news5",
-    "categoria": "Regulatório",
-    "titulo": "Impactos preliminares de nova instrução setorial",
-    "resumo": "Em revisão pela Gerência: primeira leitura dos possíveis efeitos nos processos de fechamento.",
-    "conteudoCompleto": "CONTEÚDO EM REVISÃO — aguardando aprovação da Gerência antes da publicação.\nEste item ilustra o estágio intermediário do fluxo editorial (Fase 4 do roadmap).",
-    "dataPublicacao": "2026-09-15",
-    "dataVigencia": null,
-    "fonte": "Pauta editorial demonstrativa — sem notícia externa vinculada",
-    "link": null,
-    "documento": null,
-    "empresasImpactadas": [
-      "Empresa A (exemplo)",
-      "Empresa B (exemplo)"
-    ],
-    "areaResponsavel": "Normas e Reporte",
-    "responsavel": "Ana Martins",
-    "nivelImpacto": "Moderado",
-    "status": "Em revisão",
-    "aprovadoPor": null,
-    "dataAprovacao": null,
-    "motivoRecusa": null,
-    "historicoStatus": [
-      {
-        "de": null,
-        "para": "Rascunho",
-        "autor": "Ana Martins",
-        "data": "2026-09-14T09:00:00.000Z"
-      },
-      {
-        "de": "Rascunho",
-        "para": "Em revisão",
-        "autor": "Ana Martins",
-        "data": "2026-09-15T09:30:00.000Z"
-      }
-    ]
-  },
-  {
     "id": "aneel-tarifas-equatorial-para-2026",
+    "origem": "externo",
     "categoria": "ANEEL",
     "titulo": "Aprovadas as novas tarifas da Equatorial Pará",
     "resumo": "O reajuste tarifário anual da Equatorial Pará foi aprovado pela ANEEL e alcança aproximadamente 3,12 milhões de unidades consumidoras em 228 municípios. A tarifa residencial terá variação de 6,70%, enquanto o efeito médio para o consumidor será de 6,94%.",
@@ -222,145 +62,8 @@
     ]
   },
   {
-    "id": "demo-cpc-ifrs-acompanhamento",
-    "categoria": "CPC / IFRS",
-    "titulo": "Atualizações técnicas e pronunciamentos em acompanhamento",
-    "resumo": "Espaço para destacar normas em análise e traduzir seus efeitos para as rotinas contábeis.",
-    "conteudoCompleto": "CONTEÚDO DEMONSTRATIVO — este card ilustra a hierarquia visual da Central de Conteúdo e não representa uma publicação técnica real.\nQuando notícias reais estiverem disponíveis, substitua este registro por um conteúdo revisado, com fonte primária e data de vigência confirmadas.",
-    "dataPublicacao": "2026-09-16",
-    "dataVigencia": null,
-    "dataCaptura": "2026-09-16",
-    "fonte": "Pauta demonstrativa — normas e reporte",
-    "urlFonte": null,
-    "link": null,
-    "documento": null,
-    "imagem": null,
-    "imagemAlt": null,
-    "impacto": "Moderado",
-    "nivelImpacto": "Moderado",
-    "empresasImpactadas": [
-      "Empresa A (exemplo)"
-    ],
-    "areaResponsavel": "Normas e Reporte",
-    "responsavel": "Marina Oliveira",
-    "palavrasChave": [
-      "CPC",
-      "IFRS",
-      "normas contábeis",
-      "pronunciamentos"
-    ],
-    "indicadores": [],
-    "destaque": false,
-    "demonstrativo": true,
-    "ativo": true,
-    "statusCuradoria": "Demonstrativo",
-    "status": "Publicado",
-    "aprovadoPor": "Marina Oliveira",
-    "dataAprovacao": "2026-09-16",
-    "motivoRecusa": null,
-    "historicoStatus": [
-      {
-        "de": null,
-        "para": "Publicado",
-        "autor": "Marina Oliveira",
-        "data": "2026-09-16"
-      }
-    ]
-  },
-  {
-    "id": "demo-grupo-deliberacoes",
-    "categoria": "Grupo",
-    "titulo": "Deliberações corporativas que exigem acompanhamento",
-    "resumo": "Decisões do Grupo organizadas por vigência, empresas impactadas e área responsável.",
-    "conteudoCompleto": "CONTEÚDO DEMONSTRATIVO — este card ilustra a hierarquia visual da Central de Conteúdo e não representa uma deliberação real do Grupo.\nQuando deliberações reais estiverem disponíveis, substitua este registro por um conteúdo revisado e aprovado pela Gerência.",
-    "dataPublicacao": "2026-09-16",
-    "dataVigencia": null,
-    "dataCaptura": "2026-09-16",
-    "fonte": "Exemplo de deliberação corporativa",
-    "urlFonte": null,
-    "link": null,
-    "documento": null,
-    "imagem": null,
-    "imagemAlt": null,
-    "impacto": "Moderado",
-    "nivelImpacto": "Moderado",
-    "empresasImpactadas": [
-      "Empresa A (exemplo)",
-      "Empresa B (exemplo)"
-    ],
-    "areaResponsavel": "Gerência de Contabilidade",
-    "responsavel": "Marina Oliveira",
-    "palavrasChave": [
-      "grupo",
-      "deliberação",
-      "governança corporativa"
-    ],
-    "indicadores": [],
-    "destaque": false,
-    "demonstrativo": true,
-    "ativo": true,
-    "statusCuradoria": "Demonstrativo",
-    "status": "Publicado",
-    "aprovadoPor": "Marina Oliveira",
-    "dataAprovacao": "2026-09-16",
-    "motivoRecusa": null,
-    "historicoStatus": [
-      {
-        "de": null,
-        "para": "Publicado",
-        "autor": "Marina Oliveira",
-        "data": "2026-09-16"
-      }
-    ]
-  },
-  {
-    "id": "demo-interno-comunicados",
-    "categoria": "Interno",
-    "titulo": "Comunicados operacionais para os times contábeis",
-    "resumo": "Orientações objetivas sobre fechamento, conciliações, prazos e procedimentos internos.",
-    "conteudoCompleto": "CONTEÚDO DEMONSTRATIVO — este card ilustra a hierarquia visual da Central de Conteúdo e não representa um comunicado interno real.\nQuando comunicados reais estiverem disponíveis, substitua este registro por um conteúdo revisado pela área responsável.",
-    "dataPublicacao": "2026-09-16",
-    "dataVigencia": null,
-    "dataCaptura": "2026-09-16",
-    "fonte": "Exemplo de comunicado interno",
-    "urlFonte": null,
-    "link": null,
-    "documento": null,
-    "imagem": null,
-    "imagemAlt": null,
-    "impacto": "Baixo",
-    "nivelImpacto": "Baixo",
-    "empresasImpactadas": [
-      "Empresa A (exemplo)"
-    ],
-    "areaResponsavel": "Gerência de Contabilidade",
-    "responsavel": "Jonathan Bruno",
-    "palavrasChave": [
-      "comunicado interno",
-      "fechamento",
-      "conciliações",
-      "procedimentos"
-    ],
-    "indicadores": [],
-    "destaque": false,
-    "demonstrativo": true,
-    "ativo": true,
-    "statusCuradoria": "Demonstrativo",
-    "status": "Publicado",
-    "aprovadoPor": "Jonathan Bruno",
-    "dataAprovacao": "2026-09-16",
-    "motivoRecusa": null,
-    "historicoStatus": [
-      {
-        "de": null,
-        "para": "Publicado",
-        "autor": "Jonathan Bruno",
-        "data": "2026-09-16"
-      }
-    ]
-  },
-  {
     "id": "interno-projecthub-lancamento-2026",
+    "origem": "contabilidade",
     "categoria": "Interno",
     "titulo": "ProjectHub: nova solução integra a gestão de projetos da Contabilidade",
     "resumo": "Criado pelo time da Contabilidade, o ProjectHub concentra planejamento, execução, prazos, recursos, riscos e indicadores em uma única visão, fortalecendo a governança e a tomada de decisão.",
@@ -409,50 +112,522 @@
     ]
   },
   {
-    "id": "interno-arrendamentos-ifrs16-atualizacao-2026",
-    "categoria": "Interno",
-    "titulo": "Sistema de Arrendamentos IFRS 16 / CPC 06 (R2): novidades da solução",
-    "resumo": "Nova janela de Abertura RIT para visualização das obrigações por vencimento e login redesenhado trazem mais clareza, melhor experiência de uso e evolução contínua da ferramenta.",
-    "conteudoCompleto": "O time da Contabilidade segue evoluindo o Sistema de Arrendamentos IFRS 16 / CPC 06 (R2), com melhorias que ampliam a usabilidade, a qualidade da informação e a experiência de acesso à ferramenta.\nNova funcionalidade — Abertura RIT: nova janela para visualização da abertura das obrigações de arrendamento por vencimento, trazendo maior apoio à análise e ao reporte das informações, com detalhamento por instituição/credora, cronograma de amortização de principal e juros de longo prazo e conciliação do saldo contábil.\nNova cara do sistema: login redesenhado, interface mais moderna e experiência visual mais intuitiva, reforçando a identidade corporativa da solução.\nEssas evoluções seguem a mesma diretriz das demais soluções da área: mais clareza nas informações, melhor experiência de uso e evolução contínua da ferramenta.",
-    "dataPublicacao": "2026-09-22",
+    "id": "eqtl-seguranca-digital-atitude",
+    "origem": "equatorial",
+    "categoria": "Segurança da informação",
+    "titulo": "Sua atitude é a nossa melhor defesa no ambiente digital",
+    "resumo": "Segurança digital é trabalho em equipe: lidamos todos os dias com dados sensíveis de clientes, fornecedores e colegas, e cada clique pede atenção.",
+    "conteudoCompleto": "Ter segurança no ambiente digital é um trabalho em equipe.\nAfinal, no Grupo Equatorial, trabalhamos com dados sensíveis diariamente, como informações de clientes, de fornecedores e de colegas.\nIsso exige que a nossa atenção seja redobrada em cada clique, construindo juntos uma rede de proteção que se fortalece do nosso jeito: com atitude.\nVamos juntos com consciência e cuidado nessa jornada de segurança digital!",
+    "dataPublicacao": "2026-09-17",
     "dataVigencia": null,
-    "dataCaptura": "2026-09-22T09:00:00-03:00",
-    "fonte": "Gerência de Contabilidade",
-    "urlFonte": "https://arrendamento.contabilidade-eqtl.com/",
-    "link": "https://arrendamento.contabilidade-eqtl.com/",
+    "fonte": "Comunicação Grupo Equatorial — e-mail de 17/09/2026",
+    "link": null,
     "documento": null,
-    "imagem": "assets/images/comunicados/arrendamentos-ifrs16-atualizacao.webp",
-    "imagemAlt": "Comunicado das novidades do Sistema de Arrendamentos IFRS 16 / CPC 06 (R2): nova funcionalidade de Abertura RIT e login redesenhado",
-    "statusSistema": "Ativo",
-    "sistemaId": "s1",
-    "impacto": "Moderado",
+    "imagem": "assets/images/comunicados/seguranca-digital-atitude.webp",
+    "imagemCapa": "assets/images/comunicados/seguranca-digital-atitude-capa.webp",
+    "imagemAlt": "Peça da campanha de segurança digital: \"Sua atitude é a nossa melhor defesa\", com uma personagem cercada de ícones de cadeado e proteção.",
     "nivelImpacto": "Moderado",
     "empresasImpactadas": [
-      "Gerência de Contabilidade"
+      "Grupo Equatorial"
     ],
-    "areaResponsavel": "Contabilidade IV",
-    "responsavel": "Jonathan Bruno",
+    "areaResponsavel": "Comunicação Grupo Equatorial",
+    "responsavel": "Eduardo dos Santos Rocha",
     "palavrasChave": [
-      "IFRS 16",
-      "CPC 06",
-      "arrendamentos",
-      "Abertura RIT",
-      "atualização de sistema"
+      "segurança digital",
+      "segurança da informação",
+      "dados sensíveis",
+      "atitude para transformar"
     ],
-    "indicadores": [],
-    "destaque": true,
-    "demonstrativo": false,
     "ativo": true,
-    "statusCuradoria": "Publicado",
     "status": "Publicado",
-    "aprovadoPor": "Jonathan Bruno",
+    "aprovadoPor": "Eduardo dos Santos Rocha",
+    "dataAprovacao": "2026-09-21",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Eduardo dos Santos Rocha",
+        "data": "2026-09-21"
+      }
+    ]
+  },
+  {
+    "id": "eqtl-agentes-inovacao-2026-inscricoes-encerradas",
+    "origem": "equatorial",
+    "categoria": "Inovação",
+    "titulo": "Agentes da Inovação: inscrições do Ciclo 2026 encerradas",
+    "resumo": "As ideias registradas pelos colaboradores passam agora pela avaliação inicial dos coordenadores de pesquisa; o cronograma das próximas etapas será divulgado em breve.",
+    "conteudoCompleto": "As inscrições do Programa Agentes da Inovação — Ciclo 2026 estão oficialmente encerradas.\nAgradecemos a participação de todos os colaboradores que registraram suas ideias.\nAs próximas etapas serão conduzidas pelos coordenadores de pesquisa, com avaliação inicial das propostas recebidas.\nEm breve, mais informações sobre o cronograma do programa serão compartilhadas.\nDúvidas: agentesdainovacao@eqtlab.com.br.",
+    "dataPublicacao": "2026-09-11",
+    "dataVigencia": null,
+    "fonte": "Comunicação Grupo Equatorial — e-mail de 11/09/2026",
+    "link": null,
+    "documento": null,
+    "imagem": "assets/images/comunicados/agentes-inovacao-2026.webp",
+    "imagemCapa": "assets/images/comunicados/agentes-inovacao-2026-capa.webp",
+    "imagemAlt": "Peça do Programa Agentes da Inovação, Ciclo 2026, com o aviso \"Inscrições encerradas!\".",
+    "links": [
+      {
+        "rotulo": "Dúvidas: agentesdainovacao@eqtlab.com.br",
+        "url": "mailto:agentesdainovacao@eqtlab.com.br",
+        "area": [
+          0.236,
+          0.835,
+          0.547,
+          0.042
+        ]
+      }
+    ],
+    "nivelImpacto": "Baixo",
+    "empresasImpactadas": [
+      "Grupo Equatorial"
+    ],
+    "areaResponsavel": "EQT Lab",
+    "responsavel": "Eduardo dos Santos Rocha",
+    "palavrasChave": [
+      "agentes da inovação",
+      "EQT Lab",
+      "inovação",
+      "ideias",
+      "ciclo 2026"
+    ],
+    "ativo": true,
+    "status": "Publicado",
+    "aprovadoPor": "Eduardo dos Santos Rocha",
+    "dataAprovacao": "2026-09-21",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Eduardo dos Santos Rocha",
+        "data": "2026-09-21"
+      }
+    ]
+  },
+  {
+    "id": "eqtl-migrasap-verdade-ou-mentira-4",
+    "origem": "equatorial",
+    "categoria": "SAP",
+    "titulo": "MigraSAP: 4ª rodada do Verdade ou Mentira",
+    "resumo": "Teste em poucos minutos o que você sabe sobre as mudanças trazidas pelo MigraSAP e prepare-se para a chegada do SAP S/4 HANA.",
+    "conteudoCompleto": "O MigraSAP já está transformando a forma como você trabalha — mas será que você sabe o que realmente está mudando? Confira na 4ª rodada do Verdade ou Mentira.\nTeste seus conhecimentos em poucos minutos e descubra se você já é um embaixador da mudança ou se está começando essa jornada com a gente.\nTeremos novas rodadas: fique ligado na sua caixa de e-mails e continue se preparando para a chegada do SAP S/4 HANA.\nDúvidas, contribuições ou sugestões: proj.migrasap@equatorialenergia.com.br.",
+    "dataPublicacao": "2026-09-04",
+    "dataVigencia": null,
+    "fonte": "Comunicação Grupo Equatorial — e-mail de 04/09/2026",
+    "link": "https://view.genially.com/6a919f986c06f9397668e87c",
+    "rotuloLink": "Responder ao quiz",
+    "documento": null,
+    "imagem": "assets/images/comunicados/migrasap-verdade-ou-mentira-4.webp",
+    "imagemCapa": "assets/images/comunicados/migrasap-verdade-ou-mentira-4-capa.webp",
+    "imagemAlt": "Peça do MigraSAP: \"Você está preparado para a nova era do SAP? Verdade ou Mentira — 4ª edição\", com o QR Code do quiz.",
+    "links": [
+      {
+        "rotulo": "Responder ao quiz",
+        "url": "https://view.genially.com/6a919f986c06f9397668e87c",
+        "area": [
+          0.046,
+          0.674,
+          0.616,
+          0.061
+        ]
+      },
+      {
+        "rotulo": "QR Code do quiz: responder à 4ª rodada",
+        "url": "https://view.genially.com/6a919f986c06f9397668e87c",
+        "area": [
+          0.704,
+          0.543,
+          0.246,
+          0.202
+        ]
+      },
+      {
+        "rotulo": "Dúvidas: proj.migrasap@equatorialenergia.com.br",
+        "url": "mailto:proj.migrasap@equatorialenergia.com.br",
+        "area": [
+          0.054,
+          0.944,
+          0.479,
+          0.035
+        ]
+      }
+    ],
+    "nivelImpacto": "Moderado",
+    "empresasImpactadas": [
+      "Grupo Equatorial"
+    ],
+    "areaResponsavel": "Projeto MigraSAP",
+    "responsavel": "Eduardo dos Santos Rocha",
+    "palavrasChave": [
+      "MigraSAP",
+      "SAP",
+      "S/4 HANA",
+      "migração",
+      "quiz",
+      "verdade ou mentira"
+    ],
+    "ativo": true,
+    "status": "Publicado",
+    "aprovadoPor": "Eduardo dos Santos Rocha",
+    "dataAprovacao": "2026-09-21",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Eduardo dos Santos Rocha",
+        "data": "2026-09-21"
+      }
+    ]
+  },
+  {
+    "id": "cfc-ia-contabilidade-seguranca-dados",
+    "origem": "externo",
+    "categoria": "IA",
+    "titulo": "IA generativa na contabilidade: como usar sem expor os dados",
+    "resumo": "Artigo da Comissão de Tecnologia e Inovação do CFC mostra dois caminhos para usar o ChatGPT e outros modelos de linguagem com dados contábeis, dentro da LGPD: busca cognitiva em nuvem controlada e modelos rodando no próprio computador.",
+    "conteudoCompleto": "O Conselho Federal de Contabilidade publicou um artigo de Álvaro Brito, membro da Comissão Permanente de Tecnologia e Inovação do CFC, sobre como levar a inteligência artificial generativa para a rotina contábil sem abrir mão da proteção de dados. O resumo abaixo segue o raciocínio do autor; a íntegra está no site do CFC, no botão ao fim da página.\n## Por que o cuidado\nFerramentas como o ChatGPT aceleram análises e a produção de textos, mas o dado contábil é sensível por natureza: traz a situação financeira detalhada das empresas e, muitas vezes, dados pessoais protegidos pela LGPD. Levar esse material para um serviço aberto na internet é expô-lo.\n[figura 1]\n## Caminho 1: IA na nuvem, com os dados num ambiente controlado\nA primeira saída proposta é combinar o modelo de linguagem com uma plataforma de busca cognitiva — o exemplo do artigo é o Azure AI Search. Em vez de receber os arquivos inteiros, o modelo consulta um índice dos documentos e recebe só o necessário para responder.\n• Indexar: os documentos financeiros, como planilhas e PDFs, viram um índice pesquisável.\n• Consultar: a busca separa as informações que respondem à pergunta e as entrega ao modelo.\n• Controlar: todo o processamento fica dentro de um ambiente sob controle da organização.\n## Caminho 2: o modelo no próprio computador\nA segunda saída é rodar o modelo de linguagem localmente. O autor cita o Jan.ai, que permite conversar com modelos direto no dispositivo, sem conexão com a internet: as perguntas com dados sensíveis não saem da máquina. A contrapartida é o hardware — modelos grandes, como o Llama 2 de 70 bilhões de parâmetros, pedem mais memória do que um computador comum tem, por isso a proposta usa modelos menores e mais focados.\n## A conclusão do autor\nO ganho da IA generativa na contabilidade é real, desde que venha acompanhado de segurança de dados e conformidade regulatória. Para o autor, a combinação de modelos de linguagem com processamento privado de dados e ambientes controlados é o que permite usar a tecnologia sem colocar em risco a informação dos clientes.\n## Para ler junto\nO artigo é de abril de 2024: nomes e recursos das ferramentas podem ter mudado desde então. Na rotina da área, vale ler também os comunicados do Grupo sobre segurança digital e sobre o Código de Ética e a LGPD, na aba Equatorial da Comunicação.",
+    "dataPublicacao": "2026-09-21",
+    "dataVigencia": null,
+    "fonte": "Conselho Federal de Contabilidade (CFC) — artigo de Álvaro Brito, publicado em 19/04/2024",
+    "urlFonte": "https://cfc.org.br/destaque/artigo-a-revolucao-da-inteligencia-artificial-na-contabilidade-seguranca-de-dados-com-chatgpt/",
+    "link": "https://cfc.org.br/destaque/artigo-a-revolucao-da-inteligencia-artificial-na-contabilidade-seguranca-de-dados-com-chatgpt/",
+    "rotuloLink": "Ler o artigo no site do CFC",
+    "documento": null,
+    "imagem": "assets/images/comunicados/cfc-ia-contabilidade-capa.webp",
+    "imagemAlt": "Ilustração: mesa de contabilidade com planilhas, relatórios e calculadora; fluxos de luz passam por um escudo com cadeado até um painel de assistente de IA.",
+    "figuras": [
+      {
+        "imagem": "assets/images/comunicados/cfc-ia-contabilidade-risco.webp",
+        "alt": "Ilustração: documentos financeiros saem da mesa e são levados por fluxos de dados até uma nuvem pública, com um triângulo de alerta.",
+        "legenda": "O risco: planilhas e relatórios colados num serviço aberto saem do controle da empresa."
+      }
+    ],
+    "nivelImpacto": "Moderado",
+    "empresasImpactadas": [
+      "Grupo Equatorial"
+    ],
+    "areaResponsavel": "CFC — Comissão Permanente de Tecnologia e Inovação",
+    "responsavel": "Eduardo dos Santos Rocha",
+    "palavrasChave": [
+      "inteligência artificial",
+      "IA generativa",
+      "ChatGPT",
+      "LGPD",
+      "segurança de dados",
+      "busca cognitiva",
+      "Azure AI Search",
+      "Jan.ai",
+      "LLM",
+      "CFC"
+    ],
+    "ativo": true,
+    "status": "Publicado",
+    "aprovadoPor": "Eduardo dos Santos Rocha",
+    "dataAprovacao": "2026-09-21",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Eduardo dos Santos Rocha",
+        "data": "2026-09-21"
+      }
+    ],
+    "creditoImagens": "Ilustrações geradas com IA (Gemini)"
+  },
+  {
+    "id": "interno-movimentacao-controladoria-2026-05",
+    "origem": "contabilidade",
+    "categoria": "Carreira",
+    "titulo": "Mudanças organizacionais na Diretoria de Controladoria e Estratégia",
+    "resumo": "Normas e Consolidação se divide em duas gerências, Ativos ganha as frentes Econômica e Técnica e a Contabilidade passa a ser segregada em quatro grandes frentes, com novos gestores em cada uma.",
+    "conteudoCompleto": "Comprometidos com o desenvolvimento para transformar as pessoas e a organização, compartilhamos as seguintes movimentações em nossa estrutura.\nRelacionada a Superintendência de Tributos e Consolidação, sob a gestão **de Geovane Ximenes:**\nA estrutura da Gerência de Normas e Consolidação foi reorganizada, resultando na segregação entre duas Gerências: **Gerência de Normas e Contabilidade e Gerência de Consolidação**. A área de Normas e Contabilidade requer conhecimento técnico aprofundado, análise de impactos regulatórios e societários, elaborações de estudos contábeis de novos negócios, fusões, aquisições e reestruturações, além do acompanhamento do fechamento contábil das Holdings.\nJá a área Consolidação demandam maior foco em prazos, elaboração de demonstrações financeiras em conformidade societária e regulatória, e atuação direta no relacionamento com a auditoria externa.\nConsiderando o crescimento do Grupo nos últimos anos e a avaliação de potencial aquisições a separação permite que cada gerência se aprofunde em seu campo, promovendo maior foco e agilidade no atendimento das demandas.\nNa **Gerência de Consolidação:**\n[figura 1]\n**Convidamos Allana Ferreira de Souza para a posição de Gerente Consolidação.** Allana possui formação em Contabilidade com MBA em Gestão Financeira, Auditoria e Controladoria. Possui dez anos de atuação na área contábil do setor elétrico. Iniciou na Equatorial em 2020, na EQTL Pará, como Especialista Contábil. Atuou como Executiva de Contabilidade na EQTL Alagoas e, posteriormente, na EQTL Goiás. Anteriormente era responsável pela Gerência Corporativa de Contabilidade Outros Negócios onde tinha como objetivo de dar visibilidade no saneamento dos temas contábeis das empresas que compõem os outros negócios do grupo.\nA **Gerência de Normas e Contabilidade**, está, interinamente, sob a gestão da Allana Souza.\nRelacionada a **Superintendência de Ativos e Contabilidade,** sob a gestão de **Bruno Couto**:\nA estrutura passou por uma reorganização que resultou na criação de duas frentes complementares na área de Ativos: **Gerência de Ativos Econômica** e **Gerência de Ativos Técnica**. Essa divisão fortalece a especialização das equipes e permite uma gestão mais integrada de todo o ciclo de vida dos ativos.\nNo âmbito da **Contabilidade**, ocorreu o processo de verticalização e consequente extinção da Gerência de Contabilidade e Outros Negócios, assim como reorganização das áreas executivas da Contabilidade Distribuidoras por processos que, anteriormente, estavam estruturadas por empresas. Essa mudança tem como objetivo organizar as atividades contábeis de maneira centralizada e integrada entre as empresas do Grupo Equatorial, estabelecendo um fluxo operacional que padronize processos e aumente o controle das informações, a governança e o compliance.\nComo parte dessa estruturação, a contabilidade passa a ser segregada em quatro grandes frentes: **Regulatório e Projetos**, **Contas a Receber**, **Geral e Conciliação** e **Auditorias**, fortalecendo a clareza de responsabilidades e a eficiência na execução dos processos.\nNa **Gerência de Contabilidade:**\n[figura 2]\n**Convidamos Alexandra Furtado para a posição de Gerente de Contabilidade**. Alexandra possui formação em Contabilidade com MBA em Gestão Empresarial e MBA em ESG e Reputação. Possui 16 anos de experiência em contabilidade societária, regulatória e na migração de sistemas contábeis, financeiros e comerciais. Iniciou na Eletrobrás (CEPISA), onde atuava como gerente de contabilidade, ativos e tributos. Quando da aquisição desta pela Equatorial, em 2018, atuou como Executiva de Contabilidade da EQTL PI e EQTL AL e, posteriormente, como Gerente Corporativa de Contabilidade das Distribuidoras.\nNa área **Executiva Conciliação e Auditorias** responsável pelo fechamento contábil, conciliação de contas, atendimento a auditorias, padronização e inovação dos processos contábeis.\n[figura 3]\n**Convidamos Jonathan Bruno a Executivo Conciliação e Auditorias.** Jonathan possui formação em Contabilidade com MBA em Gestão Financeira, Controladoria, Auditoria e Compliance e Especialização em Finanças Corporativas com IA. Profissional com 10 anos de experiência em Contabilidade. Iniciou na Equatorial em 2020, construindo uma trajetória ascendente até função executiva. Anteriormente era responsável pela Executiva Corporativa de Contabilidade das Distribuidoras EQTL PI e EQTL AL.\nNa área **Executiva Contas a Receber** responsável pelo registro contábil de ativos, passivos e resultados de todas as operações comerciais das empresas de energia e saneamento do grupo.\n[figura 4]\n**Convidamos Marcia Fernanda a Executiva Contas a receber.** Márcia possui formação em Contabilidade com especializações em Auditoria Fiscal e Gestão de Tributos e Contabilidade Governamental. Possui mais de 13 anos de experiência nas áreas contábil e financeira, atuando em empresas de grande porte dos setores de energia, saneamento e telecomunicações. Iniciou na Equatorial em 2022. Experiência em fechamento contábil, demonstrações financeiras, auditorias, controladoria, orçamento e indicadores financeiros. Anteriormente era responsável pela Executiva Corporativa de Contabilidade da CSA.\nNa área **Executiva Regulatório e Projetos**, responsável pelo registro contábil, atendimento às fiscalizações e demais demandas das operações regulatórias das empresas de energia e saneamento e coordenação de projetos contábeis.\n[figura 5]\n**Convidamos Ana Laura do Carmo a Executiva Regulatório e Projetos.** Possui 19 anos de experiência no setor elétrico, atuando nas áreas contábil, financeira e de suprimentos, com vivência em estoques, controle e compra de materiais elétricos, análise contábil e atendimento a auditorias internas, externas e regulatórias. Iniciou no Grupo Rede (CELPA) em 2006 e, quando da aquisição desta pela Equatorial em 2012, atuou nos processos de integração e padronização contábil. Anteriormente era responsável pela Executiva Corporativa de Contabilidade das Distribuidoras EQTL PA e CEA.\nNa área **Executiva Contabilidade Geral** responsável pelo registro contábil de todos os ativos, passivos e resultados não vinculados às operações comerciais e regulatórias das empresas de energia e saneamento, bem como registros contábeis das empresas de Serviços, Institutos e Associações.\n[figura 6]\n**Convidamos Luana Maria a Executiva Contabilidade Geral.** Luana possui formação em Contabilidade com pós-graduação em Normas Brasileiras de Contabilidade e IFRS. Possui conhecimento em contabilidade societária, fechamento contábil, padronização de processos e visão analítica e sistêmica. Iniciou na Equatorial em 2017, como estagiária na área de Ativos. Anteriormente era responsável pela Executiva Corporativa de Contabilidade Serviços.\nPara **Gerência de Ativos Técnica**, responsável por consolidar a governança técnica dos ativos, integrando as frentes de **BDGD**, **Encerramento de Obras e Fiscalização de Obras**, assegurando integridade das informações, rastreabilidade dos investimentos e conformidade regulatória das distribuidoras do grupo.\n[figura 7]\n**Promovemos Bruno de Souza Oliveira a Gerente de Ativos Técnica.** Bruno possui formação em Administração, Contabilidade e Técnico em Processos Gerenciais, possui MBAs em Controladoria e Finanças, Gestão de Pessoas, Liderança e Gestão da Inovação. Profissional com mais de 10 anos de experiência no setor elétrico, com atuação em gestão de ativos, regulação e Base de Remuneração Regulatória (BRR). Ingressou no Grupo Equatorial em 2021 e, anteriormente, era responsável pela Executiva de Base de Remuneração Regulatória com objetivo maximização da remuneração de capital, mitigação de glosas e gestão da conformidade regulatória da BRR.\n**Para Gerência de Ativos Econômica,** responsável pela gestão integrada **do Ativo Imobilizado** de todas as operações do Grupo Equatorial, e Atuação na condução da **Base de Remuneração Regulatória (BRR)**,\n[figura 8]\n**Convidamos Diego Carneiro Fontes a Gerente Ativos Econômica. Diego possui formação em** Engenharia Agrônoma com MBA em Controladoria e Finanças e formação complementar em Regulação Econômica, Gestão de Ativos e Modelagem Financeira aplicada ao setor elétrico. Possui mais de 20 anos de experiência no setor, com atuação nacional e internacional em Base de Remuneração Regulatória (BRR), gestão de ativos e processos tarifários, liderança estratégica em regulação econômica, modelagem financeiro-regulatória e governança patrimonial. Iniciou na Equatorial em 2019 como Gerente na Gerência de Ativos.\n[figura 9]\n**Convidamos Pedro Gonçalves para Executivo BRR (Base de Remuneração Regulatória).** Pedro possui formação em Contabilidade com MBA em Energia Elétrica: Geração, Transmissão e Distribuição. Possui 10 anos de experiência na área contábil, atuando em controladoria, conciliações, análise de contas, fechamento contábil e gestão de ativos. Nos últimos 5 anos, consolidou expertise no setor elétrico, com foco em ativos imobilizados, CAPEX, obras em andamento e conformidade regulatória. Iniciou na Equatorial em 2020 como Analista Junior na Gerência de Ativos. Em 2024 passou a ocupar o cargo de executivo na mesma Gerência.\nÉ com **atitude** que seguimos, juntos, entregando resultados ainda melhores para os colaboradores, clientes, sociedade e acionistas.\nForte abraço,\n**Henderson Rovay**\n**Diretor de Controladoria**",
+    "dataPublicacao": "2026-05-14",
+    "dataVigencia": null,
+    "fonte": "Comunicação Grupo Equatorial — e-mail de 14/05/2026, \"Comunicado de Movimentação | Diretoria de Controladoria e Estratégia\", assinado por Henderson Rovay, Diretor de Controladoria",
+    "link": null,
+    "documento": null,
+    "imagem": "assets/images/comunicados/movimentacao-controladoria-2026.webp",
+    "imagemMiniatura": "assets/images/comunicados/movimentacao-controladoria-2026-miniatura.webp",
+    "imagemAlt": "Alexandra Furtado, nova Gerente de Contabilidade, num quadro grande à esquerda; à direita, em quatro quadros, os executivos da Contabilidade: Jonathan Bruno (Conciliação e Auditorias) e Marcia Fernanda (Contas a Receber) em cima, Ana Laura do Carmo (Regulatório e Projetos) e Luana Maria (Contabilidade Geral) embaixo, sobre o degradê verde do Carreira Equatorial.",
+    "imagemFoco": "esquerda",
+    "figuras": [
+      {
+        "tipo": "retrato",
+        "imagem": "assets/images/comunicados/movimentacao-controladoria-2026/allana-ferreira-de-souza.webp",
+        "alt": "Foto de Allana Ferreira de Souza"
+      },
+      {
+        "tipo": "retrato",
+        "imagem": "assets/images/comunicados/movimentacao-controladoria-2026/alexandra-furtado.webp",
+        "alt": "Foto de Alexandra Furtado"
+      },
+      {
+        "tipo": "retrato",
+        "imagem": "assets/images/comunicados/movimentacao-controladoria-2026/jonathan-bruno.webp",
+        "alt": "Foto de Jonathan Bruno"
+      },
+      {
+        "tipo": "retrato",
+        "imagem": "assets/images/comunicados/movimentacao-controladoria-2026/marcia-fernanda.webp",
+        "alt": "Foto de Marcia Fernanda"
+      },
+      {
+        "tipo": "retrato",
+        "imagem": "assets/images/comunicados/movimentacao-controladoria-2026/ana-laura-do-carmo.webp",
+        "alt": "Foto de Ana Laura do Carmo"
+      },
+      {
+        "tipo": "retrato",
+        "imagem": "assets/images/comunicados/movimentacao-controladoria-2026/luana-maria.webp",
+        "alt": "Foto de Luana Maria"
+      },
+      {
+        "tipo": "retrato",
+        "imagem": "assets/images/comunicados/movimentacao-controladoria-2026/bruno-de-souza-oliveira.webp",
+        "alt": "Foto de Bruno de Souza Oliveira"
+      },
+      {
+        "tipo": "retrato",
+        "imagem": "assets/images/comunicados/movimentacao-controladoria-2026/diego-carneiro-fontes.webp",
+        "alt": "Foto de Diego Carneiro Fontes"
+      },
+      {
+        "tipo": "retrato",
+        "imagem": "assets/images/comunicados/movimentacao-controladoria-2026/pedro-goncalves.webp",
+        "alt": "Foto de Pedro Gonçalves"
+      }
+    ],
+    "nivelImpacto": "Relevante",
+    "empresasImpactadas": [
+      "Grupo Equatorial"
+    ],
+    "areaResponsavel": "Diretoria de Controladoria e Estratégia",
+    "responsavel": "Eduardo dos Santos Rocha",
+    "palavrasChave": [
+      "movimentação",
+      "estrutura organizacional",
+      "Controladoria",
+      "Normas e Contabilidade",
+      "Consolidação",
+      "Gerência de Contabilidade",
+      "Ativos Econômica",
+      "Ativos Técnica",
+      "BRR",
+      "Conciliação e Auditorias",
+      "Contas a Receber",
+      "Regulatório e Projetos",
+      "Contabilidade Geral",
+      "carreira"
+    ],
+    "ativo": true,
+    "status": "Publicado",
+    "aprovadoPor": "Eduardo dos Santos Rocha",
+    "dataAprovacao": "2026-09-21",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Eduardo dos Santos Rocha",
+        "data": "2026-09-21"
+      }
+    ]
+  },
+  {
+    "id": "eqtl-migrasap-replanejamento-go-live",
+    "origem": "equatorial",
+    "categoria": "SAP",
+    "titulo": "Atualização do cronograma do Projeto MigraSAP",
+    "resumo": "O Go Live do SAP S/4HANA passou de 12 de outubro para 15 de novembro de 2026, para assegurar a qualidade e a segurança da transição para o novo ambiente.",
+    "conteudoCompleto": "Após uma análise criteriosa do cenário atual do projeto, comunicamos uma importante atualização referente ao **cronograma do MigraSAP** e a data prevista para entrada em produção - **Go Live do SAP S/4HANA**.\nEm razão da necessidade de readequação do planejamento das atividades, foi aprovado o **replanejamento do projeto**, resultando na **alteração da data originalmente prevista para o Go Live**, de 12 de outubro de 2026 para **15 de novembro de 2026**.\nA decisão foi tomada com o objetivo de **assegurar a qualidade e a segurança transição para o novo ambiente**, considerando a necessidade de execução de ajustes relevantes no ambiente produtivo do SAP ECC, especialmente migração da base de dados para a nova infraestrutura em nuvem.\nEssas adequações são fundamentais para garantir a continuidade operacional, a estabilidade dos processos de negócio e a mitigação de riscos durante o transição entre os sistemas.\nAgradecemos a compreensão de todos(as) envolvidos(as) e reforçamos nosso compromisso com uma transição bem executada e com o menor impacto operações do Grupo Equatorial.\nEstamos inteiramente à disposição para quaisquer dúvidas ou esclarecimentos.\nAtenciosamente,\n**Projeto MigraSAP**.",
+    "dataPublicacao": "2026-09-10",
+    "dataVigencia": null,
+    "fonte": "Comunicação Grupo Equatorial — e-mail de 10/09/2026, \"MigraSAP | Replanejamento no Cronograma do Projeto\", assinado por Projeto MigraSAP",
+    "link": null,
+    "documento": null,
+    "imagem": "assets/images/comunicados/migrasap-replanejamento-2026.webp",
+    "imagemCapa": "assets/images/comunicados/migrasap-replanejamento-2026-capa.webp",
+    "imagemAlt": "Peça do MigraSAP \"Atualização do cronograma do Projeto MigraSAP\", com um calendário no alto: o Go Live do SAP S/4HANA passa de 12 de outubro para 15 de novembro de 2026.",
+    "links": [
+      {
+        "rotulo": "Dúvidas: proj.migrasap@equatorialenergia.com.br",
+        "url": "mailto:proj.migrasap@equatorialenergia.com.br",
+        "area": [
+          0.044,
+          0.948,
+          0.536,
+          0.037
+        ]
+      }
+    ],
+    "nivelImpacto": "Relevante",
+    "empresasImpactadas": [
+      "Grupo Equatorial"
+    ],
+    "areaResponsavel": "Projeto MigraSAP",
+    "responsavel": "Eduardo dos Santos Rocha",
+    "palavrasChave": [
+      "MigraSAP",
+      "SAP S/4HANA",
+      "Go Live",
+      "cronograma",
+      "replanejamento",
+      "SAP ECC",
+      "nuvem"
+    ],
+    "ativo": true,
+    "status": "Publicado",
+    "aprovadoPor": "Eduardo dos Santos Rocha",
     "dataAprovacao": "2026-09-22",
     "motivoRecusa": null,
     "historicoStatus": [
       {
         "de": null,
         "para": "Publicado",
-        "autor": "Jonathan Bruno",
+        "autor": "Eduardo dos Santos Rocha",
+        "data": "2026-09-22"
+      }
+    ]
+  },
+  {
+    "id": "eqtl-migrasap-sociedade-parceira",
+    "origem": "equatorial",
+    "categoria": "SAP",
+    "titulo": "Importância do preenchimento correto da Sociedade Parceira",
+    "resumo": "Com o SAP Group Reporting, o campo Sociedade Parceira é o que identifica as operações entre empresas do Grupo na consolidação; contas de partes relacionadas terão bloqueio sistêmico sem ele.",
+    "conteudoCompleto": "Como parte da preparação para a implementação do **SAP Group Reporting**, reforçamos uma prática fundamental para garantir a qualidade das informações financeiras do Grupo: **o correto preenchimento do campo “Sociedade Parceira” nos lançamentos contábeis no SAP**.\nA Sociedade Parceira permite identificar corretamente as operações realizadas entre empresas do Grupo e é uma informação essencial para que essas transações sejam reconhecidas e tratadas adequadamente durante o processo de consolidação.\n## Porque o preenchimento correto é tão importante?\nAo informar corretamente a Sociedade Parceira, contribuímos diretamente para:\n• **identificar** adequadamente as **operações intercompany**;\n• viabilizar a **correta execução das eliminações** no SAP Group Reporting;\n• **reduzir divergências e inconsistências** durante a consolidação;\n• **minimizar ajustes, reclassificações e retrabalhos** no fechamento contábil;\n• **aumentar a confiabilidade, a rastreabilidade e a qualidade** das informações financeiras do Grupo.\n## O que muda na prática:\nPara determinadas contas contábeis que recebem lançamentos manuais e possuem natureza exclusivamente relacionada a partes relacionadas, será implementado um **bloqueio sistêmico no SAP**. Nesses casos, o lançamento somente poderá ser contabilizado após o preenchimento da **Sociedade Parceira**.\nPara as demais contas, mesmo quando não houver bloqueio, é fundamental adotar a seguinte boa prática:\n**Sempre que uma transação envolver outra empresa do Grupo, preencha corretamente o campo “Sociedade Parceira”.**\nA seleção deverá refletir a empresa do Grupo que representa a contraparte da operação, conforme demonstrado no SAP:\n[figura 1]\nO resultado esperado é que os documentos sejam contabilizados com a Sociedade Parceira corretamente registrada, permitindo sua identificação durante a consolidação:\n[figura 2]\n## Atenção no momento do lançamento\nA ausência ou o preenchimento incorreto da Sociedade Parceira impedirá a identificação automática das operações intercompany, comprometendo o processo de consolidação, gerando divergências e demandando a realização de ajustes posteriores.\n• Por isso, **antes de concluir um lançamento entre empresas do Grupo, confira se a Sociedade Parceira foi informada corretamente.**\n• **Um preenchimento correto na origem significa mais qualidade na consolidação, menos retrabalho no fechamento e informações financeiras mais confiáveis para todo o Grupo.**\nContamos com o apoio e o comprometimento de todos para incorporar essa prática à rotina operacional e contribuir para o sucesso da implementação do **SAP Group Reporting.**\nEm caso de dúvidas, entre em contato com as equipes de Consolidação e Contabilidade Corporativa ou com o time do Projeto SAP Group Reporting.\nAtenciosamente,\n**Consolidação e Contabilidade Corporativa**\n**Projeto MigraSAP – Group Reporting**",
+    "dataPublicacao": "2026-09-17",
+    "dataVigencia": null,
+    "fonte": "Comunicação Grupo Equatorial — e-mail de 17/09/2026, \"MigraSAP | Atenção ao preenchimento da Sociedade Parceira no SAP\", assinado por Consolidação e Contabilidade Corporativa e Projeto MigraSAP – Group Reporting",
+    "link": null,
+    "documento": null,
+    "imagem": "assets/images/comunicados/migrasap-sociedade-parceira.webp",
+    "imagemCapa": "assets/images/comunicados/migrasap-sociedade-parceira-capa.webp",
+    "imagemAlt": "Peça do MigraSAP \"Importância do Preenchimento Correto da Sociedade Parceira\", com prédios ligados por uma rede no alto e, no corpo, as orientações e duas telas do SAP.",
+    "links": [
+      {
+        "rotulo": "Dúvidas: proj.migrasap@equatorialenergia.com.br",
+        "url": "mailto:proj.migrasap@equatorialenergia.com.br",
+        "area": [
+          0.042,
+          0.983,
+          0.507,
+          0.0135
+        ]
+      }
+    ],
+    "figuras": [
+      {
+        "imagem": "assets/images/comunicados/migrasap-sociedade-parceira-tela-lancamento.webp",
+        "alt": "Tela do SAP \"Entrar documento de conta do Razão\", com a coluna Sociedade parceira das linhas do lançamento e, ao lado, a lista das empresas do Grupo para escolher.",
+        "legenda": "No lançamento, a Sociedade parceira de cada linha é escolhida na lista das empresas do Grupo."
+      },
+      {
+        "imagem": "assets/images/comunicados/migrasap-sociedade-parceira-tela-documento.webp",
+        "alt": "Tela do SAP \"Exibir documento: Visão de entrada\", com a coluna SocParceir preenchida em todas as linhas do documento.",
+        "legenda": "Documento contabilizado com a Sociedade parceira (coluna SocParceir) em cada linha."
+      }
+    ],
+    "nivelImpacto": "Relevante",
+    "empresasImpactadas": [
+      "Grupo Equatorial"
+    ],
+    "areaResponsavel": "Consolidação e Contabilidade Corporativa",
+    "responsavel": "Eduardo dos Santos Rocha",
+    "palavrasChave": [
+      "MigraSAP",
+      "SAP",
+      "Sociedade Parceira",
+      "SAP Group Reporting",
+      "intercompany",
+      "consolidação",
+      "eliminações",
+      "partes relacionadas",
+      "bloqueio sistêmico"
+    ],
+    "ativo": true,
+    "status": "Publicado",
+    "aprovadoPor": "Eduardo dos Santos Rocha",
+    "dataAprovacao": "2026-09-22",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Eduardo dos Santos Rocha",
+        "data": "2026-09-22"
+      }
+    ]
+  },
+  {
+    "id": "eqtl-migrasap-tipo-de-movimento",
+    "origem": "equatorial",
+    "categoria": "SAP",
+    "titulo": "Importância da utilização correta de Tipo de Movimento",
+    "resumo": "Algumas contas contábeis passam a exigir o Tipo de Movimento no SAP; nas demais, escolher o tipo certo mantém a rastreabilidade e a qualidade das informações de reporte.",
+    "conteudoCompleto": "Reforçamos a importância do **correto preenchimento do campo “Tipo de Movimento” nos lançamentos contábeis realizados no SAP**.\nEmbora seja um campo específico do lançamento, sua utilização correta tem papel fundamental na identificação da natureza das movimentações contábeis e patrimoniais, contribuindo diretamente para a **qualidade, rastreabilidade e consistência das informações financeiras** utilizadas nos processos contábeis, gerenciais e de reporte.\n## Porque o Tipo de Movimento é importante?\nO preenchimento adequado desse campo permite identificar corretamente a natureza de cada movimentação e contribui para:\n• garantir maior **integridade e rastreabilidade** das informações financeiras;\n• facilitar a identificação e a análise das **movimentações patrimoniais**;\n• apoiar a **correta execução dos processos contábeis** e de reporte;\n• **reduzir ajustes, correções e retrabalhos** durante os fechamentos;\n• facilitar a **análise de variações** entre períodos;\n• aumentar a **confiabilidade das informações** utilizadas para fins gerenciais, societários e regulatórios.\n## O que muda na prática:\nCom o objetivo de fortalecer a qualidade das informações registradas no SAP, serão adotados **controles sistêmicos para determinadas contas contábeis**, tornando obrigatório o preenchimento do **Tipo de Movimento** em situações específicas.\nNesses casos, o sistema poderá impedir a contabilização do lançamento enquanto a informação não estiver corretamente preenchida.\nPara as demais situações, mesmo quando não houver bloqueio sistêmico, é fundamental adotar a seguinte boa prática:\n**Sempre que aplicável, selecione o Tipo de Movimento que represente corretamente a natureza da operação registrada.**\nNo momento do lançamento, o SAP disponibiliza as opções de Tipo de Movimento para seleção, conforme demonstrado abaixo:\n[figura 1]\nApós a contabilização, é importante verificar se o documento apresenta o campo devidamente preenchido:\n[figura 2]\n## Atenção antes de concluir o lançamento\nA ausência ou a utilização incorreta do Tipo de Movimento gerará inconsistências nos processos de reporte, consolidação e elaboração das demonstrações contábeis e notas explicativas, além de demandar ajustes posteriores e retrabalho para regularização das informações.\n• Por isso, **antes de concluir um lançamento contábil, verifique se o Tipo de Movimento foi informado corretamente, sempre que aplicável.**\n• **Uma informação correta na origem representa mais qualidade nos dados, maior eficiência nos fechamentos e mais confiabilidade para os processos contábeis da Companhia.**\nContamos com o apoio e o comprometimento de todos para incorporar essa prática à rotina operacional e contribuir para o fortalecimento da governança e da qualidade das informações financeiras.\nEm caso de dúvidas, entre em contato com a equipe de Consolidação e/ou a equipe de Contabilidade Corporativa.\nAtenciosamente,\n**Consolidação e Contabilidade Corporativa**\n**Projeto MigraSAP**",
+    "dataPublicacao": "2026-09-18",
+    "dataVigencia": null,
+    "fonte": "Comunicação Grupo Equatorial — e-mail de 18/09/2026, \"MigraSAP | Importância da Utilização Correta de Tipo de Movimento\", assinado por Consolidação e Contabilidade Corporativa e Projeto MigraSAP",
+    "link": null,
+    "documento": null,
+    "imagem": "assets/images/comunicados/migrasap-tipo-de-movimento.webp",
+    "imagemCapa": "assets/images/comunicados/migrasap-tipo-de-movimento-capa.webp",
+    "imagemAlt": "Peça do MigraSAP \"Importância da Utilização Correta de Tipo de Movimento\", com um documento ligado a ícones de compras, banco e gráficos no alto e, no corpo, as orientações e duas telas do SAP.",
+    "links": [
+      {
+        "rotulo": "Dúvidas: proj.migrasap@equatorialenergia.com.br",
+        "url": "mailto:proj.migrasap@equatorialenergia.com.br",
+        "area": [
+          0.042,
+          0.984,
+          0.507,
+          0.0136
+        ]
+      }
+    ],
+    "figuras": [
+      {
+        "imagem": "assets/images/comunicados/migrasap-tipo-de-movimento-tela-lancamento.webp",
+        "alt": "Tela do SAP \"Entrar documento de conta do Razão\", com a coluna TpMov das linhas e, ao lado, a lista \"Tipo de movimento\" com os códigos para escolher.",
+        "legenda": "No lançamento, o Tipo de movimento de cada linha é escolhido na lista de códigos do SAP."
+      },
+      {
+        "imagem": "assets/images/comunicados/migrasap-tipo-de-movimento-tela-documento.webp",
+        "alt": "Tela do SAP \"Exibir documento: Visão de entrada\", com a coluna TpMov preenchida nas duas linhas do documento.",
+        "legenda": "Documento contabilizado com o Tipo de movimento (coluna TpMov) preenchido."
+      }
+    ],
+    "nivelImpacto": "Relevante",
+    "empresasImpactadas": [
+      "Grupo Equatorial"
+    ],
+    "areaResponsavel": "Consolidação e Contabilidade Corporativa",
+    "responsavel": "Eduardo dos Santos Rocha",
+    "palavrasChave": [
+      "MigraSAP",
+      "SAP",
+      "Tipo de Movimento",
+      "TpMov",
+      "controles sistêmicos",
+      "reporte",
+      "consolidação",
+      "notas explicativas"
+    ],
+    "ativo": true,
+    "status": "Publicado",
+    "aprovadoPor": "Eduardo dos Santos Rocha",
+    "dataAprovacao": "2026-09-22",
+    "motivoRecusa": null,
+    "historicoStatus": [
+      {
+        "de": null,
+        "para": "Publicado",
+        "autor": "Eduardo dos Santos Rocha",
         "data": "2026-09-22"
       }
     ]

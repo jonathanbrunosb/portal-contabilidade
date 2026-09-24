@@ -222,11 +222,15 @@ export function portalItemId(manifest) {
 }
 
 /** Converte o manifesto em um item da coleção newsletter/noticias do portal, sempre "Em revisão". */
-export function toPortalItem(manifest, { imagePath, categoria, nivelImpacto, areaResponsavel, autor, origin, replaces }) {
+export function toPortalItem(manifest, { imagePath, categoria, origem, nivelImpacto, areaResponsavel, autor, origin, replaces }) {
   const now = new Date().toISOString();
   const paragraphs = [manifest.description, manifest.functionality ? `Funcionalidade: ${manifest.functionality}` : '', manifest.access_url ? `Acesso: ${manifest.access_url}` : ''].filter(Boolean);
   return {
     id: portalItemId(manifest),
+    // Quem escreveu (contabilidade | equatorial | externo): a capa agrupa a
+    // Comunicacao por origem e o selo sai dela, entao nao pode faltar. O
+    // manifesto do AI Studio nao traz o campo; quem importa escolhe.
+    origem: origem || 'contabilidade',
     categoria: categoria || manifest.destination.portal_category,
     titulo: manifest.title,
     resumo: manifest.summary || manifest.subtitle || manifest.title,

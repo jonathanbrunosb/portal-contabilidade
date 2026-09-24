@@ -11,3 +11,21 @@ server/audit.log
 # Copy INICIAR_API.cmd.example to INICIAR_API.cmd and edit the copy instead.
 INICIAR_API.cmd
 .env
+
+# Working material that must never reach GitHub Pages. The site is published by
+# .github/workflows/pages.yml, which packages everything tracked in the repo —
+# so anything committed here goes public. These hold brand material, the
+# Comunicação .msg e-mails with employee names, a bookmark export with a payroll
+# ID, and the source assets for the card artwork (already embedded in the SVGs).
+# They stay on disk and keep working locally; they just can't be committed.
+projeto/
+skills-lock.json
+
+# .claude/ é conhecimento do projeto e vai versionado: os documentos de
+# redesign, as ferramentas e as skills próprias. Ficam de fora as skills de
+# terceiros — têm licença própria, são reinstaláveis e somam ~4,3 MB.
+.claude/skills/*
+!.claude/skills/portal-corporativo/
+!.claude/skills/dudu-check-cores/
+!.claude/skills/dudu-check-modais/
+__pycache__/

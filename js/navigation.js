@@ -1,64 +1,64 @@
-import { icon,escapeHTML as e } from './ui.js';
-export function initializeNavigation(config,onNavigate,onAccess) {
-  document.querySelector('#navigation').innerHTML=`<p class="nav-label">PORTAL</p>${config.menu.map((item,i)=>`<a class="nav-link ${i===0?'active':''}" href="#${e(item.target)}" data-menu-index="${i}">${icon(item.icon)}<span>${e(item.label)}</span></a>`).join('')}<p class="nav-label">ACESSOS RÁPIDOS</p>${config.links.map((item,i)=>`<button class="nav-link" data-access="${i}">${icon(item.icon)}<span>${e(item.nome)}</span>${item.target?'':'<span class="external" aria-hidden="true">↗</span>'}</button>`).join('')}`;
-  document.querySelector('#menu-toggle').innerHTML=icon('menu');
-  const sidebar=document.querySelector('#sidebar'),scrim=document.querySelector('#scrim'),toggle=document.querySelector('#menu-toggle');
-  function menu(open,restore=true) {
-    sidebar.inert=!open&&!matchMedia('(min-width:1001px)').matches;
-    sidebar.classList.toggle('open',open);
-    scrim.hidden=!open;
-    toggle.setAttribute('aria-expanded',String(open));
-    document.body.style.overflow=open?'hidden':'';
-    if(open)document.querySelector('#close-menu').focus();
-    else if(restore)toggle.focus();
+import { icon,escapeHTML as e } from './ui.js?v=20260924-1';
+// Menu embutido na base da faixa do cabeçalho: uma seção por item, com ícone
+// e **sem submenu suspenso**. Clicar leva direto à primeira página da seção; as
+// demais aparecem na faixa de subpáginas, em abas — o mesmo caminho que
+// Documentos & Normas já fazia. No celular, o botão "Menu" abre a mesma lista.
+// `sections` já chega filtrado por perfil; cada página é um destino do portal
+// ({target, tab?, view?, adminTab?, grupo?}) entregue a onSelect.
+const desktop=matchMedia('(min-width:1001px)');
+export function initializeNavigation({sections},{onSelect,hashOf}) {
+  const nav=document.querySelector('#navigation'),bar=document.querySelector('#main-nav'),toggle=document.querySelector('#menu-toggle');
+  const destinos=[],paginasPorSecao=[];
+  nav.innerHTML=sections.map(section=>{
+    const paginas=section.paginas||section.itens||[];
+    const destino=section.target?section:paginas[0];
+    if(!destino)return '';
+    destinos.push(destino);
+    paginasPorSecao.push(paginas.length?paginas:[destino]);
+    return `<li><a class="ph-top" href="${e(hashOf(destino))}" data-nav="${destinos.length-1}">${icon(section.icon)}<span>${e(section.label)}</span></a></li>`;
+  }).join('');
+  nav.targets=destinos;
+  nav.secoes=paginasPorSecao;
+  toggle.innerHTML=`${icon('menu')}<span>Menu</span>`;
+
+  const setMobile=openState=> {
+    bar.classList.toggle('open',openState);
+    toggle.setAttribute('aria-expanded',String(openState));
   }
-  toggle.onclick=()=>menu(!sidebar.classList.contains('open'));
-  document.querySelector('#close-menu').onclick=()=>menu(false);
-  scrim.onclick=()=>menu(false);
-  document.addEventListener('keydown',event=> {
-    if(!sidebar.classList.contains('open'))return;
-    if(event.key==='Escape') {
-      menu(false);
-      return;
-    }
-    if(event.key==='Tab') {
-      const focusables=[...sidebar.querySelectorAll('a,button')].filter(el=>el.offsetParent!==null);
-      const first=focusables[0],last=focusables.at(-1);
-      if(event.shiftKey&&document.activeElement===first) {
-        event.preventDefault();
-        last.focus();
-      }
-      else if(!event.shiftKey&&document.activeElement===last) {
-        event.preventDefault();
-        first.focus();
-      }
-    }
-  }
-  );
-  const mq=matchMedia('(min-width:1001px)');
-  mq.addEventListener('change',()=> {
-    menu(false,false);
-  }
-  );
-  sidebar.inert=!mq.matches;
-  document.querySelector('#navigation').addEventListener('click',event=> {
-    const link=event.target.closest('.nav-link');
-    if(!link)return;
-    const wasOpen=sidebar.classList.contains('open');
-    menu(false,false);
-    if(link.dataset.access!==undefined) {
-      onAccess(config.links[Number(link.dataset.access)]);
-      return;
-    }
+  ;
+  toggle.onclick=()=>setMobile(!bar.classList.contains('open'));
+  desktop.addEventListener('change',()=>setMobile(false));
+
+  nav.addEventListener('click',event=> {
+    const dest=event.target.closest('[data-nav]');
+    if(!dest)return;
     event.preventDefault();
-    document.querySelectorAll('.nav-link').forEach(el=>el.classList.toggle('active',el===link));
-    onNavigate(config.menu[Number(link.dataset.menuIndex)]);
-    if(wasOpen)document.querySelector('#main').focus( {
-      preventScroll:true
-    }
-    );
+    setMobile(false);
+    onSelect(destinos[Number(dest.dataset.nav)]);
   }
   );
+
+  // Menu do usuário (Bem-vindo): troca de identificação, preferências e alertas.
+  const userBtn=document.querySelector('#top-user'),userMenu=document.querySelector('#user-menu');
+  const setUser=state=> {
+    userMenu.hidden=!state;
+    userBtn.setAttribute('aria-expanded',String(state));
+  }
+  ;
+  userBtn.onclick=()=>setUser(userMenu.hidden);
+  userMenu.addEventListener('click',event=>{if(event.target.closest('button'))setUser(false);});
+  userMenu.addEventListener('keydown',event=>{if(event.key==='Escape'){setUser(false);userBtn.focus();}});
+  document.addEventListener('click',event=>{if(!event.target.closest('.ph-user-wrap'))setUser(false);});
+}
+// Marca como atual (aria-current) a seção que contém o destino aberto.
+export function markCurrentSection(matches) {
+  const nav=document.querySelector('#navigation'),secoes=nav.secoes||[];
+  nav.querySelectorAll(':scope > li').forEach(li=>{
+    const top=li.querySelector('.ph-top');
+    const i=Number(top?.dataset.nav);
+    const hit=top&&(secoes[i]||[]).some(matches);
+    if(hit)top.setAttribute('aria-current','page');else top?.removeAttribute('aria-current');
+  });
 }
 // WAI-ARIA keyboard pattern for both tab groups.
 export function bindTabs(selector,callback) {

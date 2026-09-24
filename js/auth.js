@@ -1,4 +1,4 @@
-import { escapeHTML as e,safeURL } from './ui.js';
+import { escapeHTML as e,safeURL,comVersao } from './ui.js?v=20260924-1';
 // Presentation only: a browser-local choice is not authentication. hasAccess()
 // controls which sections/menu items/search results render for a profile — it
 // is a UX consistency layer, not a security boundary: the JSON sources remain
@@ -85,14 +85,16 @@ export function hasAccess(user,capability) {
 }
 export function renderUser(user) {
   const visitor=isVisitorUser(user);
-  const photo=safeURL(user.foto)||'assets/users/default.svg';
-  const avatarAlt=visitor?'Avatar corporativo do perfil de visitante':`Avatar de ${e(user.nome)}`;
-  const avatarTitle=visitor?' title="Visitante"':'';
-  const support=visitor?'<p>Conteúdos disponíveis conforme o perfil de visitante.</p>':'';
-  const perfilLine=visitor?`<span class="profile-area">Perfil: ${e(user.perfil)}</span>`:'';
-  const switchLabel=visitor?'Identificar colaborador':'Trocar identificação';
-  document.querySelector('#profile').innerHTML=`<img class="avatar large" src="${e(photo)}" alt="${avatarAlt}"${avatarTitle}><h2>${e(user.nome)}</h2><p>${e(user.cargo)}</p>${support}<span class="profile-area">Área: ${e(user.area)}</span>${perfilLine}<button class="text-btn profile-switch" id="switch-identity">${switchLabel}</button>`;
-  document.querySelector('#top-user').innerHTML=`<span>${e(user.nome)}<small>${e(user.area)}</small></span><img class="avatar" src="${e(photo)}" alt="${avatarAlt}"${avatarTitle}>`;
+  const unidentified=!visitor&&user.id===undefined;
+  const photo=comVersao(safeURL(user.foto)||'assets/users/default.svg');
+  const avatarAlt=visitor?'Avatar corporativo do perfil de visitante':'';
+  const firstName=visitor?'Visitante':unidentified?'':String(user.nome||'').split(' ')[0];
+  const greeting=firstName?`Bem-vindo, <b>${e(firstName)}</b>`:'Identifique-se';
+  const detail=visitor?'Perfil de visitante':unidentified?'Escolha sua área':[user.cargo,user.area].filter(Boolean).map(e).join(' · ');
+  const switchLabel=visitor||unidentified?'Identificar colaborador':'Trocar identificação';
+  document.querySelector('#top-user').innerHTML=`<img class="avatar" src="${e(photo)}" alt="${avatarAlt}"><span>${greeting}<small>${detail}</small></span>`;
+  document.querySelector('#top-user').setAttribute('aria-label',`${firstName?`Bem-vindo, ${firstName}`:'Identificação'}: abrir opções do usuário`);
+  document.querySelector('#switch-identity').textContent=switchLabel;
   document.querySelectorAll('.avatar').forEach(img=>img.addEventListener('error',()=> {
     img.src='assets/users/default.svg';
   }

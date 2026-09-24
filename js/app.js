@@ -1,19 +1,26 @@
-import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,apiUploadContentImage,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260923-1';
-import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js?v=20260918-1';
-import { initializeNavigation,bindTabs,selectTab } from './navigation.js';
-import { renderNewsletter,showArticle,loadNoticias,renderNoticiasHeader,renderNoticiaFiltros,renderNoticias } from './newsletter.js?v=20260918-1';
-import { renderTeamStructure } from './teams.js?v=20260918-1';
-import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,notify } from './ui.js';
-import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js';
-import { readZip,validatePackage,findExisting,toPortalItem,portalItemId } from './ai-studio-import.js?v=20260923-1';
-let data,currentTab='newsletter',currentAdminTab='equipes',currentUser,currentMenu=[];
+import { loadData,isLiveDataSource,apiWrite,apiUploadPhoto,apiUploadContentImage,getAdminToken,setAdminToken,hasLocalTeams,saveLocalTeams,clearLocalTeams,hasLocalAutomacoes,saveLocalAutomacoes,clearLocalAutomacoes } from './data-service.js?v=20260924-1';
+import { identifyUser,renderUser,hasAccess,getStoredUserId,setStoredUserId } from './auth.js?v=20260924-1';
+import { initializeNavigation,markCurrentSection,bindTabs,selectTab } from './navigation.js?v=20260924-1';
+import { comunicados,filtrarComunicados,faixaComunicado,paginaComunicado,colunasOrigem,itemDaColuna,hashComunicado,ligarMidias,ultimaAtualizacaoLabel,textoDoComunicado } from './newsletter.js?v=20260924-1';
+import { prepararIndice,agrupar,destacar,termosDe,atributosDoLink,ligarBuscaTopo,MINIMO_CARACTERES } from './busca.js?v=20260924-1';
+import { renderTeamStructure } from './teams.js?v=20260924-1';
+import { initCarousel,slideHTML } from './carousel.js?v=20260924-1';
+import { TIPOS_ALVO,SITUACOES,LIMITE_NO_AR,situacaoDestaque,alvoDoDestaque,resolverDestaque,destaquesNoAr,destaqueDoAlvo } from './destaques.js?v=20260924-1';
+import { escapeHTML as e,normalize,icon,hydrateIcons,badge,dateLabel,showDialog,initializeDialog,detailGrid,safeURL,comVersao,notify,ORIGENS,seloOrigem,opcoesOrigem } from './ui.js?v=20260924-1';
+import { track,setAnalyticsEnabled,summary,exportAnalytics,clearAnalytics } from './analytics.js?v=20260924-1';
+import { readZip,validatePackage,findExisting,toPortalItem,portalItemId } from './ai-studio-import.js?v=20260924-1';
+let data,currentTab='comunicacao',currentAdminTab='equipes',currentUser,currentMenu=[],navSections=[];
 const $=selector=>document.querySelector(selector);
+const TITULO_PADRAO=document.title;
 // Capability required to see each menu target / page section / searchable collection.
 const TARGET_ACCESS= {
   central:'conteudo',equipes:'time',processos:'gerencial',painel:'gerencial',agenda:'gerencial',editorial:'gerencial',administracao:'administracao'
 }
 ;
-const CENTRAL_TABS=['newsletter','noticias','sistemas','documentos','automacoes'];
+// Comunicação: uma aba por origem (+ "Todos") e a página de cada comunicado.
+const CENTRAL_TABS=['comunicacao','comunicacao-contabilidade','comunicacao-equatorial','comunicacao-externo','comunicado','portais-todos','sistemas','portais-equatorial','portais-servicos','portais-gente','portais-powerbi','portais-externos','documentos','automacoes-todos','automacoes','atalhos-equatorial','automacoes-externos'];
+// Páginas ainda sem conteúdo definido (o usuário vai desenhar).
+const PAGINAS_EM_DEFINICAO=[];
 const SECTION_ACCESS= {
   central:'conteudo',painel:'gerencial',editorial:'gerencial'
 }
@@ -24,18 +31,32 @@ const EDITORIAL_CATEGORIAS= {
 }
 ;
 const COLLECTION_ACCESS= {
-  newsletter:'conteudo',noticias:'conteudo',sistemas:'conteudo',documentos:'conteudo',equipes:'time',usuarios:'time',processos:'gerencial',agenda:'gerencial',entregas:'gerencial'
+  newsletter:'conteudo',noticias:'conteudo',sistemas:'conteudo',documentos:'conteudo',portais:'conteudo',externos:'conteudo',automacoes:'conteudo',links:'conteudo',equipes:'time',usuarios:'time',processos:'gerencial',agenda:'gerencial',entregas:'gerencial'
 }
 ;
+// Origem de cada registro (contabilidade | equatorial | externo). O conteúdo
+// publicado traz o campo `origem` no próprio JSON; as coleções de uma origem só
+// e os dados de gestão da gerência caem no padrão abaixo quando o campo falta
+// (automação criada antes do campo existir, por exemplo).
+const ORIGEM_PADRAO= {
+  sistemas:'contabilidade',automacoes:'contabilidade',equipes:'contabilidade',usuarios:'contabilidade',processos:'contabilidade',agenda:'contabilidade',entregas:'contabilidade',portais:'equatorial',links:'equatorial',externos:'externo'
+}
+;
+const origemDe=(collection,item)=>item?.origem||ORIGEM_PADRAO[collection]||'';
 function applyAccess(user) {
   Object.entries(SECTION_ACCESS).forEach(([id,capability])=> {
     document.getElementById(id).hidden=!hasAccess(user,capability);
   }
   );
   $('.home-columns').classList.toggle('single-column',!hasAccess(user,'time'));
-  $('#notifications').hidden=!hasAccess(user,'gerencial');
+  $('#notifications').closest('li').hidden=!hasAccess(user,'gerencial');
 }
-function openAccess(item) {
+// `opened` = o link já abriu em nova aba pelo próprio <a> do menu; aqui só registra.
+function openAccess(item,{opened=false}={}) {
+  if(opened) {
+    track('system_access',{sistema:item.nome,configurado:true});
+    return;
+  }
   if(item.target) {
     track('system_access',{sistema:item.nome,configurado:true});
     navigate(currentMenu.find(menuItem=>menuItem.target===item.target&&(!item.tab||menuItem.tab===item.tab))||item);
@@ -47,71 +68,247 @@ function openAccess(item) {
     window.open(url,'_blank','noopener,noreferrer');
     return;
   }
-  showDialog(item.nome,'ACESSO CORPORATIVO',`<p>${e(item.descricao||'Acesso utilizado pela Gerência de Contabilidade.')}</p><p>O endereço deste acesso ainda não foi cadastrado. Solicite o link ao responsável da área.</p>${detailGrid({'Status':'Aguardando configuração','Responsável':item.responsavel||'Administração do portal'})}`);
+  showDialog(item.nome,'Acesso corporativo',`<p>${e(item.descricao||'Acesso utilizado pela Gerência de Contabilidade.')}</p><p>O endereço deste acesso ainda não foi cadastrado. Solicite o link ao responsável da área.</p>${detailGrid({'Status':'Aguardando configuração','Responsável':item.responsavel||'Administração do portal'})}`);
 }
-// A system with a corporate image gets the status and the access button laid
-// over the image itself (object-fit:cover keeps it from distorting); a
-// system without one keeps the original icon + badge/button-below layout —
-// that fallback must keep working since not every registered system has art.
-function systemCard(item) {
-  if(!item.imagem)return `<article class="content-card"><div class="system-symbol">${icon(item.icon)}</div><h3>${e(item.nome)}</h3><p>${e(item.descricao)}</p><div class="card-bottom">${badge(item.status)}<button class="text-btn" data-system="${e(item.id)}">Acessar sistema ↗</button></div></article>`;
-  return `<article class="content-card"><div class="system-media"><img class="system-image" src="${e(safeURL(item.imagem)||'')}" alt="Ilustração do sistema ${e(item.nome)}" loading="lazy">${badge(item.status,'system-media-badge')}<button class="primary-btn system-media-access" data-system="${e(item.id)}">Acessar sistema ↗</button></div><h3>${e(item.nome)}</h3><p>${e(item.descricao)}</p></article>`;
+// Cartao padrao das grades de Portais e Links, atalhos e automacoes. Medido em
+// microsoft.com/pt-br: imagem numa coluna fixa a esquerda, conteudo ao lado e
+// uma faixa de acoes no rodape. **O cartao inteiro leva ao destino**: a acao
+// principal recebe `pcard-principal` e o CSS estica um `::after` dela por cima
+// do cartao. A ficha continua saindo pelo "i", que fica por cima do esticado.
+const podeAdministrar = () => hasAccess(currentUser, 'administracao');
+function cardPortal(o) {
+  const url = safeURL(o.imagem) || (o.imagem && !/^https?:/i.test(o.imagem) ? o.imagem : null);
+  const media = url
+    ? `<img class="pcard-img" src="${e(comVersao(url))}" alt="" loading="lazy">`
+    : `<span class="pcard-simbolo">${icon(o.icone || 'grid')}</span>`;
+  // Para quem administra: um lápis no canto da imagem, que não cobre a arte
+  // (pedido do usuário em 21/09/2026; antes era uma faixa "Trocar imagem").
+  const acaoImagem = url ? 'Trocar imagem' : 'Definir imagem';
+  const trocar = o.alvoImagem && podeAdministrar()
+    ? `<button class="pcard-trocar" data-trocar-imagem="${e(o.alvoImagem)}" aria-label="${acaoImagem} de ${e(o.titulo)}" title="${acaoImagem}">${icon('pencil')}</button>`
+    : '';
+  const info = o.registro
+    ? `<button class="pcard-info" data-record="${e(o.registro)}" aria-label="Informações sobre ${e(o.titulo)}">${icon('info')}</button>`
+    : '';
+  // A primeira acao do cartao e a principal: e ela que cobre o cartao. Sem
+  // acao ("Acesso em configuracao"), nada e esticado e o cartao nao clica.
+  const acao = (o.acao || '').replace('class="primary-btn pcard-acessar"',
+    'class="primary-btn pcard-acessar pcard-principal"');
+  // Selo de origem só onde a tela mistura origens (Documentos & Normas). Nas
+  // páginas que já são de uma origem só, repetir o mesmo selo em todo cartão
+  // seria ruído: a faixa de subpáginas já diz de onde é.
+  const selo = seloOrigem(o.origem);
+  const rotulo = o.rotulo || selo
+    ? `<p class="meta-label${selo ? ' rotulo-com-selo' : ''}">${selo}${o.rotulo ? `<span>${e(o.rotulo)}</span>` : ''}</p>`
+    : '';
+  return `<article class="pcard"><div class="pcard-media${url ? '' : ' sem-imagem'}">${media}${trocar}</div><div class="pcard-corpo">${rotulo}<h3>${e(o.titulo)}</h3><p class="pcard-texto">${e(o.descricao || '')}</p></div><div class="pcard-acoes">${o.statusHTML || '<span></span>'}<span class="pcard-botoes">${info}${acao}</span></div></article>`;
 }
-function documentCard(item) {
-  return `<article class="content-card doc-card"><div class="card-meta"><span class="system-symbol">${icon('file')}</span><span class="muted">${e(item.formato)}</span></div><h3>${e(item.categoria)}</h3><p>${e(item.titulo)}</p><div class="doc-actions"><button class="text-btn" data-record="documentos:${e(item.id)}">Abrir →</button><a class="text-btn" href="${e(safeURL(item.arquivo)||'')}" download>Baixar ↓</a></div></article>`;
-}
-function documentResults() {
-  const query=normalize($('#doc-search')?.value),category=$('#doc-filter')?.value;
-  const records=data.documentos.filter(item=>(!category||item.categoria===category)&&normalize(JSON.stringify(item)).includes(query));
-  $('#document-results').innerHTML=records.map(documentCard).join('')||'<p class="empty-state">Nenhum documento encontrado. Tente outra categoria ou termo.</p>';
-  $('#doc-count').textContent=`${records.length} documentos de exemplo` ;
-}
-// Images render with a static fallback icon already in the markup (see
-// itemMedia() in newsletter.js); an onerror listener just toggles which
-// one is visible, keeping error handling out of inline HTML attributes.
-function wireNoticiaImages(root) {
-  root.querySelectorAll('.noticia-media img,.noticia-destaque-media img').forEach(img=>img.addEventListener('error',()=> {
-    img.closest('.noticia-media,.noticia-destaque-media')?.classList.add('noticia-media-fallback');
+// O corpo do cartao fica acima do link esticado, para o texto poder ser
+// selecionado. Em troca, o clique nele chega aqui: navega so quando o usuario
+// nao estava selecionando texto, e nunca por cima de um link ou botao.
+const acaoAcessar = (url, nome, marca = 'data-quick') => `<a class="primary-btn pcard-acessar" href="${e(url)}" target="_blank" rel="noopener noreferrer" ${marca}="${e(nome)}">Acessar${icon('external').replace('class="icon"','class="icon ext"')}</a>`;
+const acaoBaixar = (url, nome) => `<a class="primary-btn pcard-acessar" href="${e(url)}" download data-doc-title="${e(nome)}">${icon('download')}Baixar</a>`;
+const ACAO_PENDENTE = '<span class="meta-label pcard-pendente">Acesso em configuração</span>';
+// `selo` põe o selo da origem no cartão — só nas abas "Todos", que misturam
+// origens; nas demais a aba já diz de onde é.
+const seloDe=(colecao,item,opcoes)=>opcoes?.selo?origemDe(colecao,item):'';
+function systemCard(item,opcoes) {
+  const url = safeURL(item.link);
+  return cardPortal( {
+    imagem:item.imagem,icone:item.icon,titulo:item.nome,descricao:item.descricao,origem:seloDe('sistemas',item,opcoes),
+    rotulo:item.responsavel,statusHTML:badge(item.status),
+    acao:url?acaoAcessar(url,item.nome):`<button class="primary-btn pcard-acessar" data-system="${e(item.id)}">Acessar</button>`,
+    registro:`sistemas:${item.id}`,alvoImagem:`sistemas:${item.id}`
   }
-  , {
-    once:true
-  }
-  ));
+  );
 }
-function renderNoticiasResults() {
-  const query=$('#noticia-search')?.value||'';
-  const categoria=$('#content-view .noticia-chip[aria-selected="true"]')?.dataset.categoria||'';
-  const resultados=$('#noticias-resultados');
-  resultados.innerHTML=renderNoticias(loadNoticias(data.noticias),categoria,query);
-  wireNoticiaImages(resultados);
+// Atalho corporativo (config.json › links) no mesmo cartão das demais grades.
+function linkCard(item,index,opcoes) {
+  if(item.target)return '';
+  const url=safeURL(item.link);
+  return cardPortal( {
+    imagem:item.imagem,icone:item.icon||'link',titulo:item.nome,descricao:item.descricao,origem:seloDe('links',item,opcoes),
+    rotulo:item.responsavel,statusHTML:badge(url?'Ativo':'Link não configurado'),
+    acao:url?acaoAcessar(url,item.nome):`<button class="primary-btn pcard-acessar" data-access-link="${e(index)}">Acessar</button>`,
+    registro:`links:${index}`
+  }
+  );
 }
-// Global search results link into the tab via showRecord('noticias', id):
-// instead of opening the read-more modal (data-noticia-detalhe does that),
-// this opens/keeps the Notícias & Impactos tab, scrolls to the matching
-// card and applies a temporary highlight, per spec section 16.
-function focusNoticia(id) {
-  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if($('#home-view').hidden) {
-    $('#home-view').hidden=false;
-    $('#equipes').hidden=true;
-    history.pushState(null,'','#central');
-  }
-  renderContent('noticias');
-  requestAnimationFrame(()=>$('#central').scrollIntoView( {
-    behavior:reduced?'auto':'smooth',block:'start'
-  }
-  ));
-  setTimeout(()=> {
-    const card=document.querySelector(`[data-noticia-id="${CSS.escape(id)}"]`);
-    if(!card)return;
-    card.scrollIntoView( {
-      behavior:reduced?'auto':'smooth',block:'center'
+// Portal do Grupo (portais.json) e link externo (externos.json): o mesmo
+// cartão das demais grades, com o grupo no rótulo e o domínio de destino no
+// rodapé — num repositório de links, saber para onde se vai antes de clicar
+// vale mais do que um selo de status.
+const dominioDe=url=>{try{return new URL(url).host.replace(/^www\./,'');}catch{return '';}};
+function portalCard(colecao,opcoes) {
+  return item=> {
+    const url=safeURL(item.link);
+    const host=url?dominioDe(url):'';
+    return cardPortal( {
+      imagem:item.imagem,icone:item.icon||'link',titulo:item.nome,descricao:item.descricao,origem:seloDe(colecao,item,opcoes),
+      rotulo:item.grupo,statusHTML:host?`<span class="meta-label pcard-fonte">${e(host)}</span>`:'<span></span>',
+      acao:url?acaoAcessar(url,item.nome):ACAO_PENDENTE,
+      registro:`${colecao}:${item.id}`,alvoImagem:`${colecao}:${item.id}`
     }
     );
-    card.classList.add('noticia-highlight');
-    setTimeout(()=>card.classList.remove('noticia-highlight'),2200);
   }
-  ,320);
+  ;
+}
+// Ordem dos grupos: a do próprio arquivo, que é como o usuário os organizou.
+const gruposDe=lista=>[...new Set(lista.map(item=>item.grupo).filter(Boolean))];
+// Uma tela de grade filtrável por grupo, usada por Portais → Equatorial,
+// Portal de Serviços, Gente e Gestão e Externos: muda a coleção, o texto de
+// apoio e nada mais.
+// `destino` reparte uma mesma coleção em telas diferentes (portais.json serve
+// duas; externos.json, outras duas).
+function telaDeLinks( {colecao,destino,prefixo,rotuloBusca,placeholder,rodape,vazio,singular,plural} ) {
+  const lista=(data[colecao]||[]).filter(item=>!destino||!item.destino||item.destino===destino);
+  const ordem=gruposDe(lista);
+  // Com um grupo só (a aba Power BI, por exemplo), o filtro não teria o que filtrar.
+  const filtros=ordem.length>1?[{id:`${prefixo}-grupo`,rotulo:'Grupo',todos:'Todos os grupos',opcoes:ordem}]:[];
+  const busca={id:`${prefixo}-busca`,rotulo:rotuloBusca,placeholder};
+  $('#content-view').innerHTML=`${barraFiltro({busca,filtros})}<div class="pcard-grid" id="${prefixo}-cards"></div><div class="content-footer"><span id="${prefixo}-count" role="status" aria-live="polite"></span><span>${e(rodape)}</span></div>`;
+  ligarBarraFiltro({busca,filtros,aoMudar:()=> {
+    const query=normalize($(`#${prefixo}-busca`).value),grupo=$(`#${prefixo}-grupo`)?.value||'';
+    // Ordem alfabética do título, e não por grupo (pedido do usuário em
+    // 20/09): o grupo continua no rótulo do cartão e no filtro, mas quem
+    // procura um nome varre a lista de A a Z sem saber em que gaveta ele está.
+    const visiveis=lista.filter(item=>(!grupo||item.grupo===grupo)&&normalize(`${item.nome} ${item.descricao||''} ${item.grupo||''} ${item.link||''}`).includes(query))
+      .sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+    $(`#${prefixo}-cards`).innerHTML=visiveis.map(portalCard(colecao)).join('')||`<p class="empty-state">${e(vazio)}</p>`;
+    $(`#${prefixo}-count`).textContent=contagem(visiveis.length,singular,plural);
+  }
+  }
+  );
+}
+// Aba "Todos" de Portais e Links e de Sistemas e automações (pedido do usuário
+// em 21/09/2026): as grades das abas irmãs juntas, em ordem alfabética. A tela
+// mistura origens, então cada cartão leva o selo e entra o filtro Origem.
+// Cada registro traz o título, a origem, o texto da busca e o próprio cartão.
+const registroTodos=(colecao,item,titulo,texto,cartao)=>({titulo,origem:origemDe(colecao,item),texto:normalize(texto),cartao});
+function registrosPortaisTodos() {
+  return [
+    ...data.sistemas.map(item=>registroTodos('sistemas',item,item.nome,`${item.nome} ${item.descricao||''} ${item.responsavel||''}`,()=>systemCard(item,{selo:true}))),
+    ...data.portais.map(item=>registroTodos('portais',item,item.nome,`${item.nome} ${item.descricao||''} ${item.grupo||''} ${item.link||''}`,()=>portalCard('portais',{selo:true})(item))),
+    ...data.externos.filter(item=>item.destino==='portais-externos').map(item=>registroTodos('externos',item,item.nome,`${item.nome} ${item.descricao||''} ${item.grupo||''} ${item.link||''}`,()=>portalCard('externos',{selo:true})(item)))
+  ];
+}
+function registrosAutomacoesTodos() {
+  return [
+    ...activeAutomations().map(item=>registroTodos('automacoes',item,item.titulo,`${item.titulo} ${item.descricao||''} ${item.tipo||''}`,()=>automationCard(item,{selo:true}))),
+    ...data.config.links.filter(item=>!item.target).map(item=>registroTodos('links',item,item.nome,`${item.nome} ${item.descricao||''}`,()=>linkCard(item,data.config.links.indexOf(item),{selo:true}))),
+    ...data.externos.filter(item=>item.destino==='automacoes-externos').map(item=>registroTodos('externos',item,item.nome,`${item.nome} ${item.descricao||''} ${item.grupo||''} ${item.link||''}`,()=>portalCard('externos',{selo:true})(item)))
+  ];
+}
+function telaTodos({prefixo,registros,rotuloBusca,rodape,singular,plural}) {
+  const filtros=filtroOrigem(`${prefixo}-origem`,registros);
+  const busca={id:`${prefixo}-busca`,rotulo:rotuloBusca,placeholder:'Nome, descrição, grupo ou endereço…'};
+  $('#content-view').innerHTML=`${barraFiltro({busca,filtros})}<div class="pcard-grid" id="${prefixo}-cards"></div><div class="content-footer"><span id="${prefixo}-count" role="status" aria-live="polite"></span><span>${e(rodape)}</span></div>`;
+  ligarBarraFiltro({busca,filtros,aoMudar:()=> {
+    const query=normalize($(`#${prefixo}-busca`).value),origem=$(`#${prefixo}-origem`)?.value||'';
+    const visiveis=registros.filter(r=>(!origem||r.origem===origem)&&r.texto.includes(query))
+      .sort((a,b)=>a.titulo.localeCompare(b.titulo,'pt-BR'));
+    $(`#${prefixo}-cards`).innerHTML=visiveis.map(r=>r.cartao()).join('')||'<p class="empty-state">Nada corresponde aos filtros.</p>';
+    $(`#${prefixo}-count`).textContent=contagem(visiveis.length,singular,plural);
+  }
+  }
+  );
+}
+// Documentos & Normas em tabela: conteúdo repetitivo, sem imagem própria.
+// Ícone de apoio por grupo, já que documento não tem arte própria.
+const ICONE_GRUPO= {
+  'Normas contábeis':'file','Setor elétrico':'chart','Obrigações acessórias':'check',
+  'Legislação':'shield','Grupo Equatorial':'briefcase'
+}
+;
+function documentCard(item) {
+  const link=safeURL(item.link),arquivo=safeURL(item.arquivo);
+  return cardPortal( {
+    imagem:item.imagem,icone:ICONE_GRUPO[item.grupo]||'file',titulo:item.titulo,descricao:item.descricao,
+    rotulo:item.grupo,origem:item.origem,statusHTML:`<span class="meta-label pcard-fonte">${e(item.fonte||'Fonte a cadastrar')}</span>`,
+    acao:`${link?acaoAcessar(link,item.titulo,'data-doc-link'):''}${arquivo?acaoBaixar(arquivo,item.titulo):''}`||ACAO_PENDENTE,
+    registro:`documentos:${item.id}`
+  }
+  );
+}
+// Ordem dos grupos definida em config.json › navegacao (Documentos & Normas).
+function gruposDocumentos() {
+  const definidos=(data.config.navegacao||[]).find(s=>Array.isArray(s.gruposDocumentos))?.gruposDocumentos||[];
+  const extras=[...new Set(data.documentos.map(d=>d.grupo).filter(g=>g&&!definidos.includes(g)))];
+  return [...definidos,...extras].filter(g=>data.documentos.some(d=>d.grupo===g));
+}
+// O grupo de Documentos & Normas é escolhido pela aba da faixa de subpáginas
+// ("Todos" = ''), não por um filtro: navigate() grava aqui antes de desenhar.
+// Um <select> de grupo na faixa de filtros repetia as abas e saiu em 21/09.
+let docGrupo='';
+const documentosDaAba=()=>data.documentos.filter(item=>!docGrupo||item.grupo===docGrupo);
+function documentResults() {
+  const query=normalize($('#doc-search')?.value),origem=$('#doc-origem')?.value;
+  const ordem=gruposDocumentos();
+  const records=documentosDaAba().filter(item=>(!origem||item.origem===origem)&&normalize(JSON.stringify(item)).includes(query))
+    .sort((a,b)=>(ordem.indexOf(a.grupo)-ordem.indexOf(b.grupo))||a.titulo.localeCompare(b.titulo,'pt-BR'));
+  $('#document-results').innerHTML=records.map(documentCard).join('')||'<p class="empty-state">Nenhum documento encontrado. Tente outro grupo ou termo.</p>';
+  $('#doc-count').textContent=`${records.length} ${records.length===1?'referência oficial':'referências oficiais'}`;
+}
+// ===== Comunicação =====
+// Lista de comunicados de uma aba ('' = Todos) e a página de cada um. Como em
+// Documentos, a aba é gravada por navigate(): a origem é a aba, então não vira
+// filtro (regra "filtro não repete aba").
+let comunicadoAtual=null;
+function comunicadoAberto() {
+  const alvo=comunicadoAtual;
+  const item=alvo&&(data[alvo.colecao]||[]).find(registro=>registro.id===alvo.id);
+  return item&&item.status==='Publicado'?{item,colecao:alvo.colecao}:null;
+}
+function renderListaComunicacao(origem) {
+  const todos=comunicados(data);
+  const lista=origem?todos.filter(({item})=>item.origem===origem):todos;
+  const categorias=valoresDe(lista.map(({item})=>item),'categoria');
+  const filtros=categorias.length>1?[{id:'com-categoria',rotulo:'Categoria',todos:'Todas as categorias',opcoes:categorias}]:[];
+  const busca={id:'com-busca',rotulo:origem?`Pesquisar comunicados de ${ORIGENS[origem]}`:'Pesquisar comunicados',placeholder:'Título, texto, categoria ou fonte…'};
+  $('#content-view').innerHTML=`${barraFiltro({busca,filtros})}<div class="comunicados-lista" id="com-lista"></div><div class="content-footer"><span id="com-count" role="status" aria-live="polite"></span><span>Última atualização: ${e(ultimaAtualizacaoLabel(lista.map(({item})=>item)))}</span></div>`;
+  ligarBarraFiltro({busca,filtros,aoMudar:()=> {
+    const visiveis=filtrarComunicados(lista,{categoria:$('#com-categoria')?.value||'',query:$('#com-busca').value});
+    const vazio=lista.length?'Nenhum comunicado corresponde à busca.':`Nenhum comunicado de ${ORIGENS[origem]} publicado ainda.`;
+    $('#com-lista').innerHTML=visiveis.map(faixaComunicado).join('')||`<p class="empty-state">${e(vazio)}</p>`;
+    $('#com-count').textContent=contagem(visiveis.length,'comunicado','comunicados');
+    ligarMidias($('#com-lista'));
+  }
+  }
+  );
+}
+function renderPaginaComunicado() {
+  const aberto=comunicadoAberto();
+  if(!aberto) {
+    $('#content-view').innerHTML='<p class="empty-state">Este comunicado não foi encontrado ou não está publicado. <a href="#central/comunicacao" data-route="#central/comunicacao">Ver todos os comunicados</a>.</p>';
+    return;
+  }
+  const sistema=aberto.item.sistemaId?data.sistemas.find(s=>s.id===aberto.item.sistemaId):null;
+  $('#content-view').innerHTML=paginaComunicado(aberto,{sistema});
+  // "Mais comunicados" ao lado da ficha: primeiro os da mesma origem, depois os
+  // demais, do mais recente ao mais antigo.
+  const outros=comunicados(data).filter(c=>!(c.colecao===aberto.colecao&&c.item.id===aberto.item.id));
+  const relacionados=[...outros.filter(c=>c.item.origem===aberto.item.origem),...outros.filter(c=>c.item.origem!==aberto.item.origem)].slice(0,4);
+  if(relacionados.length)$('.comunicado-rodape-grade').insertAdjacentHTML('beforeend',`<section class="comunicado-relacionados" aria-labelledby="comunicado-relacionados-titulo"><h3 class="comunicado-ficha-titulo" id="comunicado-relacionados-titulo">Mais comunicados</h3><ul class="coluna-lista">${relacionados.map(itemDaColuna).join('')}</ul></section>`);
+  // Espaço de quem administra: a situação do comunicado no carrossel da capa e
+  // o atalho para destacá-lo (pedido do usuário em 21/09/2026).
+  if(podeAdministrar()) {
+    const ref=`${aberto.colecao}:${aberto.item.id}`;
+    const destaque=destaqueDoAlvo(data,'comunicado',ref);
+    const situacao=destaque?`<span class="badge ${COR_SITUACAO[situacaoDestaque(destaque)]}">${e(SITUACOES[situacaoDestaque(destaque)])}</span> ${e(periodoDestaque(destaque))} · posição ${e(destaque.ordem??'—')}`:'Este comunicado não está no carrossel.';
+    $('.comunicado-ficha').insertAdjacentHTML('beforeend',`<section class="comunicado-admin" aria-labelledby="comunicado-admin-titulo"><h3 class="comunicado-ficha-titulo" id="comunicado-admin-titulo">Carrossel da capa</h3><p>${situacao}</p>${botaoDestacar('comunicado',ref)}</section>`);
+  }
+  ligarMidias($('#content-view'));
+  track('record_view',{collection:aberto.colecao,label:aberto.item.titulo});
+}
+// Aba da Comunicação que corresponde a uma página: a do comunicado aberto é a
+// aba da origem dele.
+function abaDaComunicacao(tab) {
+  if(tab!=='comunicado')return tab;
+  const origem=comunicadoAberto()?.item.origem;
+  return ORIGENS[origem]?`comunicacao-${origem}`:'comunicacao';
+}
+function abrirComunicado(colecao,id) {
+  navigate(routeItem(hashComunicado(colecao,id)));
 }
 const AUTOMATION_STATUSES=['Produção','Produção e Melhorias','Desenvolvimento e Testes'];
 const AUTOMATION_FAMILIAS= {
@@ -122,25 +319,30 @@ function automationTagClass(familia) {
   return familia==='python'?'tag purple':familia==='web'?'tag teal':'tag';
 }
 // Development status ("is it functional?") and link availability ("is there
-// somewhere to click?") are independent — a card can be em Produção with the
-// link still Acesso em configuração. The badge color only ever reflects the
-// former; the access affordance below the card is the only thing that reads
-// the URL, so the two never get mixed into one signal.
+// somewhere to click?") are independent — a row can be em Produção with the
+// link still Em configuração. The badge color only ever reflects the former;
+// the Acesso column is the only thing that reads the URL, so the two never get
+// mixed into one signal.
 function automationStatusColor(status) {
   return /desenvolvimento|teste/i.test(status)?'yellow':'green';
 }
-function automationCard(item) {
-  const url=safeURL(item.url);
-  const access=url?`<a class="primary-btn" href="${e(url)}" target="_blank" rel="noopener noreferrer">Acessar automação ↗</a>`:'<p class="access-pending">Acesso em configuração</p>';
-  return `<article class="content-card" data-familia="${e(item.familia)}"><div class="card-meta"><span class="${automationTagClass(item.familia)}">${e(item.tipo)}</span></div><h3>${e(item.titulo)}</h3><p>${e(item.descricao)}</p><div class="card-bottom"><span class="badge ${automationStatusColor(item.statusDesenvolvimento)}">${e(item.statusDesenvolvimento)}</span><button class="text-btn" data-record="automacoes:${e(item.id)}">Ver detalhes →</button></div>${access}</article>`;
+// Ícone de apoio por tecnologia, usado quando a automação ainda não tem arte.
+const ICONE_FAMILIA= {
+  sap:'grid',python:'file',web:'globe'
+}
+;
+function automationCard(item,opcoes) {
+  const url=safeURL(item.url),arquivo=safeURL(item.arquivo);
+  return cardPortal( {
+    imagem:item.imagem,icone:ICONE_FAMILIA[item.familia]||'flow',titulo:item.titulo,descricao:item.descricao,origem:seloDe('automacoes',item,opcoes),
+    rotulo:item.tipo,statusHTML:`<span class="badge ${automationStatusColor(item.statusDesenvolvimento)}">${e(item.statusDesenvolvimento)}</span>`,
+    acao:url?acaoAcessar(url,item.titulo):arquivo?acaoBaixar(arquivo,item.titulo):ACAO_PENDENTE,
+    registro:`automacoes:${item.id}`,alvoImagem:`automacoes:${item.id}`
+  }
+  );
 }
 function activeAutomations() {
   return data.automacoes.filter(item=>item.ativo!==false);
-}
-function renderAutomationsOverview() {
-  const ativos=activeAutomations();
-  const count=familia=>ativos.filter(item=>item.familia===familia).length;
-  $('#aut-metrics').innerHTML=`<article class="kpi"><div class="kpi-top"><span>Automações catalogadas</span>${icon('flow')}</div><div class="kpi-value">${ativos.length}</div></article><article class="kpi"><div class="kpi-top"><span>SAP / VBA</span>${icon('grid')}</div><div class="kpi-value">${count('sap')}</div></article><article class="kpi"><div class="kpi-top"><span>Script Python</span>${icon('file')}</div><div class="kpi-value">${count('python')}</div></article><article class="kpi"><div class="kpi-top"><span>RPA Web</span>${icon('globe')}</div><div class="kpi-value">${count('web')}</div></article>`;
 }
 function renderAutomationsResults() {
   const words=normalize($('#aut-search').value).trim().split(/\s+/).filter(Boolean);
@@ -150,64 +352,236 @@ function renderAutomationsResults() {
     .filter(item=>words.every(word=>normalize(`${item.titulo} ${item.descricao} ${item.tipo}`).includes(word)))
     .sort((a,b)=>(a.ordem??0)-(b.ordem??0));
   $('#aut-cards').innerHTML=visible.map(automationCard).join('')||'<p class="empty-state">Nenhuma automação corresponde aos filtros selecionados.</p>';
-  $('#aut-count').innerHTML=`<strong>${visible.length}</strong> ${visible.length===1?'automação encontrada':'automações encontradas'}`;
+  $('#aut-count').textContent=`${visible.length} ${visible.length===1?'automação':'automações'}`;
 }
+// Faixa de busca e filtros das telas de conteúdo. Uma só forma em todas elas:
+// a busca primeiro, os filtros depois e "Limpar filtros" no fim. A capa não
+// tem faixa — lá a busca é a do cabeçalho.
+function barraFiltro({busca,filtros=[]}) {
+  const campos=filtros.map(filtro=>`<select id="${e(filtro.id)}" aria-label="${e(filtro.rotulo)}"><option value="">${e(filtro.todos)}</option>${filtro.opcoes.map(opcao=>`<option value="${e(opcao.valor??opcao)}">${e(opcao.rotulo??opcao)}</option>`).join('')}</select>`).join('');
+  return `<div class="filter-bar" role="search"><input type="search" id="${e(busca.id)}" aria-label="${e(busca.rotulo)}" placeholder="${e(busca.placeholder)}">${campos}<button class="secondary-btn" id="filtro-limpar" type="button">Limpar filtros</button></div>`;
+}
+function ligarBarraFiltro({busca,filtros=[],aoMudar,aoLimpar}) {
+  const campos=[$(`#${busca.id}`),...filtros.map(filtro=>$(`#${filtro.id}`))].filter(Boolean);
+  $(`#${busca.id}`).oninput=aoMudar;
+  filtros.forEach(filtro=>{const campo=$(`#${filtro.id}`);if(campo)campo.onchange=aoMudar;});
+  $('#filtro-limpar').onclick=()=> {
+    campos.forEach(campo=>{campo.value='';});
+    if(aoLimpar)aoLimpar();else aoMudar();
+    $(`#${busca.id}`)?.focus();
+  }
+  ;
+  aoMudar();
+}
+const contagem=(n,singular,plural)=>`${n} ${n===1?singular:plural}`;
+// Filtro "Origem" das telas que misturam origens. Entra antes dos demais — é o
+// recorte mais largo — e só quando a lista tem mais de uma origem: com uma só,
+// o filtro teria uma opção e nada a filtrar.
+function filtroOrigem(id,lista) {
+  const opcoes=opcoesOrigem(lista);
+  return opcoes.length>1?[{id,rotulo:'Origem',todos:'Todas as origens',opcoes}]:[];
+}
+// Lista de valores distintos de um campo, para montar um <select> de filtro.
+const valoresDe=(lista,campo)=>[...new Set(lista.map(item=>item[campo]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
 function renderContent(tab) {
   currentTab=tab;
   track('tab_view',{tab});
-  selectTab('.tabs',$(`#tab-${tab}`));
-  $('#content-view').setAttribute('aria-labelledby',`tab-${tab}`);
-  activateMenu(currentMenu.find(item=>item.tab===tab)||(CENTRAL_TABS.includes(tab)?currentMenu.find(item=>item.target==='central'):null));
-  if(tab==='newsletter') {
-    $('#content-view').innerHTML=renderNewsletter(data.newsletter);
-    wireNoticiaImages($('#content-view'));
-  }
-  if(tab==='noticias') {
-    const ativos=loadNoticias(data.noticias);
-    $('#content-view').innerHTML=`${renderNoticiasHeader(ativos)}${renderNoticiaFiltros(ativos)}<div class="filter-bar noticias-searchbar"><input type="search" id="noticia-search" aria-label="Buscar notícia" placeholder="Buscar notícia..."></div><div id="noticias-resultados"></div><div class="content-footer">Conteúdo curado pela Gerência de Contabilidade — itens sinalizados como demonstrativos são apenas ilustrativos.</div>`;
-    renderNoticiasResults();
-    $('#noticia-search').oninput=renderNoticiasResults;
-    $('#content-view').querySelectorAll('.noticia-chip').forEach(chip=>chip.onclick=()=> {
-      $('#content-view').querySelectorAll('.noticia-chip').forEach(other=>other.setAttribute('aria-selected',String(other===chip)));
-      renderNoticiasResults();
+  if(CENTRAL_TABS.includes(tab))activateMenu({target:'central',tab:abaDaComunicacao(tab)});
+  if(tab==='comunicacao'||tab.startsWith('comunicacao-'))renderListaComunicacao(tab.slice('comunicacao-'.length));
+  if(tab==='comunicado')renderPaginaComunicado();
+  if(PAGINAS_EM_DEFINICAO.includes(tab))$('#content-view').innerHTML='<p class="empty-state">Conteúdo em definição. Esta página será preenchida em breve.</p>';
+  if(tab==='atalhos-equatorial') {
+    const busca={id:'atalho-busca',rotulo:'Pesquisar atalho corporativo',placeholder:'Nome ou descrição do atalho…'};
+    $('#content-view').innerHTML=`${barraFiltro({busca})}<div class="pcard-grid" id="atalho-cards"></div><div class="content-footer"><span id="atalho-count" role="status" aria-live="polite"></span><span>Atalhos corporativos do Grupo Equatorial. Endereços em data/config.json › links.</span></div>`;
+    ligarBarraFiltro({busca,aoMudar:()=> {
+      const query=normalize($('#atalho-busca').value);
+      const visiveis=data.config.links.filter(item=>!item.target&&normalize(`${item.nome} ${item.descricao||''}`).includes(query));
+      $('#atalho-cards').innerHTML=visiveis.map(item=>linkCard(item,data.config.links.indexOf(item))).join('')||'<p class="empty-state">Nenhum atalho corresponde à busca.</p>';
+      $('#atalho-count').textContent=contagem(visiveis.length,'atalho','atalhos');
+    }
     }
     );
   }
-  if(tab==='sistemas')$('#content-view').innerHTML=`<div class="card-grid systems-grid">${data.sistemas.map(systemCard).join('')}</div><div class="content-footer">Cadastre os endereços internos para habilitar os acessos.</div>`;
+  if(tab==='portais-todos')telaTodos( {
+    prefixo:'ptd',registros:registrosPortaisTodos(),rotuloBusca:'Pesquisar em Portais e Links',
+    rodape:'Todos os portais, sistemas e links, de A a Z. As abas acima recortam por origem e por assunto.',
+    singular:'acesso',plural:'acessos'
+  }
+  );
+  if(tab==='automacoes-todos')telaTodos( {
+    prefixo:'atd',registros:registrosAutomacoesTodos(),rotuloBusca:'Pesquisar em Sistemas e automações',
+    rodape:'Todas as automações, atalhos corporativos e ferramentas externas, de A a Z.',
+    singular:'item',plural:'itens'
+  }
+  );
+  if(tab==='portais-powerbi')telaDeLinks( {
+    colecao:'portais',destino:'portais-powerbi',prefixo:'pbi',rotuloBusca:'Pesquisar painel do Power BI',
+    placeholder:'Nome, descrição ou endereço…',
+    rodape:'Painéis do Power BI. Para abrir, o relatório precisa estar compartilhado com a sua conta — a ficha do “i” diz como.',
+    vazio:'Nenhum painel corresponde à busca.',singular:'painel',plural:'painéis'
+  }
+  );
+  if(tab==='portais-equatorial')telaDeLinks( {
+    colecao:'portais',destino:'portais-equatorial',prefixo:'por',rotuloBusca:'Pesquisar portal do Grupo Equatorial',
+    placeholder:'Nome, descrição, grupo ou endereço…',
+    rodape:'Portais corporativos do Grupo. O acesso depende da sua identificação de rede — o portal só centraliza os endereços.',
+    vazio:'Nenhum portal corresponde aos filtros.',singular:'portal',plural:'portais'
+  }
+  );
+  if(tab==='portais-servicos')telaDeLinks( {
+    colecao:'portais',destino:'portais-servicos',prefixo:'psv',
+    rotuloBusca:'Pesquisar serviço do Portal de Serviços',
+    placeholder:'Nome, descrição, grupo ou endereço…',
+    rodape:'Atendimento interno do Grupo, no Portal de Serviços. Abrir chamado, acompanhar ocorrência e pedir acesso exigem a identificação de rede.',
+    vazio:'Nenhum serviço corresponde aos filtros.',singular:'serviço',plural:'serviços'
+  }
+  );
+  if(tab==='portais-gente')telaDeLinks( {
+    colecao:'portais',destino:'portais-gente',prefixo:'gen',
+    rotuloBusca:'Pesquisar em Gente e Gestão',
+    placeholder:'Nome, descrição, grupo ou endereço…',
+    rodape:'Sistemas de gente do Grupo: Conecta, aprendizagem, desempenho, benefícios e jornada. Cada um tem o seu próprio acesso — a ficha do “i” avisa quando tem pegadinha.',
+    vazio:'Nenhum acesso corresponde aos filtros.',singular:'acesso',plural:'acessos'
+  }
+  );
+  if(tab==='portais-externos')telaDeLinks( {
+    colecao:'externos',destino:'portais-externos',prefixo:'ext',rotuloBusca:'Pesquisar link externo',
+    placeholder:'Nome, descrição, grupo ou endereço…',
+    rodape:'Sites de terceiros que ajudam no dia a dia. Cada um tem cadastro e regras próprias — leia a ficha no “i” antes de enviar arquivo ou dado do Grupo.',
+    vazio:'Nenhum link corresponde aos filtros.',singular:'link','plural':'links'
+  }
+  );
+  if(tab==='automacoes-externos')telaDeLinks( {
+    colecao:'externos',destino:'automacoes-externos',prefixo:'aex',
+    rotuloBusca:'Pesquisar ferramenta externa',placeholder:'Nome, descrição, grupo ou endereço…',
+    rodape:'Ferramentas de terceiros que automatizam tarefas do dia a dia. Cada uma tem cadastro e regras próprias — leia a ficha no “i” antes de enviar arquivo do Grupo.',
+    vazio:'Nenhuma ferramenta corresponde aos filtros.',singular:'ferramenta',plural:'ferramentas'
+  }
+  );
+  if(tab==='sistemas') {
+    const filtros=[{id:'sis-responsavel',rotulo:'Equipe responsável',todos:'Todas as equipes',opcoes:valoresDe(data.sistemas,'responsavel')}];
+    const busca={id:'sis-busca',rotulo:'Pesquisar sistema da área',placeholder:'Nome, descrição ou equipe responsável…'};
+    $('#content-view').innerHTML=`${barraFiltro({busca,filtros})}<div class="pcard-grid" id="sis-cards"></div><div class="content-footer"><span id="sis-count" role="status" aria-live="polite"></span><span>Cadastre os endereços internos para habilitar os acessos.</span></div>`;
+    ligarBarraFiltro({busca,filtros,aoMudar:()=> {
+      const query=normalize($('#sis-busca').value),responsavel=$('#sis-responsavel').value;
+      const visiveis=data.sistemas.filter(item=>(!responsavel||item.responsavel===responsavel)&&normalize(`${item.nome} ${item.descricao||''} ${item.responsavel||''}`).includes(query));
+      $('#sis-cards').innerHTML=visiveis.map(systemCard).join('')||'<p class="empty-state">Nenhum sistema corresponde aos filtros.</p>';
+      $('#sis-count').textContent=contagem(visiveis.length,'sistema','sistemas');
+    }
+    }
+    );
+  }
   if(tab==='documentos') {
-    $('#content-view').innerHTML=`<div class="filter-bar"><input type="search" id="doc-search" aria-label="Pesquisar documentos" placeholder="Pesquisar documentos…"><select id="doc-filter" aria-label="Categoria de documento"><option value="">Todas as categorias</option>${data.documentos.map(i=>`<option>${e(i.categoria)}</option>`).join('')}</select></div><div id="document-results" class="card-grid"></div><div class="content-footer" id="doc-count" aria-live="polite"></div>`;
-    documentResults();
-    $('#doc-search').oninput=documentResults;
-    $('#doc-filter').onchange=documentResults;
+    // Sem filtro de grupo: o grupo é a aba. A origem só entra quando a aba
+    // aberta mistura origens — hoje, só "Todos".
+    const filtros=filtroOrigem('doc-origem',documentosDaAba());
+    const busca={id:'doc-search',rotulo:'Pesquisar documentos e normas',placeholder:'Título, descrição, grupo ou fonte…'};
+    $('#content-view').innerHTML=`${barraFiltro({busca,filtros})}<div class="pcard-grid" id="document-results"></div><div class="content-footer"><span id="doc-count" role="status" aria-live="polite"></span><span>Referências oficiais: o endereço de cada uma foi conferido na fonte — a data está na ficha do documento.</span></div>`;
+    ligarBarraFiltro({busca,filtros,aoMudar:documentResults});
   }
   if(tab==='automacoes') {
-    $('#content-view').innerHTML=`<div class="kpi-grid" id="aut-metrics"></div><div class="filter-bar automations-filter"><input type="search" id="aut-search" aria-label="Pesquisar automação" placeholder="Título, descrição, tecnologia ou transação SAP…"><select id="aut-type" aria-label="Tecnologia"><option value="">Todas as tecnologias</option>${Object.entries(AUTOMATION_FAMILIAS).map(([value,label])=>`<option value="${e(value)}">${e(label)}</option>`).join('')}</select><select id="aut-status" aria-label="Status de desenvolvimento"><option value="">Todos os status</option>${AUTOMATION_STATUSES.map(s=>`<option>${e(s)}</option>`).join('')}</select><button class="secondary-btn" id="aut-clear" type="button">Limpar filtros</button></div><div class="content-footer"><span id="aut-count" role="status" aria-live="polite"></span><span>As soluções estão funcionais conforme o status informado; os acessos pelo portal podem estar em configuração.</span></div><div class="card-grid automations-grid" id="aut-cards"></div>`;
-    renderAutomationsOverview();
-    renderAutomationsResults();
-    $('#aut-search').oninput=renderAutomationsResults;
-    $('#aut-type').onchange=renderAutomationsResults;
-    $('#aut-status').onchange=renderAutomationsResults;
-    $('#aut-clear').onclick=()=> {
-      $('#aut-search').value='';
-      $('#aut-type').value='';
-      $('#aut-status').value='';
-      renderAutomationsResults();
-      $('#aut-search').focus();
-    }
-    ;
+    const filtros=[
+      {id:'aut-type',rotulo:'Tecnologia',todos:'Todas as tecnologias',opcoes:Object.entries(AUTOMATION_FAMILIAS).map(([valor,rotulo])=>({valor,rotulo}))},
+      {id:'aut-status',rotulo:'Status de desenvolvimento',todos:'Todos os status',opcoes:AUTOMATION_STATUSES}
+    ];
+    const busca={id:'aut-search',rotulo:'Pesquisar automação',placeholder:'Título, descrição, tecnologia ou transação SAP…'};
+    $('#content-view').innerHTML=`${barraFiltro({busca,filtros})}<div class="pcard-grid" id="aut-cards"></div><div class="content-footer"><span id="aut-count" role="status" aria-live="polite"></span><span>As soluções estão funcionais conforme o status informado; os acessos pelo portal podem estar em configuração.</span></div>`;
+    ligarBarraFiltro({busca,filtros,aoMudar:renderAutomationsResults});
   }
-  const pause=$('#pause-radar');
-  if(pause)pause.onclick=()=> {
-    const paused=pause.closest('.radar').classList.toggle('paused');
-    pause.setAttribute('aria-pressed',String(paused));
-    pause.setAttribute('aria-label',paused?'Retomar radar':'Pausar radar');
-    pause.textContent=paused?'▶':'Ⅱ';
-  }
-  ;
 }
 function activateMenu(item) {
-  const index=currentMenu.indexOf(item);
-  document.querySelectorAll('#navigation .nav-link').forEach(link=>link.classList.toggle('active',Number(link.dataset.menuIndex)===index));
+  if(!item)return;
+  markCurrentSection(dest=>Boolean(dest)&&dest.target===item.target&&(!item.tab||!dest.tab||dest.tab===item.tab));
+}
+// Faixa de subpáginas no padrão do CFC. Vale para **qualquer** seção do menu:
+// como o menu não abre mais submenu suspenso, é aqui que as demais páginas da
+// seção aparecem, em abas. Fica escondida quando a seção tem uma página só ou
+// quando ela é uma janela dedicada que já traz as próprias abas (Administração).
+const paginasDe=s=>s.paginas||s.itens||[];
+const mesmaPagina=(a,b)=>Boolean(a&&b)&&a.target===b.target&&(a.tab||'')===(b.tab||'')&&(a.grupo??'')===(b.grupo??'')&&(a.adminTab||'')===(b.adminTab||'');
+let subnavTargets=[];
+function renderSubnav(item) {
+  // Na página de um comunicado, a faixa é a da Comunicação, com a aba da origem
+  // dele marcada.
+  if(item.tab==='comunicado')item={...item,tab:abaDaComunicacao('comunicado')};
+  const section=navSections.find(s=>paginasDe(s).some(child=>child.target===item.target&&(child.tab||'')===(item.tab||'')));
+  const paginas=section?paginasDe(section):[];
+  const atual=paginas.find(child=>mesmaPagina(child,item));
+  const titulo=section?.label||'Portal';
+  $('#page-title').textContent=titulo;
+  // O nome da seção fica à esquerda das abas: em tela estreita o menu some e
+  // era o único lugar que dizia onde se está.
+  $('#page-section').textContent=titulo;
+  $('.pg-subnav').setAttribute('aria-label',`Páginas de ${titulo}`);
+  const janelaUnica=paginas.length>1&&paginas.every(pagina=>pagina.view&&pagina.view===paginas[0].view);
+  subnavTargets=paginas;
+  // As abas de origem da Comunicação levam a cor da origem (ver .pg-line).
+  const origemDaAba=child=>child.target==='central'&&child.tab?.startsWith('comunicacao-')?` data-origem="${e(child.tab.slice('comunicacao-'.length))}"`:'';
+  $('#page-subnav').innerHTML=paginas.map((child,i)=>`<li><a href="${e(routeHash(child))}" data-subnav="${i}"${origemDaAba(child)}${child===atual?' aria-current="page"':''}>${e(child.label)}</a></li>`).join('');
+  $('.pg-subnav').hidden=paginas.length<2||janelaUnica;
+  if($('.pg-subnav').hidden)return;
+  requestAnimationFrame(()=> {
+    const faixa=$('.pg-abas'),ativo=faixa.querySelector('[aria-current]');
+    if(ativo&&(ativo.offsetLeft<faixa.scrollLeft||ativo.offsetLeft+ativo.offsetWidth>faixa.scrollLeft+faixa.clientWidth))faixa.scrollLeft=Math.max(0,ativo.offsetLeft-24);
+    moverLinha(ativo);
+  }
+  );
+}
+// Linha deslizante da faixa de subpáginas (efeito do CFC): fica sobre a página
+// atual e acompanha o item sob o mouse ou o foco do teclado.
+function moverLinha(alvo) {
+  const linha=$('.pg-line');
+  if(!linha)return;
+  if(!alvo) {
+    linha.style.opacity='0';
+    return;
+  }
+  // A linha está dentro da faixa rolável e rola junto com ela.
+  if(alvo.dataset.origem)linha.dataset.origem=alvo.dataset.origem;
+  else delete linha.dataset.origem;
+  linha.style.opacity='1';
+  linha.style.width=`${alvo.offsetWidth}px`;
+  linha.style.transform=`translateX(${alvo.offsetLeft}px)`;
+}
+function ligarLinha() {
+  const faixa=$('.pg-abas'),atual=()=>faixa.querySelector('[aria-current]');
+  faixa.addEventListener('mouseover',event=>{const a=event.target.closest('a');if(a)moverLinha(a);});
+  faixa.addEventListener('focusin',event=>{const a=event.target.closest('a');if(a)moverLinha(a);});
+  faixa.addEventListener('mouseleave',()=>moverLinha(atual()));
+  faixa.addEventListener('focusout',event=>{if(!faixa.contains(event.relatedTarget))moverLinha(atual());});
+  window.addEventListener('resize',()=>moverLinha(atual()));
+}
+// Rotas: #inicio, #<target>, #central/<aba>, #administracao/<aba> e a página de
+// um comunicado, #central/comunicado/<coleção>/<id>.
+function routeItem(hash) {
+  const [target,sub,colecao,id]=String(hash||'').replace(/^#/,'').split('/');
+  if(target==='inicio'||!target)return {target:'inicio'};
+  // Página de resultados da busca: #busca/<termo> (não está no menu).
+  if(target==='busca') {
+    let consulta='';
+    try {
+      consulta=decodeURIComponent(sub||'');
+    }
+    catch {
+      consulta=sub||'';
+    }
+    return {target:'busca',consulta};
+  }
+  const base=currentMenu.find(item=>item.target===target);
+  if(!base)return null;
+  if(target==='central'&&sub==='comunicado'&&colecao&&id)return {...base,tab:'comunicado',comunicado:{colecao,id:decodeURIComponent(id)}};
+  // Endereços de antes da Comunicação unificada (21/09/2026).
+  if(target==='central'&&(sub==='newsletter'||sub==='noticias'))return {...base,tab:'comunicacao'};
+  if(sub&&target==='central'&&CENTRAL_TABS.includes(sub))return {...base,tab:sub};
+  if(sub&&target==='administracao')return {...base,adminTab:sub};
+  return base;
+}
+function routeHash(item) {
+  if(item.target==='busca')return `#busca/${encodeURIComponent(item.consulta||'')}`;
+  if(item.target==='central'&&item.tab==='comunicado'&&item.comunicado)return hashComunicado(item.comunicado.colecao,item.comunicado.id);
+  if(item.target==='central'&&item.tab)return `#central/${item.tab}`;
+  if(item.target==='administracao'&&item.adminTab)return `#administracao/${item.adminTab}`;
+  return `#${item.target}`;
 }
 // A menu item with a `view` opens as its own dedicated screen (#home-view
 // hidden entirely) instead of scrolling to a panel inside it — Estrutura das
@@ -215,8 +589,37 @@ function activateMenu(item) {
 // in with Central de Conteúdo or the rest of the home page.
 function navigate(item,updateHistory=true) {
   if(!item)return;
+  if(item.target==='inicio') {
+    $('#home-view').hidden=false;
+    $('#page-view').hidden=true;
+    $('.pg-subnav').hidden=true;
+    $('#equipes').hidden=true;
+    $('#administracao').hidden=true;
+    activateMenu(item);
+    document.title=TITULO_PADRAO;
+    if(updateHistory)history.pushState(null,'','#inicio');
+    window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+    $('#main').focus({preventScroll:true});
+    return;
+  }
+  if(item.target==='busca') {
+    $('#home-view').hidden=true;
+    $('#page-view').hidden=false;
+    $('.pg-subnav').hidden=true;
+    $('#equipes').hidden=true;
+    $('#administracao').hidden=true;
+    activateMenu(item);
+    $('#page-title').textContent='Busca no portal';
+    if(updateHistory)history.pushState(null,'',routeHash(item));
+    renderResultadosBusca(item.consulta||'');
+    window.scrollTo({top:0,behavior:'auto'});
+    return;
+  }
+  if(item.adminTab&&item.adminTab!==currentAdminTab)currentAdminTab=item.adminTab;
   const dedicatedView=item.view;
-  $('#home-view').hidden=Boolean(dedicatedView);
+  const pagina=!dedicatedView&&Boolean(item.tab);
+  $('#home-view').hidden=Boolean(dedicatedView)||pagina;
+  $('#page-view').hidden=!pagina;
   $('#equipes').hidden=dedicatedView!=='equipes';
   $('#administracao').hidden=dedicatedView!=='administracao';
   activateMenu(item);
@@ -228,9 +631,23 @@ function navigate(item,updateHistory=true) {
     renderAdmin();
     track('admin_view');
   }
-  else if(item.tab)renderContent(item.tab);
-  if(updateHistory)history.pushState(null,'',`#${item.target}`);
+  else if(item.tab) {
+    if(item.tab==='documentos')docGrupo=item.grupo??'';
+    if(item.tab==='comunicado')comunicadoAtual=item.comunicado||null;
+    renderContent(item.tab);
+  }
+  else activateMenu(item);
+  renderSubnav(item);
+  // A página de um comunicado leva o título dele na aba do navegador.
+  const aberto=item.tab==='comunicado'?comunicadoAberto():null;
+  document.title=aberto?`${aberto.item.titulo} | Portal Contabilidade`:TITULO_PADRAO;
+  if(updateHistory)history.pushState(null,'',routeHash(item));
   requestAnimationFrame(()=> {
+    if(pagina) {
+      window.scrollTo({top:0,behavior:'auto'});
+      $('#main').focus({preventScroll:true});
+      return;
+    }
     const target=dedicatedView?$(`#${dedicatedView}`):$(`#${item.target}`);
     target?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
     $('#main').focus({preventScroll:true});
@@ -246,32 +663,136 @@ function teamMemberId(areaId,name,index) {
   return `colaborador-${slug||`${areaId}-${index+1}`}`;
 }
 // Editorial dates (competência, atualização da base) follow the local
-// dataset, independent of the device clock. The top page-context date is the
-// one exception: it always shows today, read straight from the device clock.
+// dataset, independent of the device clock.
 function renderPeriod() {
   const config = data.config;
   const reference = new Date(config.dataReferencia + 'T12:00:00');
   const period = new Date(config.competencia + '-01T12:00:00');
   const month = period.toLocaleDateString('pt-BR', {month: 'long'});
-  $('.context-date').textContent = new Date().toLocaleDateString('pt-BR', {day:'numeric', month:'long', year:'numeric'});
-  $('.edition').textContent = `${month.toUpperCase()} / ${period.getFullYear()}`;
-  $('.period').innerHTML = `<span class="live-dot"></span> Competência: ${e(month)} ${period.getFullYear()}`;
-  $('#entregas .section-kicker').textContent = config.semanaLabel;
-  $('.footer span:last-child').textContent = `${config.demonstracao ? 'Dados ilustrativos' : 'Base local'} · Atualização da base: ${reference.toLocaleDateString('pt-BR')}`;
+  $('.period').textContent = `Competência: ${month} de ${period.getFullYear()}`;
+  $('#pf-updated').textContent = `Atualização da base: ${reference.toLocaleDateString('pt-BR')}`;
 }
 
+// Capa: vigência de destaques e avisos pela data do dispositivo (AAAA-MM-DD).
+const hoje=()=>new Date().toLocaleDateString('sv-SE');
+const vigente=item=>(!item.inicio||item.inicio<=hoje())&&(!item.fim||hoje()<=item.fim);
+const AVISO_TIPOS= {
+  extra:'Extra',prazo:'Prazo',info:'Info'
+}
+;
+// Clique num slide. O próprio link do slide leva ao destino (rota interna ou
+// outra aba); aqui fica o registro de uso e o destino sem endereço — um
+// sistema com o link ainda a cadastrar abre o aviso de configuração.
+function openDestaque(slide) {
+  track('destaque_open',{destaque:slide.titulo});
+  if(!slide.href&&slide.alvo?.tipo==='sistema')openAccess(data.sistemas.find(s=>s.id===slide.alvo.ref));
+}
+function openAviso(id) {
+  const aviso=data.avisos.find(a=>a.id===id);
+  if(!aviso)return;
+  track('aviso_open',{aviso:aviso.titulo});
+  showDialog(aviso.titulo,`Aviso · ${AVISO_TIPOS[aviso.tipo]||'Info'}`,`<p>${e(aviso.texto)}</p>${detailGrid({'Quando':aviso.janela||'—','Área responsável':aviso.area||'—','Origem':ORIGENS[aviso.origem]})}`);
+}
+// ===== Agenda na capa =====
+// Compromisso de data/agenda.json marcado `naCapa` entra em Avisos como uma
+// linha de calendário (pedido do usuário em 21/09/2026): o dia, o horário e,
+// quando o convite traz, o link para entrar na reunião (quem organiza não
+// entra — pedido do usuário). Sai
+// sozinho quando termina. Horário de Brasília (UTC−3, sem horário de verão).
+const FUSO_BRASILIA='-03:00';
+const momento=(dia,hora)=>new Date(`${dia}T${hora||'00:00'}:00${FUSO_BRASILIA}`);
+const fimCompromisso=a=>momento(a.data,a.fim||'23:59');
+function compromissosNaCapa() {
+  const agora=new Date();
+  return (data.agenda||[]).filter(a=>a.naCapa&&a.data&&fimCompromisso(a)>=agora)
+    .sort((a,b)=>momento(a.data,a.inicio)-momento(b.data,b.inicio)).slice(0,2);
+}
+const diaDaSemana=dia=>new Date(`${dia}T12:00:00`).toLocaleDateString('pt-BR',{weekday:'long'});
+const horarioCompromisso=a=>a.inicio?`${a.inicio}${a.fim?` às ${a.fim}`:''}`:a.horario||'';
+function linhaCompromisso(a) {
+  const mes=new Date(`${a.data}T12:00:00`).toLocaleDateString('pt-BR',{month:'short'}).replace('.','');
+  const link=safeURL(a.link);
+  const detalhe=[`${diaDaSemana(a.data).split('-')[0]}, ${dateLabel(a.data)}`,horarioCompromisso(a)].filter(Boolean).map(e).join(' · ');
+  return `<li class="aviso-agenda"><span class="aviso-data" aria-hidden="true"><strong>${e(a.data.slice(-2))}</strong>${e(mes)}</span><button type="button" class="aviso-title" data-compromisso="${e(a.id)}">${e(a.nome)}</button><small>${detalhe}</small>${link?`<a class="aviso-entrar" href="${e(link)}" target="_blank" rel="noopener noreferrer" data-reuniao="${e(a.nome)}">${icon('video')}Entrar na reunião</a>`:''}</li>`;
+}
+// Arquivo .ics montado aqui mesmo, só com o que o portal mostra (sem a lista
+// de convidados do convite original): quem não recebeu o convite salva o
+// compromisso no Outlook.
+function icsCompromisso(a) {
+  const utc=d=>d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
+  const texto=t=>String(t||'').replace(/\\/g,'\\\\').replace(/[,;]/g,m=>`\\${m}`).replace(/\n/g,'\\n');
+  const link=safeURL(a.link);
+  return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Portal da Gerência de Contabilidade//PT-BR','METHOD:PUBLISH','BEGIN:VEVENT',
+    `UID:${a.id}@portal-contabilidade`,`DTSTAMP:${utc(new Date())}`,
+    `DTSTART:${utc(momento(a.data,a.inicio||'00:00'))}`,`DTEND:${utc(fimCompromisso(a))}`,
+    `SUMMARY:${texto(a.nome)}`,`DESCRIPTION:${texto([a.descricao,link&&`Reunião on-line: ${link}`].filter(Boolean).join('\n'))}`,
+    ...(a.local||link?[`LOCATION:${texto(a.local||link)}`]:[]),'END:VEVENT','END:VCALENDAR']
+    // RFC 5545: linha longa se dobra em pedaços, cada continuação começando
+    // com um espaço (60 caracteres deixa folga para os acentos em UTF-8).
+    .map(linha=>linha.match(/.{1,60}/g).join('\r\n ')).join('\r\n');
+}
+function openCompromisso(id) {
+  const a=(data.agenda||[]).find(item=>item.id===id);
+  if(!a)return;
+  track('compromisso_open',{compromisso:a.nome});
+  const link=safeURL(a.link);
+  const arquivo=URL.createObjectURL(new Blob([icsCompromisso(a)],{type:'text/calendar;charset=utf-8'}));
+  const nomeArquivo=`${a.id}.ics`;
+  showDialog(a.nome,'Agenda da gerência',`<p>${e(a.descricao||'')}</p>${detailGrid({'Data':`${diaDaSemana(a.data)}, ${dateLabel(a.data)}`,'Horário':`${horarioCompromisso(a)} (horário de Brasília)`,'Local':a.local||'Não informado no convite','Reunião on-line':link?'Link no botão abaixo':'O convite não traz link de reunião','Fonte':a.fonte||'—'})}<div class="doc-actions">${link?`<a class="primary-btn" href="${e(link)}" target="_blank" rel="noopener noreferrer" data-reuniao="${e(a.nome)}">${icon('video')}Entrar na reunião</a> `:''}<a class="${link?'secondary-btn':'primary-btn'}" href="${arquivo}" download="${e(nomeArquivo)}">${icon('calendar')}Salvar no calendário</a></div>`);
+  $('#detail-dialog').addEventListener('close',()=>URL.revokeObjectURL(arquivo),{once:true});
+}
+function renderHome() {
+  renderCarrossel();
+  const ordemTipo= {
+    extra:0,prazo:1,info:2
+  }
+  ;
+  const avisos=(data.avisos||[]).filter(vigente).sort((a,b)=>(ordemTipo[a.tipo]??3)-(ordemTipo[b.tipo]??3)).slice(0,3);
+  const compromissos=compromissosNaCapa();
+  $('#avisos-list').innerHTML=compromissos.map(linhaCompromisso).join('')+avisos.map(a=>`<li><span class="aviso-tag ${e(a.tipo)}">${e(AVISO_TIPOS[a.tipo]||'Info')}</span><button type="button" class="aviso-title" data-aviso="${e(a.id)}">${e(a.titulo)}</button><small>${[a.janela,a.area].filter(Boolean).map(e).join(' · ')}</small></li>`).join('')||'<li class="empty-state">Nenhum aviso vigente.</li>';
+  const vistos=new Set();
+  const atalhos=[...data.config.links.filter(l=>!l.target).map(l=>({nome:l.nome,icon:l.icon,url:safeURL(l.link)})),...data.sistemas.filter(s=>s.status==='Ativo').map(s=>({nome:s.nome.split(' — ')[0],icon:s.icon||'grid',url:safeURL(s.link)}))]
+    .filter(a=>a.url&&!vistos.has(a.nome)&&vistos.add(a.nome)).slice(0,8);
+  $('#acesso-list').innerHTML=atalhos.map(a=>`<li><a href="${e(a.url)}" target="_blank" rel="noopener noreferrer" data-quick="${e(a.nome)}">${icon(a.icon||'link')}<span>${e(a.nome)}</span>${icon('external').replace('class="icon"','class="icon ext"')}</a></li>`).join('');
+  renderColunasComunicacao();
+}
+// Carrossel da capa: os destaques no ar, na ordem, cada um resolvido com o
+// que herda do destino (js/destaques.js).
+function renderCarrossel() {
+  initCarousel($('#destaques'),destaquesNoAr(data),openDestaque);
+}
+// Capa: uma coluna de comunicados por origem (Contabilidade, Equatorial,
+// Externo), no formato de portal de notícias. Pedido do usuário em 21/09/2026.
+function renderColunasComunicacao() {
+  $('#news-list').innerHTML=colunasOrigem(comunicados(data));
+  ligarMidias($('#news-list'));
+}
+// Rodapé: mapa do portal com as mesmas seções do menu (já filtradas pelo
+// perfil) e a área responsável pela gerência.
+let mapTargets=[];
+function renderPortalMap(sections) {
+  mapTargets=[];
+  const link=item=>`<li><a href="${e(routeHash(item))}" data-map="${mapTargets.push(item)-1}">${e(item.label)}</a></li>`;
+  $('#portal-map').innerHTML=sections.filter(section=>!section.target||section.paginas).map(section=>{
+    const itens=section.paginas||section.itens||[];
+    return `<div class="pf-col${itens.length>6?' wide':''}"><h2>${icon(section.icon)}<span>${e(section.label)}</span></h2><ul>${itens.map(link).join('')}</ul></div>`;
+  }).join('');
+  const gerencia=data.equipes.find(team=>team.tipo==='gerencia');
+  if(gerencia)$('#pf-area').textContent=gerencia.nome;
+}
+// Painel da gerência. Os dados ilustrativos saíram em 21/09/2026: cada bloco
+// sem registro mostra que ainda não há nada cadastrado, em vez de sumir.
 function renderDashboard() {
   const config=data.config;
-  $('#hero-metrics').innerHTML=config.resumo.map(m=>`<div class="hero-metric"><strong>${e(m.valor)}</strong><small>${e(m.label)}</small></div>`).join('');
-  $('#kpis').innerHTML=config.kpis.map(k=>`<article class="kpi"><div class="kpi-top"><span>${e(k.nome)}</span>${icon(k.icon)}</div><div class="kpi-value">${e(k.valor)}${badge(k.status)}</div><div class="progress ${e(k.cor)}" role="progressbar" aria-label="${e(k.metrica)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Number(k.progresso)}"><span style="width:${Math.max(0,Math.min(100,Number(k.progresso)))}%"></span></div><p class="kpi-foot">${e(k.metrica)}</p></article>`).join('');
-  $('#process-table').innerHTML=data.processos.map(p=>`<tr><td><button class="text-btn" data-record="processos:${e(p.id)}">${e(p.nome)}</button></td><td>${e(p.responsavel)}</td><td>${e(p.prazo)}</td><td>${badge(p.status)}</td></tr>`).join('');
-  $('#agenda-list').innerHTML=data.agenda.slice().sort((a,b)=>a.data.localeCompare(b.data)).map(a=>`<button class="agenda-event" data-record="agenda:${e(a.id)}"><span class="event-date">${e(a.data.slice(-2))}<small>${e(new Date(a.data+'T12:00:00').toLocaleDateString('pt-BR',{month:'short'}).replace('.','').toUpperCase())}</small></span><span class="event-copy"><strong>${e(a.nome)}</strong><small>${e(a.horario)}· ${e(a.responsavel)}</small></span></button>`).join('');
-  $('#deliveries').innerHTML=data.entregas.map(d=>`<button class="delivery" data-record="entregas:${e(d.id)}"><strong>${e(d.nome)}</strong><small>${e(d.responsavel)}</small><span class="delivery-bottom"><span>${e(dateLabel(d.prazo))}</span>${badge(d.status)}</span></button>`).join('');
+  $('#kpis').innerHTML=(config.kpis||[]).map(k=>`<article class="kpi"><div class="kpi-top"><span>${e(k.nome)}</span>${icon(k.icon)}</div><div class="kpi-value">${e(k.valor)}${badge(k.status)}</div><div class="progress ${e(k.cor)}" role="progressbar" aria-label="${e(k.metrica)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Number(k.progresso)}"><span style="width:${Math.max(0,Math.min(100,Number(k.progresso)))}%"></span></div><p class="kpi-foot">${e(k.metrica)}</p></article>`).join('')||'<p class="empty-state">Nenhum indicador cadastrado ainda.</p>';
+  $('#process-table').innerHTML=data.processos.map(p=>`<tr><td><button class="text-btn" data-record="processos:${e(p.id)}">${e(p.nome)}</button></td><td>${e(p.responsavel)}</td><td>${e(p.prazo)}</td><td>${badge(p.status)}</td></tr>`).join('')||'<tr><td colspan="4" class="empty-state">Nenhum processo cadastrado ainda.</td></tr>';
+  $('#agenda-list').innerHTML=data.agenda.slice().sort((a,b)=>a.data.localeCompare(b.data)).map(a=>`<button class="agenda-event" data-record="agenda:${e(a.id)}"><span class="event-date">${e(a.data.slice(-2))}<small>${e(new Date(a.data+'T12:00:00').toLocaleDateString('pt-BR',{month:'short'}).replace('.','').toUpperCase())}</small></span><span class="event-copy"><strong>${e(a.nome)}</strong><small>${e(a.horario)}· ${e(a.responsavel)}</small></span></button>`).join('')||'<p class="empty-state">Nenhum compromisso cadastrado ainda.</p>';
+  $('#deliveries').innerHTML=data.entregas.map(d=>`<button class="delivery" data-record="entregas:${e(d.id)}"><strong>${e(d.nome)}</strong><small>${e(d.responsavel)}</small><span class="delivery-bottom"><span>${e(dateLabel(d.prazo))}</span>${badge(d.status)}</span></button>`).join('')||'<p class="empty-state">Nenhuma entrega cadastrada ainda.</p>';
 }
 function editorialActions(collection,item) {
-  if(item.status==='Rascunho')return `<button class="text-btn" data-editorial="${e(collection)}:${e(item.id)}:revisao">Enviar para revisão →</button>`;
-  if(item.status==='Em revisão')return `<button class="text-btn" data-editorial="${e(collection)}:${e(item.id)}:publicar">Aprovar e publicar ✓</button><button class="text-btn" data-editorial="${e(collection)}:${e(item.id)}:recusar">Recusar ✕</button>`;
-  if(item.status==='Recusado')return `<button class="text-btn" data-editorial="${e(collection)}:${e(item.id)}:reabrir">Reabrir como rascunho ↺</button>`;
+  if(item.status==='Rascunho')return `<button class="text-btn" data-editorial="${e(collection)}:${e(item.id)}:revisao">Enviar para revisão</button>`;
+  if(item.status==='Em revisão')return `<button class="text-btn" data-editorial="${e(collection)}:${e(item.id)}:publicar">Aprovar e publicar</button><button class="text-btn" data-editorial="${e(collection)}:${e(item.id)}:recusar">Recusar</button>`;
+  if(item.status==='Recusado')return `<button class="text-btn" data-editorial="${e(collection)}:${e(item.id)}:reabrir">Reabrir como rascunho</button>`;
   return '';
 }
 function editorialFooter(item) {
@@ -335,7 +856,9 @@ async function handleEditorialAction(collection,id,action) {
       }
     }
     renderEditorial();
-    if(currentTab===collection)renderContent(collection);
+    // Publicar, recusar ou reabrir muda a Comunicação e as colunas da capa.
+    if(/^comunica/.test(currentTab)&&!$('#page-view').hidden)renderContent(currentTab);
+    renderColunasComunicacao();
     notify('Conteúdo editorial atualizado.');
   }
   catch(error) {
@@ -348,8 +871,9 @@ function openNewDraft() {
     return;
   }
   const categorias=data.config.newsletterCategorias||[];
-  showDialog('Novo rascunho','PAINEL EDITORIAL',`<form id="draft-form">
+  showDialog('Novo rascunho','Painel editorial',`<form id="draft-form">
     <label class="field">Tipo<select id="draft-tipo"><option value="newsletter">Newsletter Contábil</option><option value="noticias">Notícias &amp; Impactos</option></select></label>
+    <label class="field">Origem — quem escreveu o conteúdo<select id="draft-origem">${Object.entries(ORIGENS).map(([valor,rotulo])=>`<option value="${valor}">${rotulo}</option>`).join('')}</select></label>
     <label class="field">Categoria<input id="draft-categoria" list="draft-categorias" required></label>
     <datalist id="draft-categorias">${categorias.map(c=>`<option value="${e(c)}">`).join('')}</datalist>
     <label class="field">Título<input id="draft-titulo" required></label>
@@ -357,7 +881,7 @@ function openNewDraft() {
     <label class="field">Conteúdo completo<textarea id="draft-conteudo" required></textarea></label>
     <label class="field">Nível de impacto<select id="draft-impacto"><option>Baixo</option><option selected>Moderado</option><option>Alto</option></select></label>
     <label class="field">Área responsável<input id="draft-area" value="${e(currentUser.area||'')}"></label>
-    <label class="field">Empresas impactadas (separadas por vírgula)<input id="draft-empresas" placeholder="Empresa A (exemplo), Empresa B (exemplo)"></label>
+    <label class="field">Empresas impactadas (separadas por vírgula)<input id="draft-empresas" placeholder="Ex.: Equatorial Pará, Equatorial Maranhão"></label>
     <button class="primary-btn" type="submit">Salvar rascunho</button>
   </form>`);
   $('#draft-form').onsubmit=async event=> {
@@ -365,6 +889,7 @@ function openNewDraft() {
     const tipo=$('#draft-tipo').value;
     const body= {
       id:`redacao-${Date.now()}`,
+      origem:$('#draft-origem').value,
       categoria:$('#draft-categoria').value.trim(),
       titulo:$('#draft-titulo').value.trim(),
       resumo:$('#draft-resumo').value.trim(),
@@ -414,7 +939,7 @@ async function fileAsDataURL(file) {
   });
 }
 function renderResponsaveisEditor() {
-  $('#admin-responsaveis').innerHTML=adminEditState.responsaveis.map((p,i)=>`<fieldset class="admin-person-row" data-index="${i}"><legend>Colaborador ${i+1}</legend><img class="avatar" src="${e(safeURL(p.foto)||p.foto||'assets/users/default.svg')}" alt=""><label class="field">Nome completo<input type="text" class="admin-person-nome" value="${e(p.nome||'')}" required></label><label class="field">Cargo<input type="text" class="admin-person-cargo" value="${e(p.cargo||'')}" placeholder="Opcional"></label><label class="field">Foto ou caminho<input type="text" class="admin-person-foto-path" value="${e(p.foto||'')}" placeholder="assets/users/foto.png"></label><label class="admin-leader-choice"><input type="radio" name="admin-lider" value="${i}" ${p.id===adminEditState.liderId?'checked':''}> Liderança da equipe</label><label class="admin-file-label">Selecionar foto<input type="file" class="admin-person-foto" accept="image/*"></label><button type="button" class="danger-btn admin-remove-person" data-index="${i}">Excluir colaborador</button></fieldset>`).join('')||'<p class="empty-state compact">Nenhum colaborador cadastrado nesta equipe.</p>';
+  $('#admin-responsaveis').innerHTML=adminEditState.responsaveis.map((p,i)=>`<fieldset class="admin-person-row" data-index="${i}"><legend>Colaborador ${i+1}</legend><img class="avatar" src="${e(comVersao(safeURL(p.foto)||p.foto||'assets/users/default.svg'))}" alt=""><label class="field">Nome completo<input type="text" class="admin-person-nome" value="${e(p.nome||'')}" required></label><label class="field">Cargo<input type="text" class="admin-person-cargo" value="${e(p.cargo||'')}" placeholder="Opcional"></label><label class="field">Foto ou caminho<input type="text" class="admin-person-foto-path" value="${e(p.foto||'')}" placeholder="assets/users/foto.png"></label><label class="admin-leader-choice"><input type="radio" name="admin-lider" value="${i}" ${p.id===adminEditState.liderId?'checked':''}> Liderança da equipe</label><label class="admin-file-label">Selecionar foto<input type="file" class="admin-person-foto" accept="image/*"></label><button type="button" class="danger-btn admin-remove-person" data-index="${i}">Excluir colaborador</button></fieldset>`).join('')||'<p class="empty-state compact">Nenhum colaborador cadastrado nesta equipe.</p>';
   $('#admin-responsaveis').querySelectorAll('.admin-remove-person').forEach(btn=>btn.onclick=()=> {
     adminEditState.responsaveis.splice(Number(btn.dataset.index),1);
     renderResponsaveisEditor();
@@ -443,7 +968,7 @@ function openCreateTeam() {
   openTeamForm({id,nome:'',sigla:'',descricao:'',responsabilidades:[],empresas:[],dadosAreaValidados:false,tipo:'executiva'});
 }
 function openTeamForm(team) {
-  showDialog(adminEditState.isNew?'Nova equipe':team.nome,'ADMINISTRAÇÃO DE EQUIPES',`<form id="admin-team-form"><div class="admin-form-grid"><label class="field">Nome da equipe<input id="admin-nome" value="${e(team.nome||'')}" required></label><label class="field">Sigla<input id="admin-sigla" value="${e(team.sigla||'')}" maxlength="12"></label></div><label class="field">Descrição da área<input id="admin-descricao" value="${e(team.descricao||'')}"></label><label class="field">Responsabilidades (uma por linha)<textarea id="admin-responsabilidades">${e((team.responsabilidades||[]).join('\n'))}</textarea></label><label class="field">Empresas atendidas (uma por linha)<textarea id="admin-empresas">${e((team.empresas||[]).join('\n'))}</textarea></label><label class="admin-validated"><input type="checkbox" id="admin-validado" ${team.dadosAreaValidados?'checked':''}> Informações da área validadas para exibição</label><div class="admin-subheading"><div><h3>Colaboradores</h3><p>Cadastre os integrantes e marque quem lidera a equipe.</p></div><button type="button" class="secondary-btn" id="admin-add-person">Adicionar colaborador +</button></div><div id="admin-responsaveis"></div><div class="admin-form-actions"><button class="primary-btn" type="submit">${adminEditState.isNew?'Criar equipe':'Salvar alterações'}</button>${!adminEditState.isNew&&team.id!=='gerencia'?'<button class="danger-btn" type="button" id="admin-delete-team">Excluir equipe</button>':''}</div></form>`);
+  showDialog(adminEditState.isNew?'Nova equipe':team.nome,'Administração de equipes',`<form id="admin-team-form"><div class="admin-form-grid"><label class="field">Nome da equipe<input id="admin-nome" value="${e(team.nome||'')}" required></label><label class="field">Sigla<input id="admin-sigla" value="${e(team.sigla||'')}" maxlength="12"></label></div><label class="field">Descrição da área<input id="admin-descricao" value="${e(team.descricao||'')}"></label><label class="field">Responsabilidades (uma por linha)<textarea id="admin-responsabilidades">${e((team.responsabilidades||[]).join('\n'))}</textarea></label><label class="field">Empresas atendidas (uma por linha)<textarea id="admin-empresas">${e((team.empresas||[]).join('\n'))}</textarea></label><label class="admin-validated"><input type="checkbox" id="admin-validado" ${team.dadosAreaValidados?'checked':''}> Informações da área validadas para exibição</label><div class="admin-subheading"><div><h3>Colaboradores</h3><p>Cadastre os integrantes e marque quem lidera a equipe.</p></div><button type="button" class="secondary-btn" id="admin-add-person">Adicionar colaborador +</button></div><div id="admin-responsaveis"></div><div class="admin-form-actions"><button class="primary-btn" type="submit">${adminEditState.isNew?'Criar equipe':'Salvar alterações'}</button>${!adminEditState.isNew&&team.id!=='gerencia'?'<button class="danger-btn" type="button" id="admin-delete-team">Excluir equipe</button>':''}</div></form>`);
   renderResponsaveisEditor();
   $('#admin-add-person').onclick=()=> {
     const personId=newId(`colaborador-${adminEditState.teamId}`);
@@ -560,7 +1085,7 @@ function refreshAutomationsUI(message) {
   if(message)notify(message);
 }
 function openAutomationForm(item) {
-  showDialog(automationEditState.isNew?'Nova automação':item.titulo,'ADMINISTRAÇÃO DE AUTOMAÇÕES',`<form id="admin-automation-form"><div class="admin-form-grid"><label class="field">Título<input id="admin-aut-titulo" value="${e(item.titulo||'')}" required></label><label class="field">Ordem de exibição<input id="admin-aut-ordem" type="number" min="1" value="${e(item.ordem||1)}" required></label></div><label class="field">Tecnologia<select id="admin-aut-familia">${Object.entries(AUTOMATION_FAMILIAS).map(([value,label])=>`<option value="${e(value)}" ${item.familia===value?'selected':''}>${e(label)}</option>`).join('')}</select></label><label class="field">Tipo (rótulo exibido no card)<input id="admin-aut-tipo" value="${e(item.tipo||'')}" required placeholder="Ex.: RPA SAP, Script Python, RPA Web"></label><label class="field">Descrição<textarea id="admin-aut-descricao" required>${e(item.descricao||'')}</textarea></label><label class="field">Status de desenvolvimento<select id="admin-aut-status">${AUTOMATION_STATUSES.map(s=>`<option ${item.statusDesenvolvimento===s?'selected':''}>${e(s)}</option>`).join('')}</select></label><label class="field">URL de acesso (opcional)<input id="admin-aut-url" type="url" placeholder="https://…" value="${e(item.url||'')}"></label><label class="admin-validated"><input type="checkbox" id="admin-aut-ativo" ${item.ativo!==false?'checked':''}> Automação ativa (visível na tab)</label><div class="admin-form-actions"><button class="primary-btn" type="submit">${automationEditState.isNew?'Criar automação':'Salvar alterações'}</button>${!automationEditState.isNew?'<button class="danger-btn" type="button" id="admin-delete-automation">Excluir automação</button>':''}</div></form>`);
+  showDialog(automationEditState.isNew?'Nova automação':item.titulo,'Administração de automações',`<form id="admin-automation-form"><div class="admin-form-grid"><label class="field">Título<input id="admin-aut-titulo" value="${e(item.titulo||'')}" required></label><label class="field">Ordem de exibição<input id="admin-aut-ordem" type="number" min="1" value="${e(item.ordem||1)}" required></label></div><label class="field">Tecnologia<select id="admin-aut-familia">${Object.entries(AUTOMATION_FAMILIAS).map(([value,label])=>`<option value="${e(value)}" ${item.familia===value?'selected':''}>${e(label)}</option>`).join('')}</select></label><label class="field">Tipo (rótulo exibido no card)<input id="admin-aut-tipo" value="${e(item.tipo||'')}" required placeholder="Ex.: RPA SAP, Script Python, RPA Web"></label><label class="field">Descrição<textarea id="admin-aut-descricao" required>${e(item.descricao||'')}</textarea></label><label class="field">Status de desenvolvimento<select id="admin-aut-status">${AUTOMATION_STATUSES.map(s=>`<option ${item.statusDesenvolvimento===s?'selected':''}>${e(s)}</option>`).join('')}</select></label><label class="field">URL de acesso (opcional)<input id="admin-aut-url" type="url" placeholder="https://…" value="${e(item.url||'')}"></label><label class="admin-validated"><input type="checkbox" id="admin-aut-ativo" ${item.ativo!==false?'checked':''}> Automação ativa (visível na tab)</label><div class="admin-form-actions"><button class="primary-btn" type="submit">${automationEditState.isNew?'Criar automação':'Salvar alterações'}</button>${!automationEditState.isNew?'<button class="danger-btn" type="button" id="admin-delete-automation">Excluir automação</button>':''}</div></form>`);
   const deleteButton=$('#admin-delete-automation');
   if(deleteButton)deleteButton.onclick=()=>deleteAutomation(item.id,item.titulo);
   $('#admin-automation-form').onsubmit=async event=> {
@@ -572,6 +1097,8 @@ function openAutomationForm(item) {
       if(urlRaw&&!safeURL(urlRaw))throw new Error('URL inválida. Use um endereço http(s) válido.');
       const body= {
         id:automationEditState.id,
+        // A página de automações é Sistemas e automações › Contabilidade.
+        origem:'contabilidade',
         categoriaPortal:'Automações',
         tipo:$('#admin-aut-tipo').value.trim(),
         familia:$('#admin-aut-familia').value,
@@ -579,6 +1106,7 @@ function openAutomationForm(item) {
         descricao:$('#admin-aut-descricao').value.trim(),
         statusDesenvolvimento:$('#admin-aut-status').value,
         url:urlRaw||null,
+        imagem:item.imagem||null,
         ativo:$('#admin-aut-ativo').checked,
         ordem:Number($('#admin-aut-ordem').value)||1
       }
@@ -691,6 +1219,224 @@ function renderAdminAutomacoes() {
   $('#admin-view').innerHTML=`<div class="admin-toolbar"><button class="primary-btn" id="admin-new-automation">Nova automação +</button></div><div class="admin-team-list">${automacoesOrdenadas.map(a=>`<article class="admin-team-card"><div><span class="tag ${automationTagClass(a.familia)}">${e(a.tipo)}</span><h3>${e(a.titulo)}</h3><p>${e(a.descricao)}</p></div><div class="admin-team-meta"><strong>${a.ativo!==false?'Ativa':'Inativa'}</strong><span>ordem ${e(a.ordem??'-')}</span><button class="secondary-btn" data-admin-automation="${e(a.id)}">Administrar</button></div></article>`).join('')||'<p class="empty-state compact">Nenhuma automação cadastrada.</p>'}</div>`;
   $('#admin-new-automation').onclick=openCreateAutomation;
 }
+// ===== Carrossel: gestão dos destaques (21/09/2026) =====
+// Um registro por slide em data/destaques.json, apontando para um destino
+// (js/destaques.js). Três portas de entrada: a aba "Carrossel" da
+// Administração (visão geral, ordem, agenda), o bloco "Carrossel da capa" na
+// página de cada comunicado e o botão "Destacar no carrossel" nas fichas de
+// sistemas, portais, links externos e atalhos. Gravar exige o servidor interno.
+const dataISO=d=>d.toLocaleDateString('sv-SE');
+const somarDias=(iso,dias)=> {
+  const d=new Date(`${iso}T12:00:00`);
+  d.setDate(d.getDate()+dias);
+  return dataISO(d);
+}
+;
+const periodoDestaque=d=>[d.inicio&&dateLabel(d.inicio),d.fim&&dateLabel(d.fim)].filter(Boolean).join(' a ')||'sem período';
+const COR_SITUACAO= {
+  'no-ar':'green',agendado:'blue',pausado:'yellow',encerrado:''
+}
+;
+const ORDEM_SITUACAO=['no-ar','agendado','pausado','encerrado'];
+function botaoDestacar(tipo,ref) {
+  if(!podeAdministrar())return '';
+  const existente=destaqueDoAlvo(data,tipo,ref);
+  return `<button type="button" class="secondary-btn" data-destacar="${e(tipo)}|${e(ref)}">${existente?'Editar destaque no carrossel':'Destacar no carrossel'}</button>`;
+}
+// Destinos possíveis de cada tipo, para o <select> do formulário.
+function opcoesDoAlvo(tipo) {
+  if(tipo==='comunicado')return comunicados(data).map(({item,colecao})=>({valor:`${colecao}:${item.id}`,rotulo:item.titulo}));
+  if(tipo==='sistema')return data.sistemas.map(s=>({valor:s.id,rotulo:s.nome}));
+  if(tipo==='portal')return data.portais.map(p=>({valor:p.id,rotulo:p.nome})).sort((a,b)=>a.rotulo.localeCompare(b.rotulo,'pt-BR'));
+  if(tipo==='externo')return data.externos.map(p=>({valor:p.id,rotulo:p.nome})).sort((a,b)=>a.rotulo.localeCompare(b.rotulo,'pt-BR'));
+  if(tipo==='atalho')return data.config.links.filter(l=>!l.target).map(l=>({valor:l.nome,rotulo:l.nome}));
+  if(tipo==='pagina')return navSections.flatMap(s=>{
+    const paginas=paginasDe(s);
+    return paginas.length?paginas.map(p=>({valor:routeHash(p),rotulo:`${s.label} › ${p.label}`})):[{valor:routeHash(s),rotulo:s.label}];
+  }).filter(o=>!o.valor.startsWith('#administracao'));
+  return [];
+}
+function renderAdminCarrossel() {
+  const live=isLiveDataSource();
+  const lista=(data.destaques||[]).map(d=>({d,situacao:situacaoDestaque(d),slide:resolverDestaque(d,data)}))
+    .sort((a,b)=>(ORDEM_SITUACAO.indexOf(a.situacao)-ORDEM_SITUACAO.indexOf(b.situacao))||((a.d.ordem??99)-(b.d.ordem??99)));
+  const noAr=lista.filter(x=>x.situacao==='no-ar'&&x.slide).length;
+  const aviso=noAr>LIMITE_NO_AR?`<p class="admin-aviso">${noAr} destaques no ar. Com mais de ${LIMITE_NO_AR}, os últimos quase não são vistos: o primeiro slide concentra a maior parte dos cliques.</p>`:'';
+  const semServidor=live?'':'<p class="admin-aviso">Somente leitura: gravar destaques exige o servidor interno ligado (ver README, "Backend opcional"). A lista e a prévia funcionam sem ele.</p>';
+  const cartao=({d,situacao,slide})=>{
+    const mover=live&&(situacao==='no-ar'||situacao==='agendado')?`<button class="text-btn" data-mover-destaque="${e(d.id)}|-1" aria-label="Subir ${e(slide?.titulo||d.id)}">Subir</button><button class="text-btn" data-mover-destaque="${e(d.id)}|1" aria-label="Descer ${e(slide?.titulo||d.id)}">Descer</button>`:'';
+    return `<article class="admin-team-card admin-destaque"><div><p class="admin-destaque-meta"><span class="badge ${COR_SITUACAO[situacao]}">${e(SITUACOES[situacao])}</span><span>${e(TIPOS_ALVO[d.alvo?.tipo]||'Destino')}</span><span>posição ${e(d.ordem??'—')}</span><span>${e(periodoDestaque(d))}</span></p><h3>${e(slide?.titulo||d.titulo||d.id)}</h3><p>${slide?e(slide.subtitulo||slide.descricao||''):'<strong>Destino não encontrado ou não publicado</strong> — o slide não aparece.'}</p></div><div class="admin-destaque-acoes">${mover}<button class="secondary-btn" data-admin-destaque="${e(d.id)}">Editar</button></div></article>`;
+  };
+  $('#admin-view').innerHTML=`<div class="admin-toolbar"><button class="primary-btn" id="admin-novo-destaque">Novo destaque +</button></div>${semServidor}${aviso}<div class="admin-team-list">${lista.map(cartao).join('')||'<p class="empty-state compact">Nenhum destaque cadastrado.</p>'}</div>`;
+  $('#admin-novo-destaque').onclick=()=>openDestaqueForm(null);
+}
+// Formulário do destaque, com prévia ao vivo do slide. `alvoFixo` quando vem de
+// um comunicado ou de uma ficha: o destino já está escolhido.
+function openDestaqueForm(destaque,{alvoFixo=null}={}) {
+  const novo=!destaque;
+  const hojeISO=dataISO(new Date());
+  const maiorOrdem=(data.destaques||[]).reduce((m,d)=>Math.max(m,d.ordem||0),0);
+  const base=destaque||{id:newId('destaque'),alvo:alvoFixo||{tipo:'comunicado',ref:''},ativo:true,inicio:hojeISO,fim:somarDias(hojeISO,30),ordem:maiorOrdem+1,lado:'esquerda'};
+  const live=isLiveDataSource();
+  const v=campo=>e(base[campo]??'');
+  const campo=(id,rotulo,valor,extra='')=>`<label class="field">${rotulo}<input id="${id}" value="${valor}"${extra}></label>`;
+  showDialog(novo?'Novo destaque':'Editar destaque','Carrossel da capa',`<form id="destaque-form" class="destaque-form" novalidate>
+    <div class="destaque-previa" id="destaque-previa"></div>
+    <fieldset><legend>Destino</legend><div class="admin-form-grid">
+      <label class="field">Tipo<select id="dq-tipo"${alvoFixo?' disabled':''}>${Object.entries(TIPOS_ALVO).map(([valor,rotulo])=>`<option value="${valor}"${base.alvo?.tipo===valor?' selected':''}>${rotulo}</option>`).join('')}</select></label>
+      <div id="dq-ref-campo"></div></div></fieldset>
+    <fieldset><legend>Quando aparece</legend><div class="admin-form-grid tres">
+      ${campo('dq-inicio','Início',v('inicio'),' type="date"')}${campo('dq-fim','Fim',v('fim'),' type="date"')}${campo('dq-ordem','Posição',v('ordem'),' type="number" min="1"')}</div>
+      <label class="admin-validated"><input type="checkbox" id="dq-ativo"${base.ativo!==false?' checked':''}> Ativo: aparece dentro do período. Desmarque para pausar sem apagar.</label></fieldset>
+    <fieldset><legend>Aparência <small>— em branco, vem do destino</small></legend>
+      ${campo('dq-titulo','Título',v('titulo'))}${campo('dq-subtitulo','Subtítulo',v('subtitulo'))}
+      <label class="field">Descrição<textarea id="dq-descricao">${v('descricao')}</textarea></label>
+      <div class="admin-form-grid">${campo('dq-rotulo','Área (ao lado do selo)',v('rotulo'))}${campo('dq-acao','Texto da ação',v('acao'))}</div>
+      <div class="admin-form-grid"><label class="field">Formato<select id="dq-formato"><option value="imagem"${base.formato!=='molde'?' selected':''}>Imagem na altura toda, fundo tirado dela</option><option value="molde"${base.formato==='molde'?' selected':''}>Molde: arte montada sobre fundo próprio</option></select></label><label class="field">Lado das imagens<select id="dq-lado"><option value="esquerda"${base.lado!=='direita'?' selected':''}>Esquerda</option><option value="direita"${base.lado==='direita'?' selected':''}>Direita</option></select></label></div>
+      <div class="admin-form-grid">${campo('dq-img1','Imagem principal',e(base.imagens?.[0]||''),' placeholder="assets/destaques/…"')}${campo('dq-img2','Imagem secundária (só no molde)',e(base.imagens?.[1]||''),' placeholder="opcional"')}</div>
+      <div class="admin-form-grid">${campo('dq-fundo-img','Imagem de fundo',v('fundoImagem'),' placeholder="opcional"')}<label class="field">Enviar imagem para<span class="dq-envio"><select id="dq-envio-alvo"><option value="dq-img1">principal</option><option value="dq-img2">secundária</option><option value="dq-fundo-img">fundo</option></select><input type="file" id="dq-arquivo" accept="image/*"${live?'':' disabled'}></span></label></div>
+      <div class="admin-form-grid">${campo('dq-fundo','Cor inicial do fundo',v('fundo'),' placeholder="#0b56a8"')}${campo('dq-fundo-fim','Cor final do fundo',v('fundoFim'),' placeholder="#044d6a"')}</div>
+      ${campo('dq-alt','Descrição das imagens (texto alternativo)',v('alt'))}</fieldset>
+    <p class="admin-aviso" id="dq-erro" hidden></p>
+    <div class="admin-form-actions"><button type="submit" class="primary-btn"${live?'':' disabled'}>${novo?'Criar destaque':'Salvar alterações'}</button>${novo?'':'<button type="button" class="secondary-btn" id="dq-encerrar">Encerrar agora</button><button type="button" class="danger-btn" id="dq-excluir">Excluir</button>'}</div>
+    ${live?'':'<p class="muted">Salvar exige o servidor interno ligado (ver README, "Backend opcional"). A prévia funciona sem ele.</p>'}
+  </form>`);
+  const dialogo=$('#detail-dialog');
+  dialogo.classList.add('dialogo-largo');
+  dialogo.addEventListener('close',()=>dialogo.classList.remove('dialogo-largo'),{once:true});
+  const alvoAtual=()=>({tipo:$('#dq-tipo').value,ref:($('#dq-ref')?.value||'').trim()});
+  const campoRef=()=> {
+    const tipo=$('#dq-tipo').value;
+    const ref=base.alvo?.tipo===tipo?base.alvo.ref:'';
+    const trava=alvoFixo?' disabled':'';
+    $('#dq-ref-campo').innerHTML=tipo==='url'
+      ?`<label class="field">Endereço<input id="dq-ref" type="url" placeholder="https://…" value="${e(ref)}"${trava}></label>`
+      :`<label class="field">Destino<select id="dq-ref"${trava}><option value="">Escolha…</option>${opcoesDoAlvo(tipo).map(o=>`<option value="${e(o.valor)}"${o.valor===ref?' selected':''}>${e(o.rotulo)}</option>`).join('')}</select></label>`;
+    $('#dq-ref').oninput=$('#dq-ref').onchange=atualizar;
+  };
+  const texto=id=>$(id).value.trim();
+  // O destaque como ficaria salvo: campos vazios saem, para herdar do destino.
+  const lerFormulario=()=> {
+    const d={...base,alvo:alvoAtual(),ativo:$('#dq-ativo').checked,inicio:texto('#dq-inicio'),fim:texto('#dq-fim'),ordem:Number(texto('#dq-ordem'))||1,lado:$('#dq-lado').value,atualizadoPor:currentUser.nome,atualizadoEm:hojeISO};
+    const livres={titulo:'#dq-titulo',subtitulo:'#dq-subtitulo',descricao:'#dq-descricao',rotulo:'#dq-rotulo',acao:'#dq-acao',fundoImagem:'#dq-fundo-img',fundo:'#dq-fundo',fundoFim:'#dq-fundo-fim',alt:'#dq-alt'};
+    Object.entries(livres).forEach(([chave,sel])=>{const valor=texto(sel);if(valor)d[chave]=valor;else delete d[chave];});
+    const imagens=[texto('#dq-img1'),texto('#dq-img2')].filter(Boolean);
+    if(imagens.length)d.imagens=imagens;else delete d.imagens;
+    if($('#dq-formato').value==='molde')d.formato='molde';else delete d.formato;
+    ['inicio','fim'].forEach(chave=>{if(!d[chave])delete d[chave];});
+    return d;
+  };
+  // Placeholders mostram o que vem do destino; a prévia mostra o slide pronto.
+  function atualizar() {
+    const d=lerFormulario();
+    const herdado=alvoDoDestaque(d.alvo,data)||{};
+    [['#dq-titulo','titulo'],['#dq-subtitulo','subtitulo'],['#dq-descricao','descricao'],['#dq-rotulo','rotulo'],['#dq-acao','acao']].forEach(([sel,chave])=>{$(sel).placeholder=herdado[chave]||'';});
+    const slide=resolverDestaque(d,data);
+    $('#destaque-previa').innerHTML=slide
+      ?`<p class="meta-label">Prévia — ${e(SITUACOES[situacaoDestaque(d)])}</p><div class="dqb dqb-previa" inert><div class="dqb-trilho">${slideHTML(slide)}</div></div>`
+      :'<p class="empty-state compact">Escolha um destino (e, para página ou endereço livre, um título) para ver a prévia.</p>';
+  }
+  $('#dq-tipo').onchange=()=>{campoRef();atualizar();};
+  $('#destaque-form').addEventListener('input',atualizar);
+  campoRef();
+  atualizar();
+  $('#dq-arquivo').onchange=async()=> {
+    const arquivo=$('#dq-arquivo').files[0];
+    if(!arquivo)return;
+    try {
+      const caminho=await apiUploadPhoto(arquivo,{autor:currentUser.nome,pasta:'destaques'});
+      $(`#${$('#dq-envio-alvo').value}`).value=caminho;
+      atualizar();
+      notify('Imagem enviada.');
+    }
+    catch(error) {
+      notify(error.message);
+    }
+  }
+  ;
+  const gravar=async(corpo,mensagem)=> {
+    const existe=(data.destaques||[]).some(d=>d.id===corpo.id);
+    const salvo=await apiWrite('destaques',{id:existe?corpo.id:undefined,method:existe?'PUT':'POST',body:corpo,autor:currentUser.nome});
+    if(existe)data.destaques[data.destaques.findIndex(d=>d.id===corpo.id)]=salvo;else data.destaques.push(salvo);
+    dialogo.close();
+    aposMudarDestaques(mensagem);
+  }
+  ;
+  $('#destaque-form').onsubmit=async event=> {
+    event.preventDefault();
+    const d=lerFormulario();
+    const erro=$('#dq-erro');
+    const problema=!alvoDoDestaque(d.alvo,data)?'Escolha um destino válido (comunicado publicado, item existente, página do portal ou endereço https).'
+      :!resolverDestaque(d,data)?'Informe um título: este destino não tem título próprio.'
+      :d.inicio&&d.fim&&d.fim<d.inicio?'O fim não pode ser antes do início.':'';
+    erro.hidden=!problema;
+    erro.textContent=problema;
+    if(problema)return;
+    const noAr=(data.destaques||[]).filter(x=>x.id!==d.id&&situacaoDestaque(x)==='no-ar'&&resolverDestaque(x,data)).length+(situacaoDestaque(d)==='no-ar'?1:0);
+    if(noAr>LIMITE_NO_AR&&!confirm(`Ficarão ${noAr} destaques no ar. Com mais de ${LIMITE_NO_AR}, os últimos quase não são vistos. Salvar mesmo assim?`))return;
+    try {
+      await gravar(d,novo?'Destaque criado.':'Destaque atualizado.');
+    }
+    catch(error) {
+      notify(error.message);
+    }
+  }
+  ;
+  const encerrar=$('#dq-encerrar');
+  if(encerrar)encerrar.onclick=async()=> {
+    try {
+      // Fim ontem; se tinha começado hoje ou depois, o início recua junto,
+      // para o período não ficar invertido.
+      const ontem=somarDias(hojeISO,-1);
+      await gravar({...base,fim:ontem,inicio:base.inicio&&base.inicio>ontem?ontem:base.inicio,atualizadoPor:currentUser.nome,atualizadoEm:hojeISO},'Destaque encerrado.');
+    }
+    catch(error) {
+      notify(error.message);
+    }
+  }
+  ;
+  const excluir=$('#dq-excluir');
+  if(excluir)excluir.onclick=async()=> {
+    if(!confirm('Excluir este destaque? O destino (comunicado, sistema ou link) não é afetado.'))return;
+    try {
+      await apiWrite('destaques',{id:base.id,method:'DELETE',autor:currentUser.nome});
+      data.destaques=data.destaques.filter(d=>d.id!==base.id);
+      dialogo.close();
+      aposMudarDestaques('Destaque excluído.');
+    }
+    catch(error) {
+      notify(error.message);
+    }
+  }
+  ;
+}
+// Troca de posição com o vizinho (entre os que estão no ar ou agendados).
+async function moverDestaque(id,passo) {
+  const fila=(data.destaques||[]).filter(d=>['no-ar','agendado'].includes(situacaoDestaque(d))).sort((a,b)=>(a.ordem??99)-(b.ordem??99));
+  const i=fila.findIndex(d=>d.id===id),j=i+passo;
+  if(i<0||j<0||j>=fila.length)return;
+  // Renumera a fila inteira (1, 2, 3…) para não haver posições repetidas.
+  [fila[i],fila[j]]=[fila[j],fila[i]];
+  try {
+    for(const [n,d] of fila.entries()) {
+      if(d.ordem===n+1)continue;
+      const salvo=await apiWrite('destaques',{id:d.id,method:'PUT',body:{ordem:n+1},autor:currentUser.nome});
+      data.destaques[data.destaques.findIndex(x=>x.id===d.id)]=salvo;
+    }
+    aposMudarDestaques('Ordem atualizada.');
+  }
+  catch(error) {
+    notify(error.message);
+  }
+}
+// Depois de gravar: carrossel, aba da Administração e, se aberta, a página do
+// comunicado (que mostra a situação dele no carrossel).
+function aposMudarDestaques(mensagem) {
+  renderCarrossel();
+  if(currentAdminTab==='carrossel'&&!$('#administracao').hidden)renderAdmin();
+  if(currentTab==='comunicado'&&!$('#page-view').hidden)renderContent('comunicado');
+  notify(mensagem);
+}
 // Equipes and Automações are separate tabs (same .tabs component as Central
 // de Conteúdo) instead of one long stacked list — currentAdminTab is the
 // only piece of state that needs to survive a re-render (e.g. after a
@@ -706,16 +1452,18 @@ function renderAdmin() {
   const live=isLiveDataSource();
   const source=live?'Servidor conectado':hasLocalTeams()?'Alterações salvas neste navegador':'Base original do portal';
   const token=live?`<div class="admin-token-row"><label class="field">Token de administração<input type="password" id="admin-token" placeholder="Cole o token aqui" value="${e(getAdminToken())}"></label><button class="primary-btn" id="admin-token-save">Salvar token</button></div>`:'';
-  $('#admin-summary').innerHTML=`<div class="admin-overview"><div><span class="section-kicker">FONTE DOS DADOS</span><strong>${e(source)}</strong><p>${live?'As alterações são gravadas no servidor e compartilhadas.':'As alterações ficam neste navegador. Exporte o JSON para backup ou para atualizar a base publicada.'}</p></div></div>${token}`;
+  $('#admin-summary').innerHTML=`<div class="admin-overview"><div><span class="meta-label">Fonte dos dados</span><strong>${e(source)}</strong><p>${live?'As alterações são gravadas no servidor e compartilhadas.':'As alterações ficam neste navegador. Exporte o JSON para backup ou para atualizar a base publicada.'}</p></div></div>${token}`;
   const tokenSave=$('#admin-token-save');
   if(tokenSave)tokenSave.onclick=()=> { setAdminToken($('#admin-token').value.trim());notify('Token salvo neste navegador.');renderAdmin(); };
   selectTab('#admin-tabs',$(`#admin-tab-${currentAdminTab}`));
   $('#admin-view').setAttribute('aria-labelledby',`admin-tab-${currentAdminTab}`);
   if(currentAdminTab==='automacoes')renderAdminAutomacoes();
+  else if(currentAdminTab==='carrossel')renderAdminCarrossel();
   else if(currentAdminTab==='ai-studio')renderAdminAiStudio();
   else renderAdminEquipes();
 }
-// ===== Importação de pacotes do AI Studio (Sprint 7) =====
+
+// ===== Importação de pacotes do AI Studio (veio da `main` em 23/09/2026) =====
 // Fluxo: selecionar ZIP → validar formato, CRC, SHA-256 e assinatura → pré-visualizar →
 // confirmar → item "Em revisão" no Painel Editorial. Nunca publica automaticamente.
 let aiImportState=null;
@@ -758,7 +1506,7 @@ async function analyzeAiPackage(file) {
     aiImportState={manifest,result,collection,replaces:existing?.kind==='replaces'?existing.items.map(i=>i.id):[],previewUrl};
     const categorias=[...new Set([manifest.destination.portal_category,...(data.config.newsletterCategorias||[])])];
     const needsManualOrigin=result.origin!=='verified';
-    out.innerHTML=`<div class="ai-import-preview"><div class="ai-import-media"><img src="${previewUrl}" alt="Pré-visualização da peça"></div><div><span class="section-kicker">${e(manifest.category_label||manifest.category)} · ${e(manifest.destination.label)}</span><h3>${e(manifest.title)}</h3><p>${e(manifest.summary||'')}</p>${detailGrid({'Versão aprovada':`v${manifest.approval.version_number} (${manifest.version_id})`,'Aprovada em':manifest.approval.approved_at,'Data de referência':dateLabel(manifest.reference_date),'Fonte':manifest.source_name,'Link da fonte':manifest.source_url,'Link de acesso':manifest.access_url,'Sistema':manifest.system_name,'SHA-256 da imagem':result.imageHash})}<p>${originBadge(result.origin)} ${badge('Integridade conferida')}</p>${result.warnings.map(w=>`<p class="empty-state compact">${e(w)}</p>`).join('')}${aiImportState.replaces.length?`<p class="empty-state compact">Este pacote é uma nova versão de um conteúdo já importado (${aiImportState.replaces.map(e).join(', ')}). A publicação anterior permanece no ar até esta ser publicada; então será marcada como "Substituído".</p>`:''}<form id="ai-import-form"><div class="admin-form-grid"><label class="field">Categoria no portal<select id="ai-import-categoria">${categorias.map(c=>`<option ${c===manifest.destination.portal_category?'selected':''}>${e(c)}</option>`).join('')}</select></label><label class="field">Nível de impacto<select id="ai-import-impacto"><option>Baixo</option><option>Moderado</option><option>Alto</option></select></label></div><label class="field">Área responsável<input id="ai-import-area" value="${e(manifest.institutional_owner||'Gerência de Contabilidade')}" maxlength="120" required></label>${needsManualOrigin?'<label class="admin-validated"><input type="checkbox" id="ai-import-origin" required> Confirmo que recebi este pacote diretamente da Central de Publicações do AI Studio, por canal interno autorizado.</label>':''}<div class="admin-form-actions"><button class="primary-btn" type="submit">Importar para revisão</button><button class="text-btn" type="button" id="ai-import-cancel">Cancelar</button></div></form></div></div>`;
+    out.innerHTML=`<div class="ai-import-preview"><div class="ai-import-media"><img src="${previewUrl}" alt="Pré-visualização da peça"></div><div><span class="meta-label">${e(manifest.category_label||manifest.category)} · ${e(manifest.destination.label)}</span><h3>${e(manifest.title)}</h3><p>${e(manifest.summary||'')}</p>${detailGrid({'Versão aprovada':`v${manifest.approval.version_number} (${manifest.version_id})`,'Aprovada em':manifest.approval.approved_at,'Data de referência':dateLabel(manifest.reference_date),'Fonte':manifest.source_name,'Link da fonte':manifest.source_url,'Link de acesso':manifest.access_url,'Sistema':manifest.system_name,'SHA-256 da imagem':result.imageHash})}<p>${originBadge(result.origin)} ${badge('Integridade conferida')}</p>${result.warnings.map(w=>`<p class="empty-state">${e(w)}</p>`).join('')}${aiImportState.replaces.length?`<p class="empty-state">Este pacote é uma nova versão de um conteúdo já importado (${aiImportState.replaces.map(e).join(', ')}). A publicação anterior permanece no ar até esta ser publicada; então será marcada como "Substituído".</p>`:''}<form id="ai-import-form"><div class="admin-form-grid"><label class="field">Categoria no portal<select id="ai-import-categoria">${categorias.map(c=>`<option ${c===manifest.destination.portal_category?'selected':''}>${e(c)}</option>`).join('')}</select></label><label class="field">Origem do conteúdo<select id="ai-import-origem-conteudo">${Object.entries(ORIGENS).map(([valor,rotulo])=>`<option value="${valor}"${valor==='contabilidade'?' selected':''}>${e(rotulo)}</option>`).join('')}</select></label><label class="field">Nível de impacto<select id="ai-import-impacto"><option>Baixo</option><option>Moderado</option><option>Alto</option></select></label></div><label class="field">Área responsável<input id="ai-import-area" value="${e(manifest.institutional_owner||'Gerência de Contabilidade')}" maxlength="120" required></label>${needsManualOrigin?'<label class="admin-validated"><input type="checkbox" id="ai-import-origin" required> Confirmo que recebi este pacote diretamente da Central de Publicações do AI Studio, por canal interno autorizado.</label>':''}<div class="admin-form-actions"><button class="primary-btn" type="submit">Importar para revisão</button><button class="text-btn" type="button" id="ai-import-cancel">Cancelar</button></div></form></div></div>`;
     $('#ai-import-cancel').onclick=renderAdminAiStudio;
     $('#ai-import-form').onsubmit=event=> { event.preventDefault(); confirmAiImport(); };
   }
@@ -778,7 +1526,7 @@ async function confirmAiImport() {
   const {manifest,result,collection,replaces}=state;
   const fileName=`${portalItemId(manifest)}.png`;
   const pasta=aiStudioConfig().pastaImagens||'assets/images/ai-studio';
-  const options={categoria:$('#ai-import-categoria').value,nivelImpacto:$('#ai-import-impacto').value,areaResponsavel:$('#ai-import-area').value.trim(),autor:currentUser.nome,origin:result.origin,replaces};
+  const options={categoria:$('#ai-import-categoria').value,origem:$('#ai-import-origem-conteudo').value,nivelImpacto:$('#ai-import-impacto').value,areaResponsavel:$('#ai-import-area').value.trim(),autor:currentUser.nome,origin:result.origin,replaces};
   try {
     if(isLiveDataSource()) {
       const imagePath=await apiUploadContentImage(result.image,fileName,{autor:currentUser.nome});
@@ -803,28 +1551,33 @@ async function confirmAiImport() {
     notify(error.message);
   }
 }
+
 function showRecord(collection,id) {
   const item=data[collection]?.find(i=>i.id===id);
   if(!item)return;
+  // Comunicado abre a página própria dele, que registra a visita.
+  if(collection==='newsletter'||collection==='noticias') {
+    abrirComunicado(collection,id);
+    return;
+  }
   track('record_view',{collection,label:item.titulo||item.nome});
-  if(collection==='newsletter') {
-    showArticle(item);
-    return;
-  }
-  if(collection==='noticias') {
-    focusNoticia(id);
-    return;
-  }
   if(collection==='equipes') {
     navigate(currentMenu.find(item=>item.view==='equipes'));
     return;
   }
   if(collection==='sistemas') {
-    openAccess(item);
+    const url=safeURL(item.link);
+    showDialog(item.nome,'Sistema da área',`<p>${e(item.descricao)}</p>${detailGrid({'Responsável':item.responsavel||'—','Origem':ORIGENS[origemDe(collection,item)],'Status':item.status||'—','Endereço':url?'Cadastrado':'Aguardando cadastro'})}${url?acaoAcessar(url,item.nome):'<p class="muted">O endereço deste sistema ainda não foi cadastrado. Solicite o link ao responsável da área.</p>'}${botaoDestacar('sistema',item.id)}`);
+    return;
+  }
+  if(collection==='portais'||collection==='externos') {
+    const url=safeURL(item.link);
+    const externo=collection==='externos';
+    showDialog(item.nome,item.grupo||(externo?'Link externo':'Portal do Grupo'),`<p>${e(item.descricao)}</p>${item.observacao?`<p class="muted">${e(item.observacao)}</p>`:''}${detailGrid({'Grupo':item.grupo||'—','Origem':ORIGENS[origemDe(collection,item)],'Endereço':url?dominioDe(url):'Aguardando cadastro','Acesso':externo?'Cadastro próprio do serviço':'Identificação de rede do Grupo'})}${url?acaoAcessar(url,item.nome):'<p class="muted">O endereço deste item ainda não foi cadastrado.</p>'}${botaoDestacar(externo?'externo':'portal',item.id)}`);
     return;
   }
   if(collection==='usuarios') {
-    showDialog(item.nome,'COLABORADOR',detailGrid( {
+    showDialog(item.nome,'Colaborador',detailGrid( {
       'Matrícula':item.matricula,'Cargo':item.cargo,'Área':item.area,'Equipe':item.equipe,'Perfil':item.perfil
     }
     ));
@@ -832,37 +1585,246 @@ function showRecord(collection,id) {
   }
   if(collection==='automacoes') {
     const url=safeURL(item.url);
-    showDialog(item.titulo,'AUTOMAÇÃO',`<p>${e(item.descricao)}</p>${detailGrid({'Categoria no portal':item.categoriaPortal,'Tecnologia':item.tipo,'Status de desenvolvimento':item.statusDesenvolvimento,'Situação do acesso':url?'Disponível':'Acesso em configuração'})}${url?`<a class="primary-btn" href="${e(url)}" target="_blank" rel="noopener noreferrer">Acessar automação ↗</a>`:'<p class="muted">O acesso pelo portal ainda está em configuração.</p>'}`);
+    showDialog(item.titulo,'Automação',`<p>${e(item.descricao)}</p>${detailGrid({'Categoria no portal':item.categoriaPortal,'Origem':ORIGENS[origemDe(collection,item)],'Tecnologia':item.tipo,'Status de desenvolvimento':item.statusDesenvolvimento,'Situação do acesso':url?'Disponível':'Acesso em configuração'})}${url?`<a class="primary-btn" href="${e(url)}" target="_blank" rel="noopener noreferrer">Acessar automação${icon('external').replace('class="icon"','class="icon ext"')}</a>`:'<p class="muted">O acesso pelo portal ainda está em configuração.</p>'}`);
     return;
   }
   if(collection==='documentos') {
-    const url=safeURL(item.arquivo);
-    showDialog(item.titulo,item.categoria,`<p>${e(item.descricao)}</p>${detailGrid({'Tipo':item.formato,'Responsável':item.responsavel,'Atualização':dateLabel(item.data),'Versão':item.versao})}<p>Documento demonstrativo. Substitua pela versão aprovada antes do uso operacional.</p>${url?`<a class="primary-btn" href="${e(url)}" target="_blank" rel="noopener noreferrer">Abrir documento ↗</a> <a class="primary-btn" href="${e(url)}" download>Baixar ↓</a>`:''}`);
+    const link=safeURL(item.link),arquivo=safeURL(item.arquivo);
+    showDialog(item.titulo,item.grupo||'Documentos & Normas',`<p>${e(item.descricao)}</p>${detailGrid({'Fonte':item.fonte||'—','Origem':ORIGENS[item.origem],'Grupo':item.grupo||'—','Link verificado em':item.verificadoEm?dateLabel(item.verificadoEm):'—'})}<div class="doc-actions">${link?`<a class="primary-btn" href="${e(link)}" target="_blank" rel="noopener noreferrer" data-doc-link="${e(item.titulo)}">Acessar na fonte oficial${icon('external').replace('class="icon"','class="icon ext"')}</a>`:''}${arquivo?` <a class="primary-btn" href="${e(arquivo)}" download data-doc-title="${e(item.titulo)}">Baixar</a>`:''}</div>`);
     return;
   }
-  showDialog(item.nome,collection==='agenda'?'AGENDA DA GERÊNCIA':collection==='entregas'?'ENTREGA DA SEMANA':'PROCESSO CRÍTICO',`<p>${e(item.descricao)}</p>${detailGrid({'Responsável':item.responsavel,'Prazo / data':item.data?dateLabel(item.data):/^\d{4}-/.test(item.prazo)?dateLabel(item.prazo):item.prazo,'Status / tipo':item.status||item.tipo,'Horário':item.horario||'Não se aplica'})}`);
+  showDialog(item.nome,collection==='agenda'?'Agenda da gerência':collection==='entregas'?'Entrega':'Processo crítico',`<p>${e(item.descricao)}</p>${detailGrid({'Responsável':item.responsavel,'Prazo / data':item.data?dateLabel(item.data):/^\d{4}-/.test(item.prazo)?dateLabel(item.prazo):item.prazo,'Status / tipo':item.status||item.tipo,'Horário':item.horario||'Não se aplica'})}`);
 }
-function search(query) {
-  const normalized=normalize(query.trim());
-  $('#search-section').hidden=!normalized;
-  if(!normalized)return 0;
-  const matches=[];
-  for(const collection of ['newsletter','noticias','processos','sistemas','documentos','equipes','usuarios','agenda','entregas']) {
-    if(!hasAccess(currentUser,COLLECTION_ACCESS[collection]))continue;
-    for(const item of data[collection]) {
-      if((collection==='newsletter'||collection==='noticias')&&item.status!=='Publicado')continue;
-      if(normalize(JSON.stringify(item)).includes(normalized))matches.push( {
-        collection,item
+// O "i" do atalho mostra a ficha; quem quer o destino usa o botão Acessar.
+function showLinkInfo(index) {
+  const item=data.config.links[Number(index)];
+  if(!item)return;
+  const url=safeURL(item.link);
+  showDialog(item.nome,'Acesso corporativo',`<p>${e(item.descricao||'Acesso utilizado pela Gerência de Contabilidade.')}</p>${detailGrid({'Responsável':item.responsavel||'Administração do portal','Origem':ORIGENS[origemDe('links',item)],'Endereço':url?'Cadastrado':'Aguardando cadastro'})}${url?acaoAcessar(url,item.nome):'<p class="muted">O endereço deste acesso ainda não foi cadastrado. Solicite o link ao responsável da área.</p>'}${botaoDestacar('atalho',item.nome)}`);
+}
+// Clicar na imagem do cartão (só para quem administra) troca a arte. Grava no
+// backend quando ele está ativo; sem backend, só automações têm guarda local
+// neste navegador — sistemas exigem o backend, como o resto da administração.
+function colecaoDoCartao(collection) {
+  return collection==='sistemas'?data.sistemas:collection==='automacoes'?data.automacoes:collection==='portais'?data.portais:collection==='externos'?data.externos:null;
+}
+function openTrocarImagem(alvo) {
+  const [collection,id]=alvo.split(':');
+  const lista=colecaoDoCartao(collection);
+  const item=lista&&lista.find(registro=>registro.id===id);
+  if(!item)return;
+  const nome=item.nome||item.titulo;
+  showDialog(nome,'Imagem do cartão',`<form id="form-imagem"><p>A arte ocupa uma área 16:9 no topo do cartão. Prefira um arquivo do próprio repositório; sem imagem, o cartão mostra o ícone da categoria.</p><label class="field">Caminho ou endereço da imagem<input id="img-caminho" value="${e(item.imagem||'')}" placeholder="assets/sistemas/exemplo.webp"></label><label class="field">Ou envie um arquivo<input id="img-arquivo" type="file" accept="image/*"></label><div class="admin-form-actions"><button class="primary-btn" type="submit">Salvar imagem</button>${item.imagem?'<button class="danger-btn" type="button" id="img-remover">Remover imagem</button>':''}</div></form>`);
+  const remover=$('#img-remover');
+  if(remover)remover.onclick=()=>salvarImagemCartao(collection,item,null);
+  $('#form-imagem').onsubmit=async event=> {
+    event.preventDefault();
+    const botao=event.target.querySelector('[type=submit]');
+    botao.disabled=true;
+    try {
+      const arquivo=$('#img-arquivo').files[0];
+      let caminho=$('#img-caminho').value.trim();
+      if(arquivo) {
+        if(!isLiveDataSource())throw new Error('O envio de arquivo requer o backend opcional — ver README, "Backend opcional". Informe um caminho do repositório.');
+        caminho=await apiUploadPhoto(arquivo,{autor:currentUser.nome,pasta:collection});
+      }
+      await salvarImagemCartao(collection,item,caminho||null);
+    }
+    catch(error) {
+      notify(error.message);
+    }
+    finally {
+      botao.disabled=false;
+    }
+  }
+  ;
+}
+async function salvarImagemCartao(collection,item,imagem) {
+  try {
+    if(isLiveDataSource()) {
+      const atualizado=await apiWrite(collection,{id:item.id,method:'PUT',body:{...item,imagem},autor:currentUser.nome});
+      Object.assign(item,atualizado);
+    }
+    else if(collection==='automacoes') {
+      item.imagem=imagem;
+      saveLocalAutomacoes(data.automacoes);
+    }
+    else throw new Error('Alterar a arte dos sistemas requer o backend opcional — ver README, "Backend opcional".');
+    $('#detail-dialog').close();
+    renderContent(currentTab);
+    notify(imagem?'Imagem atualizada.':'Imagem removida.');
+  }
+  catch(error) {
+    notify(error.message);
+  }
+}
+// ===== Busca do cabeçalho =====
+// O que se busca (revisto em 22/09/2026): as páginas do portal, os
+// comunicados publicados, tudo o que tem cartão (sistemas, portais, links
+// externos, atalhos, automações, documentos), as pessoas das equipes, os
+// avisos e a agenda da capa e, para a gerência, processos e entregas. Cada
+// coleção entra só com os campos que uma pessoa usaria para achar o item
+// (nome, descrição, grupo, responsável…), nunca o JSON inteiro. O grupo de
+// cada resultado é o nome da seção do menu onde o item mora.
+const GRUPOS_BUSCA=['Páginas do portal','Comunicação','Portais e Links','Sistemas e automações','Documentos & Normas','Pessoas','Avisos e agenda','Gestão'];
+const acaoExterna=url=>({tipo:'externo',url});
+const acaoNavegar=item=>item?{tipo:'navegar',item,href:routeHash(item)}:null;
+const acaoFicha=(collection,id)=>({tipo:'funcao',executar:()=>collection==='links'?showLinkInfo(id):showRecord(collection,id)});
+function indiceDaBusca() {
+  const pode=collection=>hasAccess(currentUser,COLLECTION_ACCESS[collection]);
+  const entradas=[];
+  const incluir=entrada=>{if(entrada.acao)entradas.push(entrada);};
+  // Páginas: cada aba da faixa de subpáginas é uma página ("Portais e Links ›
+  // Power BI"); seção de uma página só entra pelo próprio nome.
+  navSections.forEach(secao=> {
+    const paginas=paginasDe(secao);
+    if(!paginas.length) {
+      incluir({grupo:'Páginas do portal',titulo:secao.label,detalhe:'Página do portal',icone:secao.icon,texto:'',peso:4,acao:acaoNavegar(secao.target==='inicio'?{target:'inicio'}:routeItem(`#${secao.target}`))});
+      return;
+    }
+    paginas.forEach(pagina=>incluir( {
+      grupo:'Páginas do portal',titulo:paginas.length>1?`${secao.label} › ${pagina.label}`:pagina.label,
+      detalhe:paginas.length>1?'Página do portal':`Página do portal · ${secao.label}`,icone:secao.icon||pagina.icon,
+      texto:secao.label,peso:4,acao:acaoNavegar(pagina)
+    }
+    ));
+  }
+  );
+  comunicados(data).forEach(({item,colecao})=>incluir( {
+    grupo:'Comunicação',titulo:item.titulo,detalhe:[ORIGENS[item.origem],item.categoria,dateLabel(item.dataPublicacao)].filter(Boolean).join(' · '),
+    resumo:item.resumo,origem:item.origem,icone:'news',
+    texto:[item.resumo,item.categoria,(item.palavrasChave||[]).join(' '),item.fonte,item.areaResponsavel,textoDoComunicado(item)].join(' '),
+    acao:acaoNavegar(routeItem(hashComunicado(colecao,item.id)))
+  }
+  ));
+  const destino=(url,collection,id)=>url?acaoExterna(url):acaoFicha(collection,id);
+  if(pode('sistemas'))data.sistemas.forEach(item=>incluir( {
+    grupo:'Portais e Links',titulo:item.nome,detalhe:['Sistema da Contabilidade',item.responsavel].filter(Boolean).join(' · '),
+    resumo:item.descricao,origem:origemDe('sistemas',item),icone:item.icon||'grid',texto:`${item.descricao||''} ${item.responsavel||''}`,
+    acao:safeURL(item.link)?acaoExterna(safeURL(item.link)):{tipo:'funcao',executar:()=>openAccess(item)}
+  }
+  ));
+  const linkDeGrupo=(collection,grupo)=>item=> {
+    const url=safeURL(item.link);
+    incluir( {
+      grupo,titulo:item.nome,detalhe:[item.grupo,url&&dominioDe(url)].filter(Boolean).join(' · '),resumo:item.descricao,
+      origem:origemDe(collection,item),icone:item.icon||'link',texto:`${item.descricao||''} ${item.grupo||''} ${url?dominioDe(url):''}`,
+      acao:destino(url,collection,item.id)
+    }
+    );
+  };
+  if(pode('portais'))data.portais.forEach(linkDeGrupo('portais','Portais e Links'));
+  if(pode('externos'))data.externos.forEach(item=>linkDeGrupo('externos',item.destino==='automacoes-externos'?'Sistemas e automações':'Portais e Links')(item));
+  if(pode('links'))data.config.links.forEach((item,indice)=> {
+    if(item.target)return;
+    const url=safeURL(item.link);
+    incluir( {
+      grupo:'Sistemas e automações',titulo:item.nome,detalhe:['Atalho corporativo',url&&dominioDe(url)].filter(Boolean).join(' · '),resumo:item.descricao,
+      origem:origemDe('links',item),icone:item.icon||'link',texto:item.descricao||'',acao:destino(url,'links',String(indice))
+    }
+    );
+  }
+  );
+  if(pode('automacoes'))activeAutomations().forEach(item=>incluir( {
+    grupo:'Sistemas e automações',titulo:item.titulo,detalhe:['Automação',AUTOMATION_FAMILIAS[item.familia]||item.tipo,item.statusDesenvolvimento].filter(Boolean).join(' · '),
+    resumo:item.descricao,origem:origemDe('automacoes',item),icone:'flow',texto:`${item.descricao||''} ${item.tipo||''} ${item.categoriaPortal||''}`,
+    acao:destino(safeURL(item.url),'automacoes',item.id)
+  }
+  ));
+  if(pode('documentos'))data.documentos.forEach(item=>incluir( {
+    grupo:'Documentos & Normas',titulo:item.titulo,detalhe:[item.grupo,item.fonte].filter(Boolean).join(' · '),resumo:item.descricao,
+    origem:item.origem,icone:ICONE_GRUPO[item.grupo]||'file',texto:`${item.descricao||''} ${item.grupo||''} ${item.fonte||''}`,
+    acao:destino(safeURL(item.link)||safeURL(item.arquivo),'documentos',item.id)
+  }
+  ));
+  // Pessoas: o quadro das equipes (a mesma pessoa em duas equipes entra uma vez).
+  const paginaEquipes=currentMenu.find(item=>item.view==='equipes');
+  if(pode('equipes')&&paginaEquipes) {
+    const vistas=new Set();
+    data.equipes.forEach(equipe=>(equipe.responsaveis||[]).forEach(pessoa=> {
+      if(vistas.has(pessoa.id))return;
+      vistas.add(pessoa.id);
+      incluir( {
+        grupo:'Pessoas',titulo:pessoa.nome,detalhe:[pessoa.cargo||'Colaborador',equipe.nome].join(' · '),origem:'contabilidade',icone:'users',
+        texto:`${pessoa.cargo||''} ${equipe.nome} ${equipe.sigla||''}`,acao:acaoNavegar(paginaEquipes)
       }
       );
     }
+    ));
   }
-  $('#search-count').textContent=`${matches.length} resultado${matches.length===1?'':'s'} para “${query.trim()}”`;
-  $('#search-results').innerHTML=matches.map(( {
-    collection,item
+  // Avisos e agenda: o que a capa mostra hoje.
+  (data.avisos||[]).filter(vigente).forEach(aviso=>incluir( {
+    grupo:'Avisos e agenda',titulo:aviso.titulo,detalhe:['Aviso',AVISO_TIPOS[aviso.tipo],aviso.janela].filter(Boolean).join(' · '),resumo:aviso.texto,
+    origem:aviso.origem,icone:'bell',texto:`${aviso.texto||''} ${aviso.area||''}`,acao:{tipo:'funcao',executar:()=>openAviso(aviso.id)}
   }
-  )=>`<article class="content-card"><span class="section-kicker">${e(({newsletter:'Newsletter',noticias:'Notícias',usuarios:'Colaboradores'})[collection]||collection)}</span><h3>${e(item.titulo||item.nome)}</h3><p>${e(item.resumo||item.descricao||item.cargo||'')}</p><button class="text-btn" data-record="${e(collection)}:${e(item.id)}">Ver detalhes →</button></article>`).join('')||'<p class="empty-state">Nenhum resultado. Experimente “conciliações”, “IFRS” ou “Contabilidade IV”.</p>';
-  return matches.length;
+  ));
+  compromissosNaCapa().forEach(compromisso=>incluir( {
+    grupo:'Avisos e agenda',titulo:compromisso.nome,detalhe:['Agenda',dateLabel(compromisso.data),horarioCompromisso(compromisso)].filter(Boolean).join(' · '),
+    resumo:compromisso.descricao,origem:origemDe('agenda',compromisso),icone:'calendar',texto:`${compromisso.descricao||''} ${compromisso.local||''}`,
+    acao:{tipo:'funcao',executar:()=>openCompromisso(compromisso.id)}
+  }
+  ));
+  ['processos','entregas'].forEach(collection=> {
+    if(pode(collection))(data[collection]||[]).forEach(item=>incluir( {
+      grupo:'Gestão',titulo:item.nome,detalhe:[collection==='processos'?'Processo crítico':'Entrega',item.responsavel,item.status].filter(Boolean).join(' · '),
+      origem:origemDe(collection,item),icone:collection==='processos'?'flow':'check',texto:`${item.descricao||''} ${item.responsavel||''}`,acao:acaoFicha(collection,item.id)
+    }
+    ));
+  }
+  );
+  return entradas;
+}
+const buscarNoPortal=consulta=>prepararIndice(indiceDaBusca())(consulta);
+// Levar ao destino escolhido na busca (caixa de sugestões ou página de
+// resultados). Link externo já abriu pelo próprio <a>; aqui só se registra.
+function executarBusca(entrada,{consulta=''}={}) {
+  track('search_select',{query:consulta,grupo:entrada.grupo,titulo:entrada.titulo});
+  const acao=entrada.acao;
+  if(acao.tipo==='externo')track('system_access',{sistema:entrada.titulo,configurado:true});
+  else if(acao.tipo==='navegar')navigate(acao.item);
+  else if(acao.tipo==='funcao')acao.executar();
+}
+function abrirResultadosBusca(consulta) {
+  track('search',{query:consulta,resultados:buscarNoPortal(consulta).length});
+  navigate({target:'busca',consulta});
+}
+// Página de resultados (#busca/<termo>): a mesma faixa de busca e filtros das
+// outras telas, e os resultados agrupados pela seção do menu.
+let resultadosExibidos=[];
+function renderResultadosBusca(consulta) {
+  const busca={id:'res-busca',rotulo:'Pesquisar no portal',placeholder:'Sistema, portal, transação SAP, norma, comunicado ou pessoa…'};
+  // Os filtros só oferecem o que existe no índice de quem está buscando.
+  const indice=indiceDaBusca();
+  const presentes=GRUPOS_BUSCA.filter(grupo=>indice.some(entrada=>entrada.grupo===grupo));
+  const filtros=[{id:'res-grupo',rotulo:'Onde',todos:'Todo o portal',opcoes:presentes},...filtroOrigem('res-origem',indice)];
+  $('#content-view').innerHTML=`${barraFiltro({busca,filtros})}<div id="res-lista" class="busca-resultados"></div><div class="content-footer"><span id="res-count" role="status" aria-live="polite"></span><span>A busca olha nomes, descrições, grupos, responsáveis e o texto dos comunicados. Links externos abrem em outra aba.</span></div>`;
+  $('#res-busca').value=consulta;
+  ligarBarraFiltro({busca,filtros,aoMudar:()=> {
+    const termo=$('#res-busca').value.trim(),grupo=$('#res-grupo').value,origem=$('#res-origem')?.value||'';
+    // O endereço acompanha o termo, para voltar e compartilhar a busca.
+    if(!$('#page-view').hidden)history.replaceState(null,'',`#busca/${encodeURIComponent(termo)}`);
+    document.title=`${termo?`Busca: ${termo}`:'Busca'} | Portal Contabilidade`;
+    const encontrados=buscarNoPortal(termo).filter(r=>(!grupo||r.grupo===grupo)&&(!origem||r.origem===origem));
+    const termos=termosDe(termo);
+    let n=0;
+    const linha=entrada=>`<li><a class="busca-item" data-resultado="${n++}" ${atributosDoLink(entrada)}>${icon(entrada.icone||'file')}<span class="busca-item-corpo"><span class="busca-item-meta">${seloOrigem(entrada.origem)}<span>${e(entrada.detalhe||'')}</span></span><span class="busca-item-titulo">${destacar(entrada.titulo,termos)}</span>${entrada.resumo?`<span class="busca-item-resumo">${e(entrada.resumo)}</span>`:''}</span>${entrada.acao.tipo==='externo'?icon('external').replace('class="icon"','class="icon ext"'):''}</a></li>`;
+    const grupos=agrupar(encontrados);
+    resultadosExibidos=grupos.flatMap(g=>g.itens);
+    const curta=normalize(termo).length<MINIMO_CARACTERES;
+    $('#res-lista').innerHTML=grupos.map(g=>`<section class="busca-grupo" aria-labelledby="res-g-${n}"><h2 id="res-g-${n}">${e(g.grupo)} <span>${g.itens.length}</span></h2><ul>${g.itens.map(linha).join('')}</ul></section>`).join('')
+      ||`<p class="empty-state">${curta?'Digite ao menos duas letras para buscar.':`Nada encontrado para “${e(termo)}”${grupo||origem?' com esses filtros':''}. Procure pelo nome de um sistema, portal ou automação, uma transação SAP (ex.: FB03), uma norma (ex.: CPC 06), um comunicado ou uma pessoa.`}</p>`;
+    $('#res-count').textContent=curta?'':`${contagem(encontrados.length,'resultado','resultados')} para “${termo}”`;
+  }
+  }
+  );
+  $('#res-lista').addEventListener('click',evento=> {
+    const link=evento.target.closest('[data-resultado]');
+    const entrada=link&&resultadosExibidos[Number(link.dataset.resultado)];
+    if(!entrada)return;
+    if(entrada.acao.tipo!=='externo')evento.preventDefault();
+    executarBusca(entrada,{consulta:$('#res-busca').value.trim()});
+  }
+  );
 }
 function preferences() {
   let prefs= {
@@ -880,10 +1842,10 @@ function preferences() {
   const usageList=(pairs,vazio)=>pairs.length?pairs.map(([k,c])=>`${k} · ${c}×`).join(', '):vazio;
   $('#settings').onclick=()=> {
     const s=summary();
-    showDialog('Preferências e uso','CONFIGURAÇÕES',`<p>Preferências salvas apenas neste navegador.</p><label class="settings-row"><input type="checkbox" id="pref-motion" ${document.body.classList.contains('no-motion')?'checked':''}> Reduzir movimento e pausar o radar</label><label class="settings-row"><input type="checkbox" id="pref-size" ${document.body.classList.contains('comfortable')?'checked':''}> Aumentar textos dos conteúdos</label><label class="settings-row"><input type="checkbox" id="pref-analytics" ${prefs.noAnalytics?'':'checked'}> Registrar meu uso do portal neste navegador</label><h3>Uso deste navegador</h3><p class="muted">Sem envio a servidores; os dados ficam só neste dispositivo e podem ser exportados ou apagados a qualquer momento.</p>${detailGrid( {
+    showDialog('Preferências e uso','Preferências',`<p>Preferências salvas apenas neste navegador.</p><label class="settings-row"><input type="checkbox" id="pref-motion" ${document.body.classList.contains('no-motion')?'checked':''}> Reduzir movimento</label><label class="settings-row"><input type="checkbox" id="pref-size" ${document.body.classList.contains('comfortable')?'checked':''}> Aumentar textos dos conteúdos</label><label class="settings-row"><input type="checkbox" id="pref-analytics" ${prefs.noAnalytics?'':'checked'}> Registrar meu uso do portal neste navegador</label><h3>Uso deste navegador</h3><p class="muted">Sem envio a servidores; os dados ficam só neste dispositivo e podem ser exportados ou apagados a qualquer momento.</p>${detailGrid( {
       'Eventos registrados':String(s.total),'Aba mais acessada':usageList(s.topAbas,'Sem dados ainda'),'Sistema mais acessado':usageList(s.topSistemas,'Sem dados ainda'),'Termo mais pesquisado':usageList(s.topBuscas,'Sem dados ainda'),'Conteúdo mais consultado':usageList(s.topRegistros,'Sem dados ainda'),'Documento mais baixado':usageList(s.topDocumentos,'Sem dados ainda')
     }
-    )}<div class="doc-actions"><button class="primary-btn" id="export-analytics">Exportar dados ↓</button><button class="text-btn" id="clear-analytics">Limpar dados locais</button></div>`);
+    )}<div class="doc-actions"><button class="primary-btn" id="export-analytics">Exportar dados</button><button class="text-btn" id="clear-analytics">Limpar dados locais</button></div>`);
     ['#pref-motion','#pref-size','#pref-analytics'].forEach(selector=>$(selector).onchange=()=> {
       const settings= {
         noMotion:$('#pref-motion').checked,comfortable:$('#pref-size').checked,noAnalytics:!$('#pref-analytics').checked
@@ -917,7 +1879,7 @@ function preferences() {
 // part of any área of the Gerência de Contabilidade gets its own option.
 function openIdentityPicker() {
   const areas=data.equipes.map(team=>`<button class="identity-pick" data-area="${e(team.id)}">${icon('users')}<span><strong>${e(team.nome)}</strong><small>${e(team.responsaveis.length)} colaborador(es)</small></span></button>`).join('');
-  showDialog('Qual área você atua?','IDENTIFICAÇÃO',`<p>Escolha sua área para localizar seu nome na lista de colaboradores. A escolha fica salva só neste navegador — não é um login corporativo.</p><div class="identity-list">${areas}<button class="identity-pick" data-visitante>${icon('globe')}<span><strong>Sou visitante</strong><small>Não faço parte da Gerência de Contabilidade</small></span></button></div>`);
+  showDialog('Qual área você atua?','Identificação',`<p>Escolha sua área para localizar seu nome na lista de colaboradores. A escolha fica salva só neste navegador — não é um login corporativo.</p><div class="identity-list">${areas}<button class="identity-pick" data-visitante>${icon('globe')}<span><strong>Sou visitante</strong><small>Não faço parte da Gerência de Contabilidade</small></span></button></div>`);
   document.querySelectorAll('[data-area]').forEach(btn=>btn.onclick=()=>openColaboradorPicker(btn.dataset.area));
   $('[data-visitante]').onclick=()=> {
     setStoredUserId('visitante');
@@ -933,10 +1895,10 @@ function openColaboradorPicker(areaId) {
   const team=data.equipes.find(t=>t.id===areaId);
   const rows=team.responsaveis.map(p=> {
     const matched=data.usuarios.find(u=>u.areaId===team.id&&normalize(u.nome)===normalize(p.nome));
-    return `<button class="identity-pick" data-user="${e(matched?matched.id:p.id)}"><img class="avatar" src="${e(safeURL(p.foto)||'assets/users/default.svg')}" alt=""><span><strong>${e(p.nome)}</strong><small>${e(p.cargo||team.nome)}</small></span></button>`;
+    return `<button class="identity-pick" data-user="${e(matched?matched.id:p.id)}"><img class="avatar" src="${e(comVersao(safeURL(p.foto)||'assets/users/default.svg'))}" alt=""><span><strong>${e(p.nome)}</strong><small>${e(p.cargo||team.nome)}</small></span></button>`;
   }
   ).join('')||'<p class="empty-state">Nenhum colaborador cadastrado nesta área.</p>';
-  showDialog(team.nome,'IDENTIFICAÇÃO',`<button class="text-btn" id="identity-back">← Voltar</button><div class="identity-list">${rows}</div>`);
+  showDialog(team.nome,'Identificação',`<button class="text-btn" id="identity-back">← Voltar</button><div class="identity-list">${rows}</div>`);
   $('#identity-back').onclick=openIdentityPicker;
   document.querySelectorAll('.identity-pick[data-user]').forEach(btn=>btn.onclick=()=> {
     setStoredUserId(btn.dataset.user);
@@ -944,7 +1906,7 @@ function openColaboradorPicker(areaId) {
   }
   );
   document.querySelectorAll('.identity-pick .avatar').forEach(img=>img.addEventListener('error',()=> {
-    img.src='assets/users/default.svg';
+    img.src=comVersao('assets/users/default.svg');
   }
   , {
     once:true
@@ -961,50 +1923,43 @@ async function init() {
     renderUser(currentUser);
     applyAccess(currentUser);
     currentMenu=data.config.menu.filter(item=>hasAccess(currentUser,TARGET_ACCESS[item.target]||'conteudo'));
-    initializeNavigation( {
-      ...data.config,menu:currentMenu
-    }
-    ,navigate,openAccess);
-    bindTabs('.tabs',tab=>renderContent(tab.dataset.tab));
+    const sections=(data.config.navegacao||[]).map(section=> {
+      // Documentos & Normas abre direto na tabela; os grupos viram a faixa de páginas.
+      if(Array.isArray(section.gruposDocumentos))return {...section,paginas:[{label:'Todos',target:'central',tab:'documentos',grupo:''},...gruposDocumentos().map(grupo=>({label:grupo,target:'central',tab:'documentos',grupo}))]};
+      if(section.target)return section;
+      return {...section,itens:(section.itens||[]).filter(item=>hasAccess(currentUser,TARGET_ACCESS[item.target]||'conteudo'))};
+    }).filter(section=>section.target||section.itens.length);
+    navSections=sections;
+    ligarLinha();
+    initializeNavigation({sections},{onSelect:navigate,hashOf:routeHash});
+    renderPortalMap(sections);
     bindTabs('#admin-tabs',tab=> {
       currentAdminTab=tab.dataset.adminTab;
       renderAdmin();
     }
     );
-    renderContent(currentTab);
     renderDashboard();
+    renderHome();
     renderEditorial();
     renderAdmin();
     renderPeriod();
-    const route=location.hash.slice(1);
-    const initialItem=currentMenu.find(item=>item.target===route)||(route==='inicio'?currentMenu.find(item=>item.target==='central'):null);
+    const initialItem=location.hash?routeItem(location.hash):null;
     if(initialItem)navigate(initialItem,false);
+    else activateMenu({target:'inicio'});
     window.addEventListener('popstate',()=> {
-      const item=currentMenu.find(menuItem=>menuItem.target===location.hash.slice(1))||currentMenu.find(menuItem=>menuItem.target==='central');
-      navigate(item,false);
+      navigate(routeItem(location.hash)||{target:'inicio'},false);
     });
     track('session_start');
     $('#switch-identity').onclick=openIdentityPicker;
     if(!getStoredUserId())openIdentityPicker();
     $('#new-draft').onclick=openNewDraft;
-    $('#search-form').onsubmit=event=> {
-      event.preventDefault();
-      const query=$('#global-search').value.trim();
-      const resultados=search(query);
-      if(query)track('search',{query,resultados});
-      if(!$('#search-section').hidden)$('#search-section').scrollIntoView();
+    // Busca do cabeçalho: sugestões abaixo do campo enquanto se digita; Enter
+    // sem escolher uma sugestão abre a página com todos os resultados.
+    ligarBuscaTopo( {
+      form:$('#search-form'),campo:$('#global-search'),buscar:buscarNoPortal,
+      executar:executarBusca,verTodos:abrirResultadosBusca
     }
-    ;
-    $('#global-search').oninput=event=> {
-      if(event.target.value&&$('#home-view').hidden)navigate(currentMenu.find(item=>item.target==='central'),false);
-      search(event.target.value);
-    };
-    $('#clear-search').onclick=()=> {
-      $('#global-search').value='';
-      search('');
-      $('#global-search').focus();
-    }
-    ;
+    );
     document.addEventListener('keydown',event=> {
       if(event.key==='/'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)&&!$('#detail-dialog').open) {
         event.preventDefault();
@@ -1021,22 +1976,19 @@ async function init() {
       }
       ))];
       track('notifications_open',{alertas:alerts.length});
-      showDialog('Central de notificações','ALERTAS DA GERÊNCIA',`<p>${alerts.length} pontos de atenção na base demonstrativa.</p>${alerts.map(({item,collection})=>`<article class="content-card"><h3>${e(item.nome)}</h3><p>${e(item.responsavel)}</p><div class="card-bottom">${badge(item.status)}<button class="text-btn" data-record="${collection}:${e(item.id)}">Ver detalhes →</button></div></article>`).join('')||'<p>Nenhum alerta.</p>'}`);
+      showDialog('Central de notificações','Alertas da gerência',`<p>${alerts.length?`${alerts.length} ${alerts.length===1?'ponto':'pontos'} de atenção em processos e entregas.`:'Nenhum ponto de atenção em processos e entregas.'}</p>${alerts.map(({item,collection})=>`<article class="content-card"><h3>${e(item.nome)}</h3><p>${e(item.responsavel)}</p><div class="card-bottom">${badge(item.status)}<button class="text-btn" data-record="${collection}:${e(item.id)}">Ver detalhes</button></div></article>`).join('')}`);
     }
     ;
     document.addEventListener('click',event=> {
       const record=event.target.closest('[data-record]');
       if(record) {
         const [collection,id]=record.dataset.record.split(':');
-        showRecord(collection,id);
+        if(collection==='links')showLinkInfo(id);else showRecord(collection,id);
       }
+      const trocarImagem=event.target.closest('[data-trocar-imagem]');
+      if(trocarImagem)openTrocarImagem(trocarImagem.dataset.trocarImagem);
       const system=event.target.closest('[data-system]');
       if(system)openAccess(data.sistemas.find(i=>i.id===system.dataset.system));
-      const noticiaDetalhe=event.target.closest('[data-noticia-detalhe]');
-      if(noticiaDetalhe) {
-        const item=data.noticias.find(i=>i.id===noticiaDetalhe.dataset.noticiaDetalhe);
-        if(item)showArticle(item);
-      }
       const editorial=event.target.closest('[data-editorial]');
       if(editorial) {
         const [collection,id,action]=editorial.dataset.editorial.split(':');
@@ -1046,16 +1998,57 @@ async function init() {
       if(adminTeam)openEditTeam(adminTeam.dataset.adminTeam);
       const adminAutomation=event.target.closest('[data-admin-automation]');
       if(adminAutomation)openEditAutomation(adminAutomation.dataset.adminAutomation);
+      // Carrossel: destacar a partir de um comunicado ou ficha, editar pela
+      // aba da Administração e reordenar.
+      const destacar=event.target.closest('[data-destacar]');
+      if(destacar) {
+        const [tipo,...partes]=destacar.dataset.destacar.split('|');
+        const ref=partes.join('|');
+        openDestaqueForm(destaqueDoAlvo(data,tipo,ref),{alvoFixo:{tipo,ref}});
+      }
+      const adminDestaque=event.target.closest('[data-admin-destaque]');
+      if(adminDestaque)openDestaqueForm((data.destaques||[]).find(d=>d.id===adminDestaque.dataset.adminDestaque)||null);
+      const moverDestaqueBtn=event.target.closest('[data-mover-destaque]');
+      if(moverDestaqueBtn) {
+        const [id,passo]=moverDestaqueBtn.dataset.moverDestaque.split('|');
+        moverDestaque(id,Number(passo));
+      }
+      const docLink=event.target.closest('[data-doc-link]');
+      if(docLink)track('document_open',{documento:docLink.dataset.docLink});
       const download=event.target.closest('a[download]');
       if(download) {
         const article=download.closest('article');
-        track('document_download',{documento:article?.querySelector('p')?.textContent||article?.querySelector('h3')?.textContent||$('#dialog-title')?.textContent||'Documento'});
+        track('document_download',{documento:download.dataset.docTitle||article?.querySelector('p')?.textContent||article?.querySelector('h3')?.textContent||$('#dialog-title')?.textContent||'Documento'});
       }
-      const homeLink=event.target.closest('.brand,.hero-link');
+      const aviso=event.target.closest('[data-aviso]');
+      if(aviso)openAviso(aviso.dataset.aviso);
+      const compromisso=event.target.closest('[data-compromisso]');
+      if(compromisso)openCompromisso(compromisso.dataset.compromisso);
+      const reuniao=event.target.closest('[data-reuniao]');
+      if(reuniao)track('reuniao_open',{compromisso:reuniao.dataset.reuniao});
+      const quick=event.target.closest('[data-quick]');
+      if(quick)track('system_access',{sistema:quick.dataset.quick,configurado:true});
+      const subnav=event.target.closest('[data-subnav]');
+      if(subnav) {
+        event.preventDefault();
+        navigate(subnavTargets[Number(subnav.dataset.subnav)]);
+      }
+      const route=event.target.closest('[data-route]');
+      if(route) {
+        event.preventDefault();
+        navigate(routeItem(route.getAttribute('data-route'))||{target:'inicio'});
+      }
+      const accessLink=event.target.closest('[data-access-link]');
+      if(accessLink)openAccess(data.config.links[Number(accessLink.dataset.accessLink)]);
+      const mapLink=event.target.closest('[data-map]');
+      if(mapLink) {
+        event.preventDefault();
+        navigate(mapTargets[Number(mapLink.dataset.map)]);
+      }
+      const homeLink=event.target.closest('.ph-brand');
       if(homeLink) {
         event.preventDefault();
-        const target=homeLink.hash.slice(1);
-        navigate(currentMenu.find(item=>item.target===target)||currentMenu.find(item=>item.target==='central'));
+        navigate(routeItem(homeLink.hash)||{target:'inicio'});
       }
     }
     );

@@ -1,29 +1,17 @@
 [
   {
-    "id": "a1",
-    "data": "2026-09-15",
-    "nome": "Checkpoint de fechamento",
-    "descricao": "Revisar pendências, dependências e próximos marcos.",
-    "responsavel": "Gerência",
-    "tipo": "Checkpoint",
-    "horario": "09:00 — 09:30"
-  },
-  {
-    "id": "a2",
-    "data": "2026-09-16",
-    "nome": "Revisão de conciliações críticas",
-    "descricao": "Analisar contas prioritárias e definir plano de ação.",
-    "responsavel": "Times Contábeis",
-    "tipo": "Revisão",
-    "horario": "14:00 — 15:00"
-  },
-  {
-    "id": "a3",
-    "data": "2026-09-18",
-    "nome": "Fórum de melhoria de processos",
-    "descricao": "Compartilhar oportunidades e priorizar melhorias.",
-    "responsavel": "Contabilidade IV",
-    "tipo": "Fórum",
-    "horario": "10:00 — 11:00"
+    "id": "rr-gerencia-contabilidade-2026-09-25",
+    "origem": "contabilidade",
+    "nome": "RR Gerência Contabilidade",
+    "descricao": "Reunião da Gerência de Contabilidade com as equipes convidadas. O convite foi enviado pelo Outlook; quem não recebeu pode salvar o compromisso no calendário por aqui.",
+    "data": "2026-09-25",
+    "inicio": "08:30",
+    "fim": "15:30",
+    "horario": "08:30 às 15:30",
+    "responsavel": "Maira Hasnah Pereira Aragao",
+    "local": "",
+    "link": "",
+    "naCapa": true,
+    "fonte": "Convite do Outlook de 16/09/2026"
   }
 ]

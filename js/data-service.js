@@ -2,7 +2,7 @@
 // the only module that knows whether data came from the live backend
 // (server/server.js, Fase 2) or from the static JSON files — both expose the
 // same shape, so the rest of the app doesn't need to care which one answered.
-const collections=['usuarios','newsletter','noticias','equipes','processos','sistemas','automacoes','agenda','documentos','entregas','config'];
+const collections=['usuarios','newsletter','noticias','equipes','processos','sistemas','automacoes','agenda','documentos','entregas','destaques','avisos','portais','externos','config'];
 // Opt-in: without window.PORTAL_API_ENABLED=true (see README "Backend opcional"),
 // the portal never attempts the live backend — same zero-config static behavior
 // as before, with no extra request and no connection-refused noise in the
@@ -151,9 +151,9 @@ export async function apiWrite(collection, { id, method='POST', body, autor } = 
 // path for use as a "foto" field. Raw bytes, no multipart — both ends are
 // ours, so there is no reason for that extra complexity.
 const UPLOAD_TIMEOUT_MS=15000;
-export async function apiUploadPhoto(file,{autor}= {}) {
+export async function apiUploadPhoto(file,{autor,pasta}= {}) {
   if(!isLiveDataSource())throw new Error('O backend opcional não está ativo — ver README, "Backend opcional".');
-  const url=`${API_BASE}/_upload?filename=${encodeURIComponent(file.name)}`;
+  const url=`${API_BASE}/_upload?filename=${encodeURIComponent(file.name)}${pasta?`&pasta=${encodeURIComponent(pasta)}`:''}`;
   const response=await withTimeout(signal=>fetch(url, {
     method:'POST',signal,cache:'no-cache',
     headers: {
